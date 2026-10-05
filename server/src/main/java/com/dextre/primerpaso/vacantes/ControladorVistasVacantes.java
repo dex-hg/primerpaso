@@ -65,7 +65,7 @@ public class ControladorVistasVacantes {
         modelo.addAttribute("fechaVencimientoLocal", vacante == null || vacante.fechaVencimiento() == null
                 ? "" : FECHA_LOCAL.format(vacante.fechaVencimiento()));
         modelo.addAttribute("habilidadesSeleccionadas", vacante == null ? List.of()
-                : vacante.habilidades().stream().map(Habilidad::id).toList());
+            : vacante.habilidades().stream().map(habilidad -> habilidad.id()).toList());
         modelo.addAttribute("carreraInactiva", carreraInactiva);
         modelo.addAttribute("habilidadesInactivas", habilidadesInactivas);
     }
