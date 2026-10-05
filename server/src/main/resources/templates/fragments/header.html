@@ -25,6 +25,42 @@
     </div>
 </header>
 
+<header class="site-header panel-header" th:fragment="panelHeader(seccionActiva, mostrarCierre)">
+    <nav class="navbar navbar-expand-md" aria-label="Navegación de tu cuenta">
+        <div class="container">
+            <a class="navbar-brand brand-link" th:href="@{/}" aria-label="PrimerPaso, ir al inicio">
+                <span class="brand-icon" aria-hidden="true"><i class="bi bi-person-workspace"></i></span>
+                <span class="brand-copy"><strong>PrimerPaso</strong><small>Inicia tu camino</small></span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#panel-navbar" aria-controls="panel-navbar"
+                    aria-expanded="false" aria-label="Abrir menú de tu cuenta">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="panel-navbar">
+                <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/panel}"
+                           th:classappend="${seccionActiva == 'panel'} ? 'active'"
+                           th:attr="aria-current=${seccionActiva == 'panel'} ? 'page' : null">Mi panel</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/cuenta}"
+                           th:classappend="${seccionActiva == 'cuenta'} ? 'active'"
+                           th:attr="aria-current=${seccionActiva == 'cuenta'} ? 'page' : null">Mi cuenta</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/}">Inicio</a></li>
+                </ul>
+                <button th:if="${mostrarCierre}" class="btn btn-soft ms-md-3" id="cerrar-sesion" type="button">
+                    <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+    </nav>
+</header>
+
 <header class="site-header sticky-top" th:fragment="siteHeader">
     <nav class="navbar navbar-expand-xl" aria-label="Navegación principal">
         <div class="container">

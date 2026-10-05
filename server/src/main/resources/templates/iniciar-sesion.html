@@ -11,7 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
-<body class="auth-page">
+<body class="auth-page" th:attr="data-ruta-base=@{/}">
     <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
 
     <div th:replace="~{fragments/header :: authHeader(@{/}, 'Volver al inicio', true)}"></div>

@@ -4,10 +4,16 @@
     const mensajeCredenciales = "Correo, contraseña o tipo de cuenta incorrectos.";
     let enProceso = false;
 
+    const obtenerRuta = (ruta) => {
+        const base = document.body.dataset.rutaBase || "/";
+        return new URL(ruta, new URL(base, window.location.origin)).pathname;
+    };
+
     const obtenerBaseApi = () => {
         const esServidorLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
         const esVistaEstatica = ["5500", "4173", "8000"].includes(window.location.port);
-        return esServidorLocal && esVistaEstatica ? `http://${window.location.hostname}:8080` : window.location.origin;
+        return esServidorLocal && esVistaEstatica ? `http://${window.location.hostname}:8080` :
+            window.location.origin + obtenerRuta("").replace(/\/$/, "");
     };
 
     const leerRespuesta = async (respuesta) => {
@@ -74,7 +80,7 @@
         return usuario.tipoCuenta !== "empresa" ||
             (Number.isSafeInteger(usuario.idEmpresa) && usuario.idEmpresa > 0 &&
                 typeof usuario.nombreEmpresa === "string" && usuario.nombreEmpresa.trim() &&
-                typeof usuario.rolEmpresa === "string" && usuario.rolEmpresa.trim());
+                ["administrador", "reclutador"].includes(usuario.rolEmpresa));
     };
 
     const iniciarAcceso = (formulario) => {
@@ -99,7 +105,7 @@
                 const resultado = await solicitarSesion();
                 if (resultado.estado === 200 && validarUsuario(resultado.contenido)) {
                     contrasena.value = "";
-                    window.location.replace("/cuenta");
+                    window.location.replace(obtenerRuta("panel"));
                     return;
                 }
                 mostrarEstado(estado, resultado.estado === 401 ? "" : mensajeError(resultado.estado), resultado.estado !== 401);
@@ -138,8 +144,8 @@
                 const resultado = await solicitarSesion("POST", datos);
                 if (resultado.estado === 200 && validarUsuario(resultado.contenido)) {
                     contrasena.value = "";
-                    mostrarEstado(estado, "Sesión iniciada. Abriendo tu cuenta…");
-                    window.location.replace("/cuenta");
+                    mostrarEstado(estado, "Sesión iniciada. Abriendo tu panel…");
+                    window.location.replace(obtenerRuta("panel"));
                     return;
                 }
                 mostrarEstado(estado, mensajeError(resultado.estado), true);
@@ -170,7 +176,7 @@
         };
         const volverAlAcceso = () => {
             ocultarDatos();
-            window.location.replace("/iniciar-sesion");
+            window.location.replace(obtenerRuta("iniciar-sesion"));
         };
         const actualizarEspera = (ocupado) => {
             enProceso = ocupado;
@@ -234,6 +240,10 @@
         window.addEventListener("pageshow", (evento) => { if (evento.persisted) comprobarSesion(); });
         comprobarSesion();
     };
+
+    window.sesionPrimerPaso = Object.freeze({
+        solicitarSesion, validarUsuario, mensajeError, mensajeConexion, mostrarEstado, obtenerRuta
+    });
 
     document.addEventListener("DOMContentLoaded", () => {
         const formulario = document.getElementById("login-form");

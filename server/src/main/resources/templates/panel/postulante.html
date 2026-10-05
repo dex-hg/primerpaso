@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Tu panel de postulante en PrimerPaso.">
+    <title>Mi panel de postulante | PrimerPaso</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+</head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('panel', true)}"></div>
+
+    <main class="panel-main container" id="main-content">
+        <section id="panel" data-tipo-cuenta="postulante" aria-labelledby="panel-titulo"
+                 th:attr="data-id-usuario=${usuario.idUsuario}">
+            <div class="panel-sesion" aria-label="Estado de la sesión">
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true">Sesión activa.</p>
+                <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
+            </div>
+
+            <div id="panel-contenido">
+                <div class="panel-bienvenida">
+                    <div>
+                        <span class="panel-etiqueta"><i class="bi bi-person" aria-hidden="true"></i> Panel de postulante</span>
+                        <h1 id="panel-titulo" th:text="${'Hola, ' + usuario.nombres}">Hola</h1>
+                        <p>Este es tu espacio para dar el siguiente paso en tu carrera.</p>
+                    </div>
+                    <span class="panel-simbolo" aria-hidden="true"><i class="bi bi-person-workspace"></i></span>
+                </div>
+
+                <div class="row g-4 panel-resumen">
+                    <div class="col-lg-7">
+                        <section class="panel-tarjeta h-100" aria-labelledby="identidad-titulo">
+                            <div class="panel-tarjeta-encabezado">
+                                <span class="panel-icono" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+                                <h2 id="identidad-titulo">Tu identidad</h2>
+                            </div>
+                            <dl class="panel-identidad">
+                                <dt>Nombre</dt>
+                                <dd th:text="${#strings.trim(usuario.nombres + ' ' + usuario.apellidos)}"></dd>
+                                <dt>Correo electrónico</dt>
+                                <dd th:text="${usuario.correo}"></dd>
+                                <dt>Tipo de cuenta</dt>
+                                <dd><span class="panel-tipo">Postulante</span></dd>
+                            </dl>
+                        </section>
+                    </div>
+                    <div class="col-lg-5">
+                        <section class="panel-tarjeta panel-acceso h-100" aria-labelledby="cuenta-titulo">
+                            <div class="panel-tarjeta-encabezado">
+                                <span class="panel-icono" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+                                <h2 id="cuenta-titulo">Mi cuenta</h2>
+                            </div>
+                            <p>Consulta los datos de tu registro y administra tu sesión.</p>
+                            <a class="btn btn-primary-custom" th:href="@{/cuenta}">Ver mi cuenta <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+                        </section>
+                    </div>
+                </div>
+
+                <section class="panel-modulos" aria-labelledby="modulos-titulo">
+                    <div class="panel-seccion-encabezado">
+                        <h2 id="modulos-titulo">Lo que viene para ti</h2>
+                        <p>Estas funciones se habilitarán en las próximas etapas.</p>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <article class="panel-modulo h-100">
+                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-search"></i></span><span class="panel-proximamente">Próximamente</span></div>
+                                <h3>Explorar oportunidades</h3>
+                                <p>Buscar vacantes por carrera, habilidades y modalidad.</p>
+                            </article>
+                        </div>
+                        <div class="col-md-4">
+                            <article class="panel-modulo h-100">
+                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-file-earmark-person"></i></span><span class="panel-proximamente">Próximamente</span></div>
+                                <h3>Mi perfil y CV</h3>
+                                <p>Actualizar tu información académica, habilidades y CV.</p>
+                            </article>
+                        </div>
+                        <div class="col-md-4">
+                            <article class="panel-modulo h-100">
+                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-send-check"></i></span><span class="panel-proximamente">Próximamente</span></div>
+                                <h3>Mis postulaciones</h3>
+                                <p>Enviar solicitudes y consultar el avance de cada postulación.</p>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <noscript><p class="panel-aviso">Activa JavaScript para cerrar tu sesión desde este panel.</p></noscript>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/footer :: authFooter(@{/}, 'Volver al inicio')}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/panel.js}"></script>
+</body>
+</html>
