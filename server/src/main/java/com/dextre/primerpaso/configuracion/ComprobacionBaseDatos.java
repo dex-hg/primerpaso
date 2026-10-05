@@ -44,7 +44,8 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
             throw new IllegalStateException("No se pudo conectar a PostgreSQL. Revisa server/.env.");
         }
         for (String tabla : List.of("users", "candidates", "careers", "skills", "work_areas",
-                "companies", "company_members", "candidate_skills", "candidate_work_areas", "company_work_areas")) {
+                "companies", "company_members", "candidate_skills", "candidate_work_areas", "company_work_areas",
+                "jobs", "job_skills")) {
             Boolean existe = jdbc.queryForObject("SELECT to_regclass(?) IS NOT NULL", Boolean.class, tabla);
             if (!Boolean.TRUE.equals(existe)) {
                 throw new IllegalStateException("Faltan tablas del esquema. Revisa db/primerpaso.sql.");
@@ -58,6 +59,6 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
         if (columnas == null || columnas != 3) {
             throw new IllegalStateException("Aplica db/registro_reclutador.sql antes de iniciar el servidor.");
         }
-        REGISTRO.info("Conexión con PostgreSQL y tablas de registro comprobadas.");
+        REGISTRO.info("Conexión con PostgreSQL y tablas del proyecto comprobadas.");
     }
 }
