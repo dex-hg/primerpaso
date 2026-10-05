@@ -13,8 +13,10 @@ public class ConfiguracionWeb implements WebMvcConfigurer {
     private final String[] origenes;
 
     public ConfiguracionWeb(@Value("${primerpaso.cors.origenes}") String origenes) {
-        this.origenes = Arrays.stream(origenes.split(",")).map(String::strip)
-                .filter(origen -> !origen.isEmpty()).toArray(String[]::new);
+        this.origenes = Arrays.stream(origenes.split(","))
+                .map(origen -> origen.strip())
+                .filter(origen -> !origen.isEmpty())
+                .toArray(String[]::new);
     }
 
     @Override
