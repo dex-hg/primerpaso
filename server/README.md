@@ -14,7 +14,7 @@ Requisitos: Java 21 o superior, PostgreSQL y la base de datos `PrimerPaso` con l
 .\mvnw.cmd spring-boot:run
 ```
 
-4. Abrir `http://localhost:8080`. No es necesario iniciar un segundo servidor para el frontend.
+Abrir `http://localhost:8080`. No es necesario iniciar un segundo servidor para el frontend.
 
 `.env` está excluido de Git. `.env.example` contiene únicamente valores de ejemplo. La aplicación comprueba la conexión y las tablas al arrancar; no crea ni modifica el esquema automáticamente.
 
