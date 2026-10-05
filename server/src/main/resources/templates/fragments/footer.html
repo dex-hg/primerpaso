@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<footer class="auth-footer" th:fragment="authFooter(backUrl, backText)">
+    <div class="container auth-footer-inner">
+        <p>© <span data-current-year></span> PrimerPaso</p>
+
+        <a th:href="${backUrl}" th:text="${backText}">
+            Volver al landing
+        </a>
+    </div>
+</footer>
+
+<footer class="site-footer" th:fragment="siteFooter">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <a class="brand-link footer-brand" th:href="@{/#inicio}">
+                    <span class="brand-icon" aria-hidden="true">
+                        <i class="bi bi-person-workspace"></i>
+                    </span>
+                    <span>PrimerPaso</span>
+                </a>
+
+                <p class="footer-description">
+                    Oportunidades para comenzar, aprender y crecer profesionalmente.
+                </p>
+
+                <div class="social-links" aria-label="Redes sociales">
+                    <a href="#" aria-label="PrimerPaso en LinkedIn">
+                        <i class="bi bi-linkedin" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" aria-label="PrimerPaso en Instagram">
+                        <i class="bi bi-instagram" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" aria-label="PrimerPaso en Facebook">
+                        <i class="bi bi-facebook" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <h2 class="footer-title">Plataforma</h2>
+                <ul class="footer-links list-unstyled">
+                    <li><a th:href="@{/#explorar-empleos}">Explorar empleos</a></li>
+                    <li><a th:href="@{/#recursos}">Recursos</a></li>
+                    <li><a th:href="@{/#para-empresas}">Para empresas</a></li>
+                </ul>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <h2 class="footer-title">PrimerPaso</h2>
+                <ul class="footer-links list-unstyled">
+                    <li><a th:href="@{/#sobre-nosotros}">Sobre nosotros</a></li>
+                    <li><a th:href="@{/contacto}">Contacto</a></li>
+                    <li><a href="#">Preguntas frecuentes</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3">
+                <h2 class="footer-title">Mantente informado</h2>
+                <p class="footer-newsletter-copy">
+                    Recibe novedades y recursos para tu desarrollo profesional.
+                </p>
+
+                <form class="footer-form" id="newsletter-form" novalidate>
+                    <label class="visually-hidden" for="newsletter-email">
+                        Correo electrónico
+                    </label>
+
+                    <div class="input-group">
+                        <input class="form-control"
+                               id="newsletter-email"
+                               type="email"
+                               placeholder="tu@correo.com"
+                               required>
+
+                        <button class="btn btn-primary-custom"
+                                type="submit"
+                                aria-label="Suscribirse">
+                            <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <p class="form-status"
+                       id="newsletter-status"
+                       role="status"
+                       aria-live="polite"></p>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
+            <p>
+                © <span id="current-year"></span>
+                PrimerPaso. Todos los derechos reservados.
+            </p>
+
+            <div class="legal-links">
+                <a href="#">Privacidad</a>
+                <a href="#">Términos</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

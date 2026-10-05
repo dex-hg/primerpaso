@@ -99,7 +99,7 @@
                 const resultado = await solicitarSesion();
                 if (resultado.estado === 200 && validarUsuario(resultado.contenido)) {
                     contrasena.value = "";
-                    window.location.replace("cuenta.html");
+                    window.location.replace("/cuenta");
                     return;
                 }
                 mostrarEstado(estado, resultado.estado === 401 ? "" : mensajeError(resultado.estado), resultado.estado !== 401);
@@ -139,7 +139,7 @@
                 if (resultado.estado === 200 && validarUsuario(resultado.contenido)) {
                     contrasena.value = "";
                     mostrarEstado(estado, "Sesión iniciada. Abriendo tu cuenta…");
-                    window.location.replace("cuenta.html");
+                    window.location.replace("/cuenta");
                     return;
                 }
                 mostrarEstado(estado, mensajeError(resultado.estado), true);
@@ -170,7 +170,7 @@
         };
         const volverAlAcceso = () => {
             ocultarDatos();
-            window.location.replace("iniciar-sesion.html");
+            window.location.replace("/iniciar-sesion");
         };
         const actualizarEspera = (ocupado) => {
             enProceso = ocupado;

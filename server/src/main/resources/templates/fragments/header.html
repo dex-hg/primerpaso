@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<header class="auth-header" th:fragment="authHeader(backUrl, backText, showIcon)">
+    <div class="container auth-header-inner">
+
+        <a class="brand-link" th:href="@{/}" aria-label="PrimerPaso, ir al inicio">
+            <span class="brand-icon" aria-hidden="true">
+                <i class="bi bi-person-workspace"></i>
+            </span>
+
+            <span class="brand-copy">
+                <strong>PrimerPaso</strong>
+                <small>Inicia tu camino</small>
+            </span>
+        </a>
+
+        <a class="auth-back-link" th:href="${backUrl}">
+            <i th:if="${showIcon}" class="bi bi-arrow-left" aria-hidden="true"></i>
+            <span th:text="${backText}">Volver al inicio</span>
+        </a>
+
+    </div>
+</header>
+
+<header class="site-header sticky-top" th:fragment="siteHeader">
+    <nav class="navbar navbar-expand-xl" aria-label="Navegación principal">
+        <div class="container">
+
+            <a class="navbar-brand brand-link"
+                th:href="@{/#inicio}"
+                aria-label="PrimerPaso, ir al inicio">
+                <span class="brand-icon" aria-hidden="true">
+                    <i class="bi bi-person-workspace"></i>
+                </span>
+
+                <span class="brand-copy">
+                    <strong>PrimerPaso</strong>
+                    <small>Inicia tu camino</small>
+                </span>
+            </a>
+
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#main-navbar"
+                    aria-controls="main-navbar"
+                    aria-expanded="false"
+                    aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="main-navbar">
+
+                <ul class="navbar-nav mx-auto mb-2 mb-xl-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/#inicio}">Inicio</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/#explorar-empleos}">
+                            Oportunidades
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/#recursos}">
+                            Cómo funciona
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/#para-empresas}">
+                            Empresas
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/#sobre-nosotros}">
+                            Nosotros
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="navbar-actions d-flex flex-column flex-xl-row gap-2">
+                    <a class="btn btn-soft" th:href="@{/iniciar-sesion}">
+                        Iniciar sesión
+                    </a>
+                    <a class="btn btn-primary-custom" th:href="@{/registro}">
+                        Registrarse
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+</header>
+
+</body>
+</html>

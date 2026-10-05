@@ -103,8 +103,7 @@ const initializeNewsletter = () => {
             return;
         }
 
-        setFormStatus(newsletterStatus, "Gracias. Tu correo quedó registrado para esta demostración.");
-        newsletterForm.reset();
+        setFormStatus(newsletterStatus, "La suscripción aún no está disponible. No se ha registrado tu correo.");
     });
 };
 
@@ -125,7 +124,7 @@ const initializeSavedJobs = () => {
 
 const initializeResponsiveMenu = () => {
     const navbarElement = document.querySelector("#main-navbar");
-    const navLinks = navbarElement?.querySelectorAll("a[href^='#']") || [];
+    const navLinks = navbarElement?.querySelectorAll("a[href^='#'], a[href*='/#']") || [];
 
     navLinks.forEach((navLink) => {
         navLink.addEventListener("click", () => {

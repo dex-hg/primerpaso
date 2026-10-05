@@ -97,6 +97,25 @@ img {
     font-size: 1.1rem;
 }
 
+.site-header .brand-copy {
+    display: grid;
+    line-height: 1.05;
+}
+
+.site-header .brand-copy strong {
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.site-header .brand-copy small {
+    margin-top: 0.2rem;
+    color: var(--color-muted);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
 .navbar-toggler {
     border: 0;
     box-shadow: none !important;
@@ -1073,4 +1092,90 @@ img {
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+.contact-page .contact-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-page .contact-heading .eyebrow {
+    text-align: center;
+}
+
+.contact-page .contact-heading h2 {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.contact-page .contact-heading p {
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+
+.contact-page .contact-hero-image {
+    width: min(100%, 430px);
+    height: 280px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 18px 40px rgba(20, 35, 80, 0.16);
+}
+
+.contact-page .contact-hero-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1.5rem !important;
+}
+
+@media (max-width: 991.98px) {
+    .contact-page .contact-hero-image {
+        width: min(100%, 500px);
+        height: 280px;
+        margin-top: 1.5rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .contact-page .contact-hero-image {
+        height: 230px;
+        border-radius: 1.25rem;
+    }
+}
+
+.contact-page .contact-cta {
+    padding: clamp(2rem, 4vw, 3rem);
+}
+
+.contact-page .contact-cta h2 {
+    max-width: 14ch;
+    margin-bottom: 0.75rem;
+}
+
+.contact-page .contact-cta p {
+    max-width: 620px;
+    margin-bottom: 0;
+}
+
+.contact-page .contact-cta .btn-soft {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.contact-page .contact-cta .btn-soft:hover {
+    background: rgba(255, 255, 255, 0.22);
 }

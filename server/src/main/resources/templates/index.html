@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
@@ -11,42 +11,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 
 <body>
     <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
 
-    <header class="site-header sticky-top">
-        <nav class="navbar navbar-expand-xl" aria-label="Navegación principal">
-            <div class="container">
-                <a class="navbar-brand brand-link" href="#inicio" aria-label="PrimerPaso, ir al inicio">
-                    <span class="brand-icon" aria-hidden="true"><i class="bi bi-person-workspace"></i></span>
-                    <span>PrimerPaso</span>
-                </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar"
-                    aria-controls="main-navbar" aria-expanded="false" aria-label="Abrir menú de navegación">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="main-navbar">
-                    <ul class="navbar-nav mx-auto mb-3 mb-xl-0">
-                        <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#explorar-empleos">Explorar empleos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#para-empresas">Para empresas</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#recursos">Recursos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#sobre-nosotros">Sobre nosotros</a></li>
-                    </ul>
-
-                    <div class="navbar-actions d-flex flex-column flex-sm-row gap-2">
-                        <a class="btn btn-soft" href="html/iniciar-sesion.html">Iniciar sesión</a>
-                        <a class="btn btn-primary-custom" href="html/registro.html">Registrarse</a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <div th:replace="~{fragments/header :: siteHeader}"></div>
 
     <main id="main-content">
         <section class="hero-section" id="inicio">
@@ -93,16 +64,16 @@
                                     </div>
                                     <div class="carousel-inner">
                                         <div class="carousel-item active">
-                                            <img src="assets/images/hero-image-1.jpg"
+                                            <img th:src="@{/assets/images/hero-image-1.jpg}"
                                                 class="d-block w-100"
                                                 alt="Jóvenes profesionales colaborando frente a una laptop">
                                         </div>
                                         <div class="carousel-item">
-                                            <img src="assets/images/hero-image-2.jpg"
+                                            <img th:src="@{/assets/images/hero-image-2.jpg}"
                                                 class="d-block w-100" alt="Equipo reunido para desarrollar un proyecto">
                                         </div>
                                         <div class="carousel-item">
-                                            <img src="assets/images/hero-image-3.jpg"
+                                            <img th:src="@{/assets/images/hero-image-3.jpg}"
                                                 class="d-block w-100"
                                                 alt="Profesionales trabajando juntos en una oficina">
                                         </div>
@@ -161,35 +132,26 @@
                 </div>
 
                 <div class="row g-4">
-                    <div class="col-sm-6 col-lg-3">
-                        <a class="category-card" href="#oportunidades-destacadas" data-search-term="tecnología">
-                            <span class="category-icon"><i class="bi bi-code-slash" aria-hidden="true"></i></span>
-                            <span class="category-copy"><strong>Tecnología</strong><small>480
-                                    oportunidades</small></span>
-                            <i class="bi bi-arrow-up-right category-arrow" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <a class="category-card" href="#oportunidades-destacadas" data-search-term="administración">
-                            <span class="category-icon"><i class="bi bi-bar-chart" aria-hidden="true"></i></span>
-                            <span class="category-copy"><strong>Administración</strong><small>325
-                                    oportunidades</small></span>
-                            <i class="bi bi-arrow-up-right category-arrow" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <a class="category-card" href="#oportunidades-destacadas" data-search-term="marketing">
-                            <span class="category-icon"><i class="bi bi-megaphone" aria-hidden="true"></i></span>
-                            <span class="category-copy"><strong>Marketing</strong><small>216
-                                    oportunidades</small></span>
-                            <i class="bi bi-arrow-up-right category-arrow" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <a class="category-card" href="#oportunidades-destacadas" data-search-term="diseño">
-                            <span class="category-icon"><i class="bi bi-vector-pen" aria-hidden="true"></i></span>
-                            <span class="category-copy"><strong>Diseño</strong><small>174 oportunidades</small></span>
-                            <i class="bi bi-arrow-up-right category-arrow" aria-hidden="true"></i>
+                    <div class="col-sm-6 col-lg-3" th:each="categoria : ${categorias}">
+                        <a class="category-card"
+                        href="#oportunidades-destacadas"
+                        th:attr="data-search-term=${categoria.termino}">
+
+                            <span class="category-icon">
+                                <i class="bi"
+                                th:classappend="${categoria.icono}"
+                                aria-hidden="true"></i>
+                            </span>
+
+                            <span class="category-copy">
+                                <strong th:text="${categoria.nombre}">Tecnología</strong>
+                                <small th:text="${categoria.oportunidades}">
+                                    480 oportunidades
+                                </small>
+                            </span>
+
+                            <i class="bi bi-arrow-up-right category-arrow"
+                            aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
@@ -370,69 +332,12 @@
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="row g-5">
-                <div class="col-lg-5">
-                    <a class="brand-link footer-brand" href="#inicio">
-                        <span class="brand-icon" aria-hidden="true"><i class="bi bi-person-workspace"></i></span>
-                        <span>PrimerPaso</span>
-                    </a>
-                    <p class="footer-description">Oportunidades para comenzar, aprender y crecer profesionalmente.</p>
-                    <div class="social-links" aria-label="Redes sociales">
-                        <a href="#" aria-label="PrimerPaso en LinkedIn"><i class="bi bi-linkedin"
-                                aria-hidden="true"></i></a>
-                        <a href="#" aria-label="PrimerPaso en Instagram"><i class="bi bi-instagram"
-                                aria-hidden="true"></i></a>
-                        <a href="#" aria-label="PrimerPaso en Facebook"><i class="bi bi-facebook"
-                                aria-hidden="true"></i></a>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-2">
-                    <h2 class="footer-title">Plataforma</h2>
-                    <ul class="footer-links list-unstyled">
-                        <li><a href="#explorar-empleos">Explorar empleos</a></li>
-                        <li><a href="#recursos">Recursos</a></li>
-                        <li><a href="#para-empresas">Para empresas</a></li>
-                    </ul>
-                </div>
-                <div class="col-6 col-lg-2">
-                    <h2 class="footer-title">PrimerPaso</h2>
-                    <ul class="footer-links list-unstyled">
-                        <li><a href="#sobre-nosotros">Sobre nosotros</a></li>
-                        <li><a href="mailto:hola@primerpaso.pe">Contacto</a></li>
-                        <li><a href="#">Preguntas frecuentes</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3">
-                    <h2 class="footer-title">Mantente informado</h2>
-                    <p class="footer-newsletter-copy">Recibe novedades y recursos para tu desarrollo profesional.</p>
-                    <form class="footer-form" id="newsletter-form" novalidate>
-                        <label class="visually-hidden" for="newsletter-email">Correo electrónico</label>
-                        <div class="input-group">
-                            <input class="form-control" id="newsletter-email" type="email" placeholder="tu@correo.com"
-                                required>
-                            <button class="btn btn-primary-custom" type="submit" aria-label="Suscribirse"><i
-                                    class="bi bi-arrow-right" aria-hidden="true"></i></button>
-                        </div>
-                        <p class="form-status" id="newsletter-status" role="status" aria-live="polite"></p>
-                    </form>
-                </div>
-            </div>
-            <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
-                <p>© <span id="current-year"></span> PrimerPaso. Todos los derechos reservados.</p>
-                <div class="legal-links">
-                    <a href="#">Privacidad</a>
-                    <a href="#">Términos</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <div th:replace="~{fragments/footer :: siteFooter}"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
-    <script src="js/main.js"></script>
+    <script th:src="@{/js/main.js}"></script>
 </body>
 
 </html>
