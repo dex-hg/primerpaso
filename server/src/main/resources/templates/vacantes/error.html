@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Revisa la solicitud | PrimerPaso</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body class="auth-page">
+    <div th:replace="~{fragments/header :: authHeader(@{/panel}, 'Volver a mi panel', true)}"></div>
+    <main class="auth-main auth-main-centered" id="main-content">
+        <section class="auth-shell auth-shell-narrow text-center">
+            <h1>Revisa la solicitud</h1>
+            <p th:text="${mensaje}"></p>
+            <a class="btn btn-primary-custom" th:href="@{/panel/empresa/vacantes}">Volver a mis vacantes</a>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/}, 'Volver al inicio')}"></div>
+    <script th:src="@{/js/auth.js}"></script>
+</body>
+</html>

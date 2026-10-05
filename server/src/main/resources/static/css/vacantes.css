@@ -1,0 +1,118 @@
+.vacantes-nueva { flex-shrink: 0; }
+.vacantes-herramientas {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.vacantes-filtro { width: min(100%, 26rem); }
+.vacantes-filtro .form-label { font-size: 0.875rem; font-weight: 650; }
+.vacantes-filtro-controles { display: flex; gap: 0.65rem; }
+.vacantes-total, .vacante-fecha { margin: 0; color: var(--color-muted); font-size: 0.875rem; }
+.vacantes-estado { margin: 0 0 1rem; color: #285943; font-weight: 600; }
+.vacantes-estado:empty { display: none; }
+.vacantes-estado.is-error, .vacante-alerta, .vacante-error-campo, .vacante-errores { color: #a82b1f; }
+.vacantes-lista { display: grid; gap: 1rem; }
+.vacante-encabezado, .vacante-pie {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.vacante-encabezado h2 { margin-top: 0.65rem; font-size: 1.25rem; }
+.vacante-encabezado h2 a { color: var(--color-ink); text-decoration: none; overflow-wrap: anywhere; }
+.vacante-encabezado h2 a:hover { color: var(--color-primary-dark); text-decoration: underline; }
+.vacante-carrera { max-width: 22rem; color: var(--color-muted); font-size: 0.875rem; text-align: right; }
+.vacante-estado {
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 0.25rem 0.75rem;
+    color: #48546a;
+    background: #eef1f6;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 650;
+}
+.vacante-estado-publicada { color: #17653e; background: #e8f7ee; }
+.vacante-estado-borrador { color: #335ab6; background: #edf2ff; }
+.vacante-estado-vencida { color: #8b4c12; background: #fff2dd; }
+.vacante-estado-cerrada { color: #5e4b76; background: #f1edf7; }
+.vacante-datos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 1rem;
+    margin: 1.1rem 0;
+    font-size: 0.925rem;
+}
+.vacante-datos dt { margin-bottom: 0.2rem; color: var(--color-muted); font-size: 0.8rem; font-weight: 500; }
+.vacante-datos dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.vacante-habilidades { display: flex; flex-wrap: wrap; gap: 0.45rem; padding: 0; list-style: none; }
+.vacante-habilidades li { padding: 0.25rem 0.6rem; color: #48546a; background: #f3f5f9; border-radius: 0.4rem; font-size: 0.8rem; }
+.vacante-pie { align-items: center; margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--color-border); }
+.vacante-acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.vacante-cerrar { color: #914330; }
+.vacante-cerrar:hover { color: #752b1d; background: #fff1ec; }
+.vacantes-vacio { padding: 3rem 1.5rem; text-align: center; }
+.vacantes-vacio h2 { margin: 1rem 0 0.6rem; font-size: 1.25rem; }
+.vacantes-vacio p { color: var(--color-muted); }
+.vacantes-paginacion { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; font-size: 0.9rem; }
+.vacantes-volver { display: inline-flex; align-items: center; gap: 0.45rem; margin-bottom: 1.5rem; color: var(--color-primary-dark); font-size: 0.9rem; font-weight: 650; }
+.vacantes-formulario-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.vacantes-formulario-encabezado h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; letter-spacing: -0.04em; }
+.vacantes-formulario-encabezado p { margin: 0; color: var(--color-muted); }
+.vacante-aviso { padding: 1rem 1.2rem; color: #6b4e1f; background: #fff7e8; border: 1px solid #f0dfbd; border-radius: 0.75rem; font-size: 0.925rem; }
+.vacantes-formulario { padding: clamp(1.25rem, 4vw, 2rem); }
+.vacantes-formulario fieldset { min-width: 0; }
+.vacante-form-seccion + .vacante-form-seccion { margin-top: 1.6rem; padding-top: 1.6rem; border-top: 1px solid var(--color-border); }
+.vacante-form-seccion h2, .vacante-form-seccion legend, .vacante-gestion h2 { margin-bottom: 0.75rem; font-size: 1.1rem; font-weight: 750; }
+.vacantes-formulario .form-label { font-size: 0.925rem; font-weight: 650; }
+.vacantes-formulario .form-control, .vacantes-formulario .form-select { min-height: 2.85rem; border-color: #dce1eb; }
+.vacantes-formulario textarea { resize: vertical; line-height: 1.65; }
+.vacante-ayuda { margin: 0.5rem 0 0; color: var(--color-muted); font-size: 0.825rem; }
+.vacante-ayuda.vacante-alerta { color: #a82b1f; }
+.vacante-seleccion-habilidades legend { float: none; width: auto; }
+.vacante-habilidades-opciones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+    max-height: 20rem;
+    margin-top: 1rem;
+    padding: 0.2rem;
+    overflow-y: auto;
+}
+.vacante-habilidad-opcion { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.7rem; background: #f7f9fc; border: 1px solid #e7ebf3; border-radius: 0.65rem; cursor: pointer; font-size: 0.875rem; }
+.vacante-habilidad-opcion:has(input:checked) { color: #254aa2; background: #edf3ff; border-color: #c6d6ff; }
+.vacante-habilidad-opcion .form-check-input { flex-shrink: 0; margin-top: 0.18rem; }
+.vacante-habilidades-inactivas { margin-top: 0.75rem; }
+.vacante-habilidades-inactivas .vacante-habilidades { margin-top: 0.5rem; }
+.vacante-error-campo { margin: 0.65rem 0 0; font-size: 0.875rem; }
+.vacante-pais { text-transform: uppercase; }
+.vacante-form-acciones { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
+.vacante-gestion { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-top: 1rem; }
+.vacante-gestion p { margin: 0; color: var(--color-muted); font-size: 0.9rem; }
+.vacante-gestion .btn { flex-shrink: 0; }
+.vacantes-formulario > .vacantes-estado { margin-top: 1rem; }
+.vacante-errores { margin-bottom: 0; font-size: 0.9rem; }
+.vacante-confirmacion { margin: 1rem 0; padding: 1.2rem; color: #283d67; background: #edf3ff; border: 1px solid #c6d6ff; border-radius: 0.85rem; }
+.vacante-confirmacion p { margin-bottom: 0.85rem; font-size: 0.925rem; }
+.vacante-confirmacion-acciones { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+@media (max-width: 991.98px) {
+    .vacante-habilidades-opciones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767.98px) {
+    .panel-bienvenida:has(.vacantes-nueva) { align-items: flex-start; flex-direction: column; gap: 1.2rem; }
+    .vacante-encabezado { flex-direction: column; gap: 0.6rem; }
+    .vacante-carrera { text-align: left; }
+    .vacante-datos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .vacante-gestion { align-items: flex-start; flex-direction: column; }
+    .vacantes-formulario-encabezado { align-items: flex-start; }
+}
+@media (max-width: 575.98px) {
+    .vacantes-herramientas { align-items: flex-start; flex-direction: column; }
+    .vacante-pie { align-items: flex-start; flex-direction: column; }
+    .vacante-habilidades-opciones { grid-template-columns: minmax(0, 1fr); }
+    .vacantes-formulario-encabezado { flex-direction: column; }
+    .vacante-form-acciones { flex-direction: column-reverse; }
+    .vacante-form-acciones .btn, .vacantes-nueva, .vacante-gestion .btn { width: 100%; }
+}

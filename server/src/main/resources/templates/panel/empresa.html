@@ -70,15 +70,16 @@
 
                 <section class="panel-modulos" aria-labelledby="modulos-titulo">
                     <div class="panel-seccion-encabezado">
-                        <h2 id="modulos-titulo">Próximos módulos de tu empresa</h2>
-                        <p>Estas funciones se habilitarán en las próximas etapas.</p>
+                        <h2 id="modulos-titulo">Herramientas de tu empresa</h2>
+                        <p>Gestiona tus oportunidades y consulta las próximas funciones.</p>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <article class="panel-modulo h-100">
-                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-briefcase"></i></span><span class="panel-proximamente">Próximamente</span></div>
+                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-briefcase"></i></span><span class="panel-tipo">Disponible</span></div>
                                 <h3>Vacantes de mi empresa</h3>
                                 <p>Crear, publicar y cerrar oportunidades de tu empresa.</p>
+                                <a class="btn btn-primary-custom mt-3" th:href="@{/panel/empresa/vacantes}">Gestionar vacantes <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
                             </article>
                         </div>
                         <div class="col-md-4">

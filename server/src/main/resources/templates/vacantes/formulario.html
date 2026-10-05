@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Prepara y gestiona una oportunidad de tu empresa en PrimerPaso.">
+    <title th:text="${esNueva ? 'Nueva vacante | PrimerPaso' : 'Detalle de vacante | PrimerPaso'}"></title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+    <link rel="stylesheet" th:href="@{/css/vacantes.css}">
+</head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('vacantes', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" data-tipo-cuenta="empresa" aria-labelledby="panel-titulo"
+                 th:attr="data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
+            <div class="panel-sesion" aria-label="Estado de la sesión">
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true">Sesión activa.</p>
+                <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
+            </div>
+            <div id="panel-contenido">
+                <a class="vacantes-volver" th:href="@{/panel/empresa/vacantes}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mis vacantes</a>
+                <div class="vacantes-formulario-encabezado">
+                    <div>
+                        <span class="panel-etiqueta"><i class="bi bi-briefcase" aria-hidden="true"></i> <span th:text="${usuario.nombreEmpresa}"></span></span>
+                        <h1 id="panel-titulo" th:text="${esNueva ? 'Nueva vacante' : (soloLectura ? 'Detalle de vacante' : 'Editar vacante')}"></h1>
+                        <p th:if="${esNueva}">Completa la oportunidad y guárdala como borrador. Podrás publicarla cuando esté lista.</p>
+                        <p th:unless="${esNueva}" th:text="${soloLectura ? 'Consulta la información de esta oportunidad.' : 'Actualiza la información de la oportunidad de tu empresa.'}"></p>
+                    </div>
+                    <span th:if="${!esNueva}" class="vacante-estado" th:classappend="${vacante.vencida ? 'vacante-estado-vencida' : 'vacante-estado-' + vacante.estado}"
+                          th:text="${vacante.vencida ? 'Vencida' : (vacante.estado == 'borrador' ? 'Borrador' : (vacante.estado == 'publicada' ? 'Publicada' : 'Cerrada'))}"></span>
+                </div>
+                <p class="vacante-aviso" th:if="${soloLectura}">Esta vacante se conserva para mantener su historial y ya no admite cambios.</p>
+                <p class="vacante-aviso" th:if="${#lists.isEmpty(catalogos.carreras) or #lists.isEmpty(catalogos.habilidades)}">
+                    No hay carreras o habilidades disponibles. Contacta al administrador para completar los catálogos antes de guardar una vacante.
+                </p>
+                <form id="formulario-vacante" class="panel-tarjeta vacantes-formulario" novalidate
+                      th:attr="data-id-vacante=${esNueva ? '' : vacante.id},data-version=${esNueva ? '' : vacante.version.toString()},data-solo-lectura=${soloLectura}">
+                    <fieldset th:disabled="${soloLectura}">
+                        <legend class="visually-hidden">Información de la vacante</legend>
+                        <div class="vacante-form-seccion">
+                            <h2>Sobre la oportunidad</h2>
+                            <p class="vacante-ayuda">Todos los campos son obligatorios.</p>
+                            <div class="mb-4">
+                                <label class="form-label" for="titulo">Título de la vacante</label>
+                                <input class="form-control" id="titulo" name="titulo" type="text" required maxlength="180"
+                                       th:value="${esNueva ? '' : vacante.titulo}" placeholder="Por ejemplo: Practicante de desarrollo web">
+                                <div class="invalid-feedback">Ingresa un título de hasta 180 caracteres.</div>
+                            </div>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="idCarrera">Carrera</label>
+                                    <select class="form-select" id="idCarrera" name="idCarrera" required>
+                                        <option value="">Selecciona una carrera</option>
+                                        <option th:if="${carreraInactiva}" th:value="${vacante.idCarrera}" selected disabled
+                                                th:text="${vacante.nombreCarrera + ' (no disponible)'}"></option>
+                                        <option th:each="carrera : ${catalogos.carreras}" th:value="${carrera.id}" th:text="${carrera.nombre}"
+                                                th:selected="${!esNueva and carrera.id == vacante.idCarrera}"></option>
+                                    </select>
+                                    <p class="vacante-ayuda vacante-alerta" th:if="${carreraInactiva and !soloLectura}">La carrera anterior ya no está disponible. Selecciona una carrera activa antes de guardar.</p>
+                                    <div class="invalid-feedback">Selecciona una carrera disponible.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="modalidad">Modalidad</label>
+                                    <select class="form-select" id="modalidad" name="modalidad" required>
+                                        <option value="">Selecciona una modalidad</option>
+                                        <option value="presencial" th:selected="${!esNueva and vacante.modalidad == 'presencial'}">Presencial</option>
+                                        <option value="remota" th:selected="${!esNueva and vacante.modalidad == 'remota'}">Remota</option>
+                                        <option value="hibrida" th:selected="${!esNueva and vacante.modalidad == 'hibrida'}">Híbrida</option>
+                                    </select>
+                                    <div class="invalid-feedback">Selecciona una modalidad.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vacante-form-seccion">
+                            <label class="form-label" for="descripcion">Descripción de la vacante</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" required maxlength="12000" rows="8"
+                                      aria-describedby="descripcion-ayuda" th:text="${esNueva ? '' : vacante.descripcion}"
+                                      placeholder="Describe las funciones, los requisitos y lo que ofrece la oportunidad."></textarea>
+                            <p class="vacante-ayuda" id="descripcion-ayuda">Texto de hasta 12 000 caracteres. Se conservarán los saltos de línea.</p>
+                            <div class="invalid-feedback">Ingresa la descripción de la vacante.</div>
+                        </div>
+                        <fieldset class="vacante-form-seccion vacante-seleccion-habilidades" aria-describedby="habilidades-ayuda">
+                            <legend>Habilidades requeridas</legend>
+                            <p class="vacante-ayuda" id="habilidades-ayuda">Selecciona entre 1 y 30 habilidades.</p>
+                            <div th:if="${!#lists.isEmpty(habilidadesInactivas)}" class="vacante-habilidades-inactivas">
+                                <p class="vacante-ayuda vacante-alerta">Estas habilidades anteriores ya no están disponibles<span th:unless="${soloLectura}">. Sustitúyelas por habilidades activas antes de guardar</span>:</p>
+                                <ul class="vacante-habilidades"><li th:each="habilidad : ${habilidadesInactivas}" th:text="${habilidad.nombre}"></li></ul>
+                            </div>
+                            <div class="vacante-habilidades-opciones">
+                                <label class="vacante-habilidad-opcion" th:each="habilidad : ${catalogos.habilidades}">
+                                    <input class="form-check-input" type="checkbox" name="habilidades" th:value="${habilidad.id}"
+                                           th:checked="${#lists.contains(habilidadesSeleccionadas, habilidad.id)}">
+                                    <span th:text="${habilidad.nombre}"></span>
+                                </label>
+                            </div>
+                            <p id="habilidades-error" class="vacante-error-campo" role="status" hidden></p>
+                        </fieldset>
+                        <div class="vacante-form-seccion">
+                            <h2>Ubicación y vigencia</h2>
+                            <div class="row g-4 mt-0">
+                                <div class="col-md-5">
+                                    <label class="form-label" for="ciudad">Ciudad</label>
+                                    <input class="form-control" id="ciudad" name="ciudad" type="text" required maxlength="120"
+                                           th:value="${esNueva ? '' : vacante.ciudad}" placeholder="Por ejemplo: Lima">
+                                    <div class="invalid-feedback">Ingresa una ciudad de hasta 120 caracteres.</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label" for="codigoPais">País</label>
+                                    <input class="form-control vacante-pais" id="codigoPais" name="codigoPais" type="text" required minlength="2" maxlength="2" pattern="[A-Za-z]{2}"
+                                           aria-describedby="pais-ayuda" th:value="${esNueva ? 'PE' : vacante.codigoPais}">
+                                    <p class="vacante-ayuda" id="pais-ayuda">Código de 2 letras. Perú: PE.</p>
+                                    <div class="invalid-feedback">Usa 2 letras, por ejemplo PE.</div>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label" for="fechaVencimiento">Fecha de vencimiento</label>
+                                    <input class="form-control" id="fechaVencimiento" name="fechaVencimiento" type="datetime-local" required
+                                           aria-describedby="fecha-ayuda" th:value="${fechaVencimientoLocal}">
+                                    <p class="vacante-ayuda" id="fecha-ayuda">Hora de Lima (UTC−5). Debe ser una fecha futura.</p>
+                                    <div class="invalid-feedback">Selecciona una fecha y hora futuras.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <p id="vacantes-estado" class="vacantes-estado" role="status" aria-live="polite" aria-atomic="true"></p>
+                    <ul id="vacante-errores" class="vacante-errores" hidden></ul>
+                    <div class="vacante-form-acciones">
+                        <a class="btn btn-soft" th:href="@{/panel/empresa/vacantes}" th:text="${soloLectura ? 'Volver a mis vacantes' : 'Cancelar'}"></a>
+                        <button th:unless="${soloLectura}" class="btn btn-primary-custom" type="submit"
+                                th:disabled="${#lists.isEmpty(catalogos.carreras) or #lists.isEmpty(catalogos.habilidades)}"
+                                th:text="${esNueva ? 'Guardar borrador' : 'Guardar cambios'}"></button>
+                    </div>
+                </form>
+                <div th:if="${!esNueva and vacante.estado != 'cerrada'}" class="vacante-gestion panel-tarjeta">
+                    <div>
+                        <h2 th:text="${vacante.estado == 'borrador' ? 'Publicar esta oportunidad' : 'Cerrar esta oportunidad'}"></h2>
+                        <p th:text="${vacante.estado == 'borrador' ? 'Se publicará la última información guardada. Guarda los cambios antes de publicar.' : 'La vacante pasará a Cerrada y conservará su información e historial.'}"></p>
+                    </div>
+                    <button class="btn" type="button" th:classappend="${vacante.estado == 'borrador' ? 'btn-primary-custom' : 'btn-soft vacante-cerrar'}"
+                            th:attr="data-accion=${vacante.estado == 'borrador' ? 'publicar' : 'cerrar'},data-id-vacante=${vacante.id},data-version=${vacante.version.toString()}"
+                            th:text="${vacante.estado == 'borrador' ? 'Publicar vacante' : 'Cerrar vacante'}"></button>
+                </div>
+                <noscript><p class="panel-aviso">Activa JavaScript para guardar, publicar o cerrar vacantes y cerrar sesión.</p></noscript>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel/empresa/vacantes}, 'Volver a mis vacantes')}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/panel.js}"></script>
+    <script th:src="@{/js/vacantes.js}"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Gestiona las vacantes de tu empresa en PrimerPaso.">
+    <title>Vacantes de mi empresa | PrimerPaso</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+    <link rel="stylesheet" th:href="@{/css/vacantes.css}">
+</head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('vacantes', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" data-tipo-cuenta="empresa" aria-labelledby="panel-titulo"
+                 th:attr="data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
+            <div class="panel-sesion" aria-label="Estado de la sesión">
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true">Sesión activa.</p>
+                <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
+            </div>
+            <div id="panel-contenido">
+                <div class="panel-bienvenida">
+                    <div>
+                        <span class="panel-etiqueta"><i class="bi bi-briefcase" aria-hidden="true"></i> Panel empresarial</span>
+                        <h1 id="panel-titulo">Vacantes de mi empresa</h1>
+                        <p>Gestiona las oportunidades de <strong th:text="${usuario.nombreEmpresa}"></strong>.</p>
+                    </div>
+                    <a class="btn btn-primary-custom vacantes-nueva" th:href="@{/panel/empresa/vacantes/nueva}">
+                        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Nueva vacante
+                    </a>
+                </div>
+                <div class="vacantes-herramientas">
+                    <form class="vacantes-filtro" method="get" th:action="@{/panel/empresa/vacantes}">
+                        <label class="form-label" for="estado-filtro">Filtrar por estado</label>
+                        <div class="vacantes-filtro-controles">
+                            <select class="form-select" id="estado-filtro" name="estado">
+                                <option value="todos" th:selected="${estadoFiltro == 'todos'}">Todos los estados</option>
+                                <option value="borrador" th:selected="${estadoFiltro == 'borrador'}">Borradores</option>
+                                <option value="publicada" th:selected="${estadoFiltro == 'publicada'}">Publicadas vigentes</option>
+                                <option value="cerrada" th:selected="${estadoFiltro == 'cerrada'}">Cerradas</option>
+                                <option value="vencida" th:selected="${estadoFiltro == 'vencida'}">Vencidas</option>
+                            </select>
+                            <button class="btn btn-soft" type="submit">Aplicar</button>
+                        </div>
+                    </form>
+                    <p class="vacantes-total" th:text="${paginaVacantes.total + (paginaVacantes.total == 1 ? ' vacante' : ' vacantes')}"></p>
+                </div>
+                <p id="vacantes-estado" class="vacantes-estado" role="status" aria-live="polite" aria-atomic="true"></p>
+                <section class="vacantes-vacio panel-tarjeta" th:if="${#lists.isEmpty(paginaVacantes.vacantes)}" aria-labelledby="vacio-titulo">
+                    <span class="panel-icono" aria-hidden="true"><i class="bi bi-briefcase"></i></span>
+                    <h2 id="vacio-titulo" th:text="${estadoFiltro == 'todos' ? 'Aún no tienes vacantes' : 'No hay vacantes con este estado'}"></h2>
+                    <p th:text="${estadoFiltro == 'todos' ? 'Crea tu primera oportunidad y guárdala como borrador antes de publicarla.' : 'Elige otro estado para consultar las oportunidades de tu empresa.'}"></p>
+                    <a class="btn btn-primary-custom" th:if="${estadoFiltro == 'todos'}" th:href="@{/panel/empresa/vacantes/nueva}">Crear primera vacante</a>
+                    <a class="btn btn-soft" th:unless="${estadoFiltro == 'todos'}" th:href="@{/panel/empresa/vacantes}">Ver todas las vacantes</a>
+                </section>
+                <div class="vacantes-lista">
+                    <article class="vacante-tarjeta panel-tarjeta" th:each="vacante : ${paginaVacantes.vacantes}">
+                        <div class="vacante-encabezado">
+                            <div>
+                                <span class="vacante-estado" th:classappend="${vacante.vencida ? 'vacante-estado-vencida' : 'vacante-estado-' + vacante.estado}"
+                                      th:text="${vacante.vencida ? 'Vencida' : (vacante.estado == 'borrador' ? 'Borrador' : (vacante.estado == 'publicada' ? 'Publicada' : 'Cerrada'))}"></span>
+                                <h2><a th:href="@{/panel/empresa/vacantes/{id}/editar(id=${vacante.id})}" th:text="${vacante.titulo}"></a></h2>
+                            </div>
+                            <span class="vacante-carrera" th:text="${vacante.nombreCarrera}"></span>
+                        </div>
+                        <dl class="vacante-datos">
+                            <div><dt>Modalidad</dt><dd th:text="${vacante.modalidad == 'remota' ? 'Remota' : (vacante.modalidad == 'hibrida' ? 'Híbrida' : 'Presencial')}"></dd></div>
+                            <div><dt>Ubicación</dt><dd th:text="${vacante.ciudad + ', ' + vacante.codigoPais}"></dd></div>
+                            <div><dt>Vencimiento (Lima)</dt><dd th:text="${vacante.fechaVencimiento == null ? 'Sin fecha definida' : #temporals.format(vacante.fechaVencimiento.atZone(T(java.time.ZoneId).of('America/Lima')), 'dd/MM/yyyy HH:mm')}"></dd></div>
+                        </dl>
+                        <ul class="vacante-habilidades" aria-label="Habilidades requeridas">
+                            <li th:each="habilidad : ${vacante.habilidades}" th:text="${habilidad.nombre}"></li>
+                        </ul>
+                        <div class="vacante-pie">
+                            <p class="vacante-fecha" th:text="${'Creada el ' + #temporals.format(vacante.fechaCreacion.atZone(T(java.time.ZoneId).of('America/Lima')), 'dd/MM/yyyy')}"></p>
+                            <div class="vacante-acciones">
+                                <a class="btn btn-soft btn-sm" th:href="@{/panel/empresa/vacantes/{id}/editar(id=${vacante.id})}"
+                                   th:text="${vacante.editable() ? 'Editar' : 'Ver detalles'}"></a>
+                                <button class="btn btn-primary-custom btn-sm" type="button" data-accion="publicar" th:if="${vacante.estado == 'borrador'}"
+                                        th:attr="data-id-vacante=${vacante.id},data-version=${vacante.version.toString()}">Publicar</button>
+                                <button class="btn btn-soft btn-sm vacante-cerrar" type="button" data-accion="cerrar" th:if="${vacante.estado == 'publicada'}"
+                                        th:attr="data-id-vacante=${vacante.id},data-version=${vacante.version.toString()}">Cerrar</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <nav class="vacantes-paginacion" aria-label="Páginas de vacantes" th:if="${paginaVacantes.totalPaginas > 1}">
+                    <a class="btn btn-soft" th:if="${paginaVacantes.pagina > 0}"
+                       th:href="@{/panel/empresa/vacantes(pagina=${paginaVacantes.pagina - 1},estado=${estadoFiltro})}">Anterior</a>
+                    <span th:text="${'Página ' + (paginaVacantes.pagina + 1) + ' de ' + paginaVacantes.totalPaginas}"></span>
+                    <a class="btn btn-soft" th:if="${paginaVacantes.pagina + 1 < paginaVacantes.totalPaginas}"
+                       th:href="@{/panel/empresa/vacantes(pagina=${paginaVacantes.pagina + 1},estado=${estadoFiltro})}">Siguiente</a>
+                </nav>
+                <noscript><p class="panel-aviso">Activa JavaScript para publicar, cerrar vacantes y cerrar sesión.</p></noscript>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel/empresa}, 'Volver a mi panel')}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/panel.js}"></script>
+    <script th:src="@{/js/vacantes.js}"></script>
+</body>
+</html>

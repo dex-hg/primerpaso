@@ -46,6 +46,11 @@
                            th:classappend="${seccionActiva == 'panel'} ? 'active'"
                            th:attr="aria-current=${seccionActiva == 'panel'} ? 'page' : null">Mi panel</a>
                     </li>
+                    <li class="nav-item" th:if="${usuario != null and usuario.tipoCuenta == 'empresa'}">
+                        <a class="nav-link" th:href="@{/panel/empresa/vacantes}"
+                           th:classappend="${seccionActiva == 'vacantes'} ? 'active'"
+                           th:attr="aria-current=${seccionActiva == 'vacantes'} ? 'page' : null">Vacantes</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/cuenta}"
                            th:classappend="${seccionActiva == 'cuenta'} ? 'active'"
