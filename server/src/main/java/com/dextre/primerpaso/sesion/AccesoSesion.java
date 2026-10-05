@@ -48,7 +48,8 @@ public class AccesoSesion {
             }
             UsuarioSesion usuario = servicio.consultarUsuario(idUsuario, tipoCuenta, idEmpresa);
             if (usuario == null || usuario.idUsuario() != idUsuario || !tipoCuenta.equals(usuario.tipoCuenta())
-                    || ("empresa".equals(tipoCuenta) && (!idEmpresa.equals(usuario.idEmpresa())
+                    || ("empresa".equals(tipoCuenta) && (idEmpresa == null
+                        || !idEmpresa.equals(usuario.idEmpresa())
                         || !("administrador".equals(usuario.rolEmpresa())
                             || "reclutador".equals(usuario.rolEmpresa()))))) {
                 throw accesoInvalido();
