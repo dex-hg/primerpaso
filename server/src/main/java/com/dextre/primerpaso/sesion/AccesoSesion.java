@@ -1,11 +1,15 @@
 package com.dextre.primerpaso.sesion;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 
@@ -74,6 +78,16 @@ public class AccesoSesion {
         respuesta.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from("PRIMERPASO_SESION", "")
                 .path("/").httpOnly(true).sameSite("Strict").secure(cookieSegura)
                 .maxAge(Duration.ZERO).build().toString());
+    }
+
+    public void comprobarToken(HttpSession sesion, String recibido) {
+        Object guardado = sesion == null ? null : sesion.getAttribute("primerpaso.tokenCsrf");
+        if (!(guardado instanceof String esperado) || recibido == null || recibido.length() != 43
+                || !MessageDigest.isEqual(esperado.getBytes(StandardCharsets.US_ASCII),
+                        recibido.getBytes(StandardCharsets.US_ASCII))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "La solicitud no es válida. Recarga la página e inténtalo nuevamente.");
+        }
     }
 
     private AccesoNoAutorizadoException accesoInvalido() {
