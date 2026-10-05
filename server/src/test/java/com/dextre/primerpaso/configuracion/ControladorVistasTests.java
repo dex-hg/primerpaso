@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.dextre.primerpaso.panel.FiltroAccesoPanel;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,16 +36,19 @@ class ControladorVistasTests {
     @Autowired
     private WebApplicationContext contexto;
 
+    @Autowired
+    private FiltroAccesoPanel filtro;
+
     private MockMvc cliente;
 
     @BeforeEach
     void prepararClienteConRenderizadoReal() {
-        cliente = MockMvcBuilders.webAppContextSetup(contexto).build();
+        cliente = MockMvcBuilders.webAppContextSetup(contexto).addFilters(filtro).build();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"/", "/iniciar-sesion", "/registro", "/registro-postulante",
-            "/registro-empresa", "/cuenta", "/contacto"})
+            "/registro-empresa", "/contacto"})
     void renderizaCadaVistaConCabeceraPieYEstilos(String ruta) throws Exception {
         String html = obtenerHtml(ruta);
         String tipoFragmento = ruta.equals("/") || ruta.equals("/contacto") ? "site" : "auth";
@@ -146,8 +151,15 @@ class ControladorVistasTests {
                 Arguments.of("/html/iniciar-sesion.html", "/iniciar-sesion"),
                 Arguments.of("/html/registro.html", "/registro"),
                 Arguments.of("/html/registro-postulante.html", "/registro-postulante"),
-                Arguments.of("/html/registro-empresa.html", "/registro-empresa"),
-                Arguments.of("/html/cuenta.html", "/cuenta"));
+                Arguments.of("/html/registro-empresa.html", "/registro-empresa"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/cuenta", "/html/cuenta.html"})
+    void exigeInicioDeSesionParaLasRutasDeCuenta(String ruta) throws Exception {
+        cliente.perform(get(ruta))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/iniciar-sesion"));
     }
 
     @Test

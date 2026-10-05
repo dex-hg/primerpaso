@@ -50,7 +50,7 @@ class ControladorSesionTests {
         servicio = mock(ServicioSesion.class);
         LocalValidatorFactoryBean validador = new LocalValidatorFactoryBean();
         validador.afterPropertiesSet();
-        cliente = MockMvcBuilders.standaloneSetup(new ControladorSesion(servicio, false))
+        cliente = MockMvcBuilders.standaloneSetup(new ControladorSesion(servicio, new AccesoSesion(servicio, false)))
                 .setControllerAdvice(new ManejadorErroresSesion()).setValidator(validador).build();
     }
 
