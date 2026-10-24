@@ -109,6 +109,7 @@ class ControladorVacantesTests {
         return Stream.of(Arguments.of(HttpMethod.GET, "/api/vacantes", null),
                 Arguments.of(HttpMethod.GET, "/api/vacantes/7", null),
                 Arguments.of(HttpMethod.POST, "/api/vacantes", DATOS),
+                Arguments.of(HttpMethod.POST, "/api/vacantes/publicar", DATOS_CREACION),
                 Arguments.of(HttpMethod.PUT, "/api/vacantes/7", DATOS),
                 Arguments.of(HttpMethod.POST, "/api/vacantes/7/publicar", ESTADO),
                 Arguments.of(HttpMethod.POST, "/api/vacantes/7/cerrar", ESTADO));
@@ -130,6 +131,20 @@ class ControladorVacantesTests {
                 .andExpect(jsonPath("$.id").value(7)).andExpect(jsonPath("$.estado").value("borrador"))
                 .andExpect(jsonPath("$.idEmpresa").doesNotExist());
         verify(vacantes).crear(usuarioActual, datosNuevos);
+    }
+
+    @Test
+    void publicaInmediatamenteConLaIdentidadEmpresarialValidada() throws Exception {
+        autorizarEmpresa();
+        SolicitudVacante solicitud = new SolicitudVacante("Desarrollador Java", "Desarrollo de sistemas web.",
+                4L, List.of(8L, 9L), "remota", "Lima", "PE", VENCIMIENTO, null);
+        when(vacantes.crearYPublicar(EMPRESA, solicitud)).thenReturn(vacante("publicada"));
+
+        cliente.perform(post("/api/vacantes/publicar").session(sesionDe(EMPRESA))
+                        .header("X-CSRF-Token", TOKEN).contentType(MediaType.APPLICATION_JSON).content(DATOS_CREACION))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.estado").value("publicada"))
+                .andExpect(header().string(HttpHeaders.LOCATION, "/api/vacantes/7"));
+        verify(vacantes).crearYPublicar(EMPRESA, solicitud);
     }
 
     @Test

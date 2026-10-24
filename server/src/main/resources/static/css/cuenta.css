@@ -1,0 +1,45 @@
+.cuenta-distribucion {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.cuenta-resumen { position: sticky; top: 1.5rem; text-align: center; }
+.cuenta-resumen h2 { margin-top: 1rem; line-height: 1.4; overflow-wrap: anywhere; }
+.cuenta-resumen > p { margin: 0.5rem 0 1rem; color: var(--color-muted); overflow-wrap: anywhere; }
+.cuenta-avatar {
+    display: inline-grid;
+    width: 5rem;
+    height: 5rem;
+    place-items: center;
+    background: var(--color-primary-soft);
+    color: var(--color-primary-dark);
+    font-size: 2.5rem;
+    border-radius: 50%;
+}
+
+.cuenta-membresia { display: grid; gap: 0.3rem; margin-top: 1.5rem; overflow-wrap: anywhere; }
+.cuenta-membresia span { color: var(--color-muted); font-size: 0.85rem; }
+.cuenta-ayuda, .cuenta-resumen > .cuenta-ayuda { margin: 1rem 0 0; color: var(--color-muted); font-size: 0.85rem; }
+.cuenta-seccion { margin-bottom: 1.25rem; }
+.cuenta-seccion > p { margin: 0.5rem 0 1.5rem; color: var(--color-muted); font-size: 0.925rem; }
+.cuenta-seccion > .cuenta-ayuda { margin-bottom: 0; }
+.cuenta-seccion .form-label { font-size: 0.9rem; font-weight: 650; }
+.cuenta-seccion .form-control, .cuenta-seccion .form-select { min-height: 2.9rem; }
+.cuenta-seccion fieldset:disabled .form-control { background: #f8f9fc; color: #5d687c; }
+.cuenta-estado { padding: 0.8rem 1rem; background: #eaf7ee; border-radius: 0.7rem; color: #24693c; }
+.cuenta-estado.is-error { color: #972e3d; background: #fff0f2; }
+.cuenta-acciones { display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+@media (max-width: 991.98px) {
+    .cuenta-distribucion { grid-template-columns: minmax(0, 1fr); }
+    .cuenta-resumen { position: static; text-align: left; }
+    .cuenta-resumen .cuenta-avatar { float: left; margin-right: 1rem; }
+    .cuenta-resumen h2 { margin-top: 0; }
+}
+
+@media (max-width: 575.98px) {
+    .cuenta-acciones { flex-direction: column-reverse; }
+    .cuenta-seccion { padding: 1.25rem; }
+}

@@ -1,12 +1,17 @@
 package com.dextre.primerpaso.configuracion;
 
+import java.time.Year;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.servlet.HandlerMapping;
+
+import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -55,7 +60,9 @@ public class ControladorVistas {
     }
 
     @GetMapping("/cuenta")
-    public String cuenta() {
+    public String cuenta(@RequestAttribute("usuarioSesion") UsuarioSesion usuario, Model modelo) {
+        modelo.addAttribute("usuario", usuario);
+        modelo.addAttribute("anioActual", Year.now(ZoneId.of("America/Lima")).getValue());
         return "cuenta";
     }
 

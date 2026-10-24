@@ -33,7 +33,9 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
     private static final Pattern RUTAS_VACANTES = Pattern.compile(
             "/panel/empresa/vacantes(?:/nueva|/[1-9][0-9]*/editar)?");
     private static final Pattern API_VACANTES = Pattern.compile(
-            "/api/vacantes(?:/[1-9][0-9]*(?:/(?:publicar|cerrar))?)?");
+            "/api/vacantes(?:/publicar|/[1-9][0-9]*(?:/(?:publicar|cerrar))?)?");
+    private static final Pattern RUTAS_OPORTUNIDADES = Pattern.compile(
+            "/panel/postulante/vacantes(?:/[1-9][0-9]*)?");
     private final AccesoSesion acceso;
     private final SpringTemplateEngine plantillas;
 
@@ -45,7 +47,7 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest solicitud) {
         String ruta = obtenerRuta(solicitud);
-        return !RUTAS_COMUNES.contains(ruta) && !ruta.startsWith("/panel/") && !esApiVacantes(ruta);
+        return !RUTAS_COMUNES.contains(ruta) && !ruta.startsWith("/panel/") && !esApiPrivada(ruta);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
         try {
             usuario = acceso.consultarUsuario(solicitud, respuesta);
         } catch (AccesoNoAutorizadoException excepcion) {
-            if (esApiVacantes(obtenerRuta(solicitud))) {
+            if (esApiPrivada(obtenerRuta(solicitud))) {
                 mostrarErrorApi(respuesta, 401);
             } else {
                 respuesta.sendRedirect(solicitud.getContextPath() + "/iniciar-sesion");
@@ -69,7 +71,10 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
         String ruta = obtenerRuta(solicitud);
         boolean permisoEmpresa = "empresa".equals(usuario.tipoCuenta())
                 && (RUTAS_VACANTES.matcher(ruta).matches() || API_VACANTES.matcher(ruta).matches());
-        if (!RUTAS_COMUNES.contains(ruta) && !ruta.equals("/panel/" + usuario.tipoCuenta()) && !permisoEmpresa) {
+        boolean permisoPostulante = "postulante".equals(usuario.tipoCuenta())
+                && RUTAS_OPORTUNIDADES.matcher(ruta).matches();
+        if (!RUTAS_COMUNES.contains(ruta) && !ruta.equals("/api/cuenta")
+                && !ruta.equals("/panel/" + usuario.tipoCuenta()) && !permisoEmpresa && !permisoPostulante) {
             mostrarError(solicitud, respuesta, 403);
             return;
         }
@@ -77,8 +82,9 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
         cadena.doFilter(solicitud, respuesta);
     }
 
-    private boolean esApiVacantes(String ruta) {
-        return ruta.equals("/api/vacantes") || ruta.startsWith("/api/vacantes/");
+    private boolean esApiPrivada(String ruta) {
+        return ruta.equals("/api/vacantes") || ruta.startsWith("/api/vacantes/")
+                || ruta.equals("/api/cuenta") || ruta.startsWith("/api/cuenta/");
     }
 
     private String obtenerRuta(HttpServletRequest solicitud) {
@@ -87,7 +93,7 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
 
     private void mostrarError(HttpServletRequest solicitud, HttpServletResponse respuesta, int estado)
             throws IOException {
-        if (esApiVacantes(obtenerRuta(solicitud))) {
+        if (esApiPrivada(obtenerRuta(solicitud))) {
             mostrarErrorApi(respuesta, estado);
             return;
         }
