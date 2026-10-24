@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             contenido.hidden = false;
-            sesion.mostrarEstado(estado, "Sesión activa.");
+            sesion.mostrarEstado(estado, "");
         } catch (error) {
             mostrarError(sesion.mensajeConexion(error));
         } finally {

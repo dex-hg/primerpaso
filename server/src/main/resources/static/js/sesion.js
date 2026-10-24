@@ -55,6 +55,7 @@
     const mostrarEstado = (elemento, mensaje, esError = false) => {
         if (!elemento) return;
         elemento.textContent = mensaje;
+        elemento.hidden = !mensaje;
         elemento.classList.toggle("is-error", esError);
     };
 
@@ -162,93 +163,12 @@
         comprobarSesion();
     };
 
-    const iniciarCuenta = (cuenta) => {
-        const estado = document.getElementById("sesion-estado");
-        const contenido = document.getElementById("datos-cuenta");
-        const empresa = document.getElementById("datos-empresa");
-        const reintentar = document.getElementById("reintentar-sesion");
-        const contenedorReintento = document.getElementById("reintentar-contenedor");
-        const cerrar = document.getElementById("cerrar-sesion");
-        const ocultarDatos = () => {
-            contenido.hidden = true;
-            empresa.hidden = true;
-            cuenta.querySelectorAll("dd").forEach((elemento) => { elemento.textContent = ""; });
-        };
-        const volverAlAcceso = () => {
-            ocultarDatos();
-            window.location.replace(obtenerRuta("iniciar-sesion"));
-        };
-        const actualizarEspera = (ocupado) => {
-            enProceso = ocupado;
-            cuenta.setAttribute("aria-busy", String(ocupado));
-            reintentar.disabled = ocupado;
-            cerrar.disabled = ocupado;
-        };
-
-        const comprobarSesion = async () => {
-            if (enProceso) return;
-            ocultarDatos();
-            actualizarEspera(true);
-            contenedorReintento.hidden = true;
-            mostrarEstado(estado, "Comprobando tu sesión…");
-            try {
-                const resultado = await solicitarSesion();
-                if (resultado.estado === 401) return volverAlAcceso();
-                if (resultado.estado !== 200 || !validarUsuario(resultado.contenido)) {
-                    mostrarEstado(estado, mensajeError(resultado.estado), true);
-                    contenedorReintento.hidden = false;
-                    return;
-                }
-                const usuario = resultado.contenido;
-                document.getElementById("cuenta-nombre").textContent = `${usuario.nombres} ${usuario.apellidos}`.trim();
-                document.getElementById("cuenta-correo").textContent = usuario.correo;
-                document.getElementById("cuenta-tipo").textContent = usuario.tipoCuenta === "empresa" ? "Empresa" : "Postulante";
-                if (usuario.tipoCuenta === "empresa") {
-                    document.getElementById("cuenta-empresa").textContent = usuario.nombreEmpresa;
-                    document.getElementById("cuenta-rol").textContent = usuario.rolEmpresa;
-                    empresa.hidden = false;
-                }
-                mostrarEstado(estado, "Sesión activa.");
-                contenido.hidden = false;
-            } catch (error) {
-                mostrarEstado(estado, mensajeConexion(error), true);
-                contenedorReintento.hidden = false;
-            } finally {
-                actualizarEspera(false);
-            }
-        };
-
-        cerrar.addEventListener("click", async () => {
-            if (enProceso) return;
-            ocultarDatos();
-            actualizarEspera(true);
-            mostrarEstado(estado, "Cerrando tu sesión…");
-            try {
-                const resultado = await solicitarSesion("DELETE");
-                if ([204, 401].includes(resultado.estado)) return volverAlAcceso();
-                mostrarEstado(estado, mensajeError(resultado.estado), true);
-                contenedorReintento.hidden = false;
-            } catch (error) {
-                mostrarEstado(estado, mensajeConexion(error), true);
-                contenedorReintento.hidden = false;
-            } finally {
-                actualizarEspera(false);
-            }
-        });
-        reintentar.addEventListener("click", comprobarSesion);
-        window.addEventListener("pagehide", ocultarDatos);
-        window.addEventListener("pageshow", (evento) => { if (evento.persisted) comprobarSesion(); });
-        comprobarSesion();
-    };
-
     window.sesionPrimerPaso = Object.freeze({
         solicitarSesion, validarUsuario, mensajeError, mensajeConexion, mostrarEstado, obtenerRuta
     });
 
     document.addEventListener("DOMContentLoaded", () => {
         const formulario = document.getElementById("login-form");
-        const cuenta = document.getElementById("cuenta");
         if (formulario) iniciarAcceso(formulario);
-        if (cuenta) iniciarCuenta(cuenta);
     });
 })();

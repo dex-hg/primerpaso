@@ -111,6 +111,8 @@ prueba("la identidad SSR permanece oculta hasta revalidar una sesión vigente", 
     comprobar.equal(entorno.elementos["panel-contenido"].hidden, false);
     comprobar.equal(entorno.elementos.panel.atributos["aria-busy"], "false");
     comprobar.equal(entorno.elementos["cerrar-sesion"].disabled, false);
+    comprobar.equal(entorno.elementos["panel-estado"].hidden, true);
+    comprobar.equal(entorno.elementos["panel-estado"].textContent, "");
     comprobar.deepEqual(entorno.destinos, []);
     comprobar.equal(entorno.solicitudes[0].credentials, "include");
     comprobar.equal(entorno.solicitudes[0].cache, "no-store");

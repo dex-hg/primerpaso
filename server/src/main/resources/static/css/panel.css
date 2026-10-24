@@ -259,3 +259,7 @@
         width: 100%;
     }
 }
+
+.panel-sesion:has(.panel-estado[hidden]):has(#panel-reintentar[hidden]) {
+    display: none;
+}
