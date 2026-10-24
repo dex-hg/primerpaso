@@ -236,9 +236,11 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         // Conserva la precisión de la versión de PostgreSQL, sin convertirla a Date.
         if (identificador) datos.version = version;
-        await ejecutarCambio(identificador ? `api/vacantes/${identificador}` : "api/vacantes",
-            identificador ? "PUT" : "POST", datos, "Guardando vacante…", (vacante) => {
-                if (!identificador && Number.isSafeInteger(vacante?.id) && vacante.id > 0) {
+        const publicarAhora = !identificador && evento.submitter?.value !== "borrador";
+        const rutaNueva = publicarAhora ? "api/vacantes/publicar" : "api/vacantes";
+        await ejecutarCambio(identificador ? `api/vacantes/${identificador}` : rutaNueva,
+            identificador ? "PUT" : "POST", datos, publicarAhora ? "Publicando vacante…" : "Guardando vacante…", (vacante) => {
+                if (!identificador && !publicarAhora && Number.isSafeInteger(vacante?.id) && vacante.id > 0) {
                     window.location.assign(sesion.obtenerRuta(`panel/empresa/vacantes/${vacante.id}/editar`));
                 } else {
                     window.location.assign(sesion.obtenerRuta("panel/empresa/vacantes"));

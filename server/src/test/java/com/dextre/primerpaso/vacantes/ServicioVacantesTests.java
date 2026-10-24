@@ -85,6 +85,38 @@ class ServicioVacantesTests {
     }
 
     @Test
+    void creaYPublicaEnLaMismaOperacionTrasGuardarLasHabilidades() {
+        when(repositorio.consultar(eq(20L), eq(50L), anyBoolean(), any()))
+                .thenReturn(Optional.of(vacante("borrador", AHORA.plusSeconds(3600))))
+                .thenReturn(Optional.of(vacante("publicada", AHORA.plusSeconds(3600))));
+
+        assertEquals("publicada", servicio.crearYPublicar(EMPRESA, solicitud(null)).estado());
+        var orden = inOrder(repositorio);
+        orden.verify(repositorio).sustituirHabilidades(20, 50, List.of(40L, 41L));
+        orden.verify(repositorio).publicar(20, 50);
+    }
+
+    @Test
+    void revierteLaVacanteNuevaSiLaPublicacionFalla() {
+        PlatformTransactionManager administrador = mock(PlatformTransactionManager.class);
+        TransactionStatus estado = mock(TransactionStatus.class);
+        when(administrador.getTransaction(any(TransactionDefinition.class))).thenReturn(estado);
+        ProxyFactory fabrica = new ProxyFactory(servicio);
+        fabrica.setProxyTargetClass(true);
+        TransactionInterceptor interceptor = new TransactionInterceptor();
+        interceptor.setTransactionManager(administrador);
+        interceptor.setTransactionAttributeSource(new AnnotationTransactionAttributeSource());
+        fabrica.addAdvice(interceptor);
+        ServicioVacantes servicioTransaccional = (ServicioVacantes) fabrica.getProxy();
+        doThrow(new ReglaVacanteException(409, "La vacante venció."))
+                .when(repositorio).publicar(20, 50);
+
+        assertThrows(ReglaVacanteException.class, () -> servicioTransaccional.crearYPublicar(EMPRESA, solicitud(null)));
+        verify(administrador).rollback(estado);
+        verify(administrador, never()).commit(any());
+    }
+
+    @Test
     void permiteQueUnReclutadorGestioneVacantesDeSuEmpresa() {
         UsuarioSesion reclutador = new UsuarioSesion(10, "Ana", "Díaz", "ana@example.test",
                 "empresa", 20L, "Empresa de prueba", "reclutador");

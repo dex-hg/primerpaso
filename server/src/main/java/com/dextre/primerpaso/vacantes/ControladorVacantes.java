@@ -60,6 +60,17 @@ public class ControladorVacantes {
                 .cacheControl(CacheControl.noStore()).body(vacante);
     }
 
+    @PostMapping(value = "/publicar", consumes = "application/json")
+    public ResponseEntity<Vacante> crearYPublicar(@RequestAttribute("usuarioSesion") UsuarioSesion usuario,
+            @Valid @RequestBody SolicitudVacante datos,
+            @RequestHeader(value = "X-CSRF-Token", required = false) String token,
+            HttpServletRequest solicitud) {
+        acceso.comprobarToken(solicitud.getSession(false), token);
+        Vacante vacante = servicio.crearYPublicar(usuario, datos);
+        return ResponseEntity.created(URI.create(solicitud.getContextPath() + "/api/vacantes/" + vacante.id()))
+                .cacheControl(CacheControl.noStore()).body(vacante);
+    }
+
     @PutMapping(value = "/{id}", consumes = "application/json")
     public ResponseEntity<Vacante> editar(@RequestAttribute("usuarioSesion") UsuarioSesion usuario,
             @PathVariable long id, @Valid @RequestBody SolicitudVacante datos,

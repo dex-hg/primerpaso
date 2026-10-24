@@ -55,6 +55,13 @@ public class ServicioVacantes {
     }
 
     @Transactional
+    public Vacante crearYPublicar(UsuarioSesion usuario, SolicitudVacante datos) {
+        Vacante vacante = crear(usuario, datos);
+        repositorio.publicar(usuario.idEmpresa(), vacante.id());
+        return obtenerVacante(usuario.idEmpresa(), vacante.id(), false, reloj.instant());
+    }
+
+    @Transactional
     public Vacante editar(UsuarioSesion usuario, long idVacante, SolicitudVacante datos) {
         long idEmpresa = exigirEmpresa(usuario);
         validarIdentificador(idVacante);

@@ -20,7 +20,7 @@
         <section id="panel" data-tipo-cuenta="empresa" aria-labelledby="panel-titulo"
                  th:attr="data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
             <div class="panel-sesion" aria-label="Estado de la sesión">
-                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true">Sesión activa.</p>
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
                 <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
             </div>
             <div id="panel-contenido">
@@ -29,7 +29,7 @@
                     <div>
                         <span class="panel-etiqueta"><i class="bi bi-briefcase" aria-hidden="true"></i> <span th:text="${usuario.nombreEmpresa}"></span></span>
                         <h1 id="panel-titulo" th:text="${esNueva ? 'Nueva vacante' : (soloLectura ? 'Detalle de vacante' : 'Editar vacante')}"></h1>
-                        <p th:if="${esNueva}">Completa la oportunidad y guárdala como borrador. Podrás publicarla cuando esté lista.</p>
+                        <p th:if="${esNueva}">Completa los datos y publica la oportunidad. También puedes guardar un borrador para continuar después.</p>
                         <p th:unless="${esNueva}" th:text="${soloLectura ? 'Consulta la información de esta oportunidad.' : 'Actualiza la información de la oportunidad de tu empresa.'}"></p>
                     </div>
                     <span th:if="${!esNueva}" class="vacante-estado" th:classappend="${vacante.vencida ? 'vacante-estado-vencida' : 'vacante-estado-' + vacante.estado}"
@@ -131,9 +131,11 @@
                     <ul id="vacante-errores" class="vacante-errores" hidden></ul>
                     <div class="vacante-form-acciones">
                         <a class="btn btn-soft" th:href="@{/panel/empresa/vacantes}" th:text="${soloLectura ? 'Volver a mis vacantes' : 'Cancelar'}"></a>
-                        <button th:unless="${soloLectura}" class="btn btn-primary-custom" type="submit"
+                        <button th:if="${esNueva}" class="btn btn-soft" type="submit" name="accion" value="borrador"
+                                th:disabled="${#lists.isEmpty(catalogos.carreras) or #lists.isEmpty(catalogos.habilidades)}">Guardar borrador</button>
+                        <button th:unless="${soloLectura}" class="btn btn-primary-custom" type="submit" name="accion" value="publicar"
                                 th:disabled="${#lists.isEmpty(catalogos.carreras) or #lists.isEmpty(catalogos.habilidades)}"
-                                th:text="${esNueva ? 'Guardar borrador' : 'Guardar cambios'}"></button>
+                                th:text="${esNueva ? 'Publicar vacante' : 'Guardar cambios'}"></button>
                     </div>
                 </form>
                 <div th:if="${!esNueva and vacante.estado != 'cerrada'}" class="vacante-gestion panel-tarjeta">

@@ -109,7 +109,7 @@ const prepararVacantes = (respuestas, opciones = {}) => {
         documento, solicitudes, iniciar: () => documento.emitir("DOMContentLoaded"),
         confirmar: () => documento.getElementById("vacante-confirmar").emitir("click"),
         cancelar: () => documento.getElementById("vacante-cancelar").emitir("click"),
-        guardar: () => formulario.emitir("submit", { preventDefault() {} }) };
+        guardar: (accion = "publicar") => formulario.emitir("submit", { preventDefault() {}, submitter: { value: accion } }) };
 };
 
 prueba("crear un borrador envía habilidades y fecha de Lima con CSRF y contexto", async () => {
@@ -117,7 +117,7 @@ prueba("crear un borrador envía habilidades y fecha de Lima con CSRF y contexto
         nueva: true, rutaBase: "/primerpaso/"
     });
     await entorno.iniciar();
-    await entorno.guardar();
+    await entorno.guardar("borrador");
     comprobar.deepEqual(entorno.solicitudes.map(({ url, method }) => ({ url, metodo: method })), [
         { url: "/primerpaso/api/sesion/seguridad", metodo: "GET" },
         { url: "/primerpaso/api/vacantes", metodo: "POST" }
@@ -132,6 +132,18 @@ prueba("crear un borrador envía habilidades y fecha de Lima con CSRF y contexto
         codigoPais: "PE", fechaVencimiento: "2040-06-05T16:30:00.000Z"
     });
     comprobar.deepEqual(entorno.destinos, ["/primerpaso/panel/empresa/vacantes/29/editar"]);
+});
+
+prueba("publicar una vacante nueva usa una sola mutación y vuelve al listado", async () => {
+    const entorno = prepararVacantes([respuestaSeguridad(), crearRespuesta(201, { id: 29, estado: "publicada" })], {
+        nueva: true
+    });
+    await entorno.iniciar();
+    await entorno.guardar();
+    comprobar.equal(entorno.solicitudes[1].url, "/api/vacantes/publicar");
+    comprobar.equal(entorno.solicitudes[1].method, "POST");
+    comprobar.equal(entorno.solicitudes.length, 2);
+    comprobar.deepEqual(entorno.destinos, ["/panel/empresa/vacantes"]);
 });
 
 prueba("editar conserva la versión de PostgreSQL con sus microsegundos", async () => {

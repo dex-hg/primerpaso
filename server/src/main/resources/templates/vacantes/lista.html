@@ -20,7 +20,7 @@
         <section id="panel" data-tipo-cuenta="empresa" aria-labelledby="panel-titulo"
                  th:attr="data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
             <div class="panel-sesion" aria-label="Estado de la sesión">
-                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true">Sesión activa.</p>
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
                 <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
             </div>
             <div id="panel-contenido">
@@ -54,7 +54,7 @@
                 <section class="vacantes-vacio panel-tarjeta" th:if="${#lists.isEmpty(paginaVacantes.vacantes)}" aria-labelledby="vacio-titulo">
                     <span class="panel-icono" aria-hidden="true"><i class="bi bi-briefcase"></i></span>
                     <h2 id="vacio-titulo" th:text="${estadoFiltro == 'todos' ? 'Aún no tienes vacantes' : 'No hay vacantes con este estado'}"></h2>
-                    <p th:text="${estadoFiltro == 'todos' ? 'Crea tu primera oportunidad y guárdala como borrador antes de publicarla.' : 'Elige otro estado para consultar las oportunidades de tu empresa.'}"></p>
+                    <p th:text="${estadoFiltro == 'todos' ? 'Crea tu primera oportunidad y publícala para que los postulantes puedan encontrarla.' : 'Elige otro estado para consultar las oportunidades de tu empresa.'}"></p>
                     <a class="btn btn-primary-custom" th:if="${estadoFiltro == 'todos'}" th:href="@{/panel/empresa/vacantes/nueva}">Crear primera vacante</a>
                     <a class="btn btn-soft" th:unless="${estadoFiltro == 'todos'}" th:href="@{/panel/empresa/vacantes}">Ver todas las vacantes</a>
                 </section>
