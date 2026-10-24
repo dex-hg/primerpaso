@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Vacantes disponibles en PrimerPaso.">
+    <title>Vacantes disponibles | PrimerPaso</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+    <link rel="stylesheet" th:href="@{/css/oportunidades.css}">
+</head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('oportunidades', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" data-tipo-cuenta="postulante" th:attr="data-id-usuario=${usuario.idUsuario}" aria-labelledby="pagina-titulo">
+            <div class="panel-sesion" aria-label="Estado de la sesión">
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+                <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
+            </div>
+            <div id="panel-contenido">
+                <div class="panel-bienvenida"><div><span class="panel-etiqueta"><i class="bi bi-search" aria-hidden="true"></i> Oportunidades para ti</span><h1 id="pagina-titulo">Encuentra tu siguiente oportunidad</h1><p>Explora las vacantes publicadas y vigentes de las empresas en PrimerPaso.</p></div><span class="panel-simbolo" aria-hidden="true"><i class="bi bi-briefcase"></i></span></div>
+                <form class="panel-tarjeta oportunidades-filtros" method="get" th:action="@{/panel/postulante/vacantes}" aria-label="Buscar y filtrar vacantes">
+                    <div class="row g-3">
+                        <div class="col-12"><label class="form-label" for="busqueda">¿Qué oportunidad buscas?</label><input class="form-control" type="search" id="busqueda" name="busqueda" maxlength="180" placeholder="Puesto, empresa o habilidad" th:value="${filtros.busqueda}"></div>
+                        <div class="col-lg-3 col-md-6"><label class="form-label" for="idCarrera">Carrera</label><select class="form-select" id="idCarrera" name="idCarrera"><option value="">Todas las carreras</option><option th:each="carrera : ${catalogos.carreras}" th:value="${carrera.id}" th:text="${carrera.nombre}" th:selected="${filtros.idCarrera == carrera.id}"></option></select></div>
+                        <div class="col-lg-3 col-md-6"><label class="form-label" for="modalidad">Modalidad</label><select class="form-select" id="modalidad" name="modalidad"><option value="">Todas las modalidades</option><option value="presencial" th:selected="${filtros.modalidad == 'presencial'}">Presencial</option><option value="remota" th:selected="${filtros.modalidad == 'remota'}">Remota</option><option value="hibrida" th:selected="${filtros.modalidad == 'hibrida'}">Híbrida</option></select></div>
+                        <div class="col-lg-3 col-md-6"><label class="form-label" for="ciudad">Ciudad</label><input class="form-control" id="ciudad" name="ciudad" maxlength="120" placeholder="Ej. Lima" th:value="${filtros.ciudad}"></div>
+                        <div class="col-lg-3 col-md-6"><label class="form-label" for="idHabilidad">Habilidad</label><select class="form-select" id="idHabilidad" name="idHabilidad"><option value="">Todas las habilidades</option><option th:each="habilidad : ${catalogos.habilidades}" th:value="${habilidad.id}" th:text="${habilidad.nombre}" th:selected="${filtros.idHabilidad == habilidad.id}"></option></select></div>
+                    </div>
+                    <div class="oportunidades-botones"><button class="btn btn-primary-custom" type="submit"><i class="bi bi-search me-1" aria-hidden="true"></i> Buscar vacantes</button><a class="btn btn-soft" th:href="@{/panel/postulante/vacantes}">Limpiar filtros</a></div>
+                </form>
+                <div class="oportunidades-resultados"><h2 th:text="${paginaVacantes.total == 1 ? '1 vacante disponible' : paginaVacantes.total + ' vacantes disponibles'}"></h2><span>Más recientes primero</span></div>
+                <section class="panel-tarjeta oportunidades-vacio" th:if="${#lists.isEmpty(paginaVacantes.oportunidades)}" aria-label="Sin resultados"><i class="bi bi-search" aria-hidden="true"></i><h2>No encontramos vacantes con estos criterios</h2><p>Prueba otra palabra o cambia los filtros para explorar más oportunidades.</p><a class="btn btn-soft" th:href="@{/panel/postulante/vacantes}">Ver todas las vacantes</a></section>
+                <div class="oportunidades-lista">
+                    <article class="panel-tarjeta oportunidad-tarjeta" th:each="vacante : ${paginaVacantes.oportunidades}">
+                        <div class="oportunidad-meta"><span class="panel-tipo" th:text="${vacante.modalidad == 'hibrida' ? 'Híbrida' : #strings.capitalize(vacante.modalidad)}"></span><span th:text="${formatoFecha.format(vacante.fechaPublicacion)}"></span></div>
+                        <h2><a th:href="@{/panel/postulante/vacantes/{id}(id=${vacante.id})}" th:text="${vacante.titulo}"></a></h2><p class="oportunidad-empresa" th:text="${vacante.nombreEmpresa}"></p>
+                        <p class="oportunidad-ubicacion"><i class="bi bi-geo-alt" aria-hidden="true"></i> <span th:text="${#strings.isEmpty(vacante.ciudad) ? 'Ubicación por confirmar' : vacante.ciudad + (#strings.isEmpty(vacante.codigoPais) ? '' : ', ' + vacante.codigoPais)}"></span></p>
+                        <p class="oportunidad-carrera" th:text="${vacante.nombreCarrera}"></p>
+                        <p class="oportunidad-extracto" th:text="${#strings.abbreviate(vacante.descripcion, 180)}"></p>
+                        <div class="oportunidad-habilidades"><span th:each="habilidad, indice : ${vacante.habilidades}" th:if="${indice.index < 4}" th:text="${habilidad.nombre}"></span><span th:if="${#lists.size(vacante.habilidades) > 4}" th:text="${'+' + (#lists.size(vacante.habilidades) - 4)}"></span></div>
+                        <a class="btn btn-soft oportunidad-ver" th:href="@{/panel/postulante/vacantes/{id}(id=${vacante.id})}">Ver vacante <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+                    </article>
+                </div>
+                <nav class="oportunidades-paginacion" th:if="${paginaVacantes.totalPaginas > 1}" aria-label="Páginas de vacantes">
+                    <a class="btn btn-soft" th:if="${paginaVacantes.pagina > 0}" th:href="@{/panel/postulante/vacantes(pagina=${paginaVacantes.pagina - 1},busqueda=${filtros.busqueda},modalidad=${filtros.modalidad},idCarrera=${filtros.idCarrera},ciudad=${filtros.ciudad},idHabilidad=${filtros.idHabilidad})}">Anterior</a>
+                    <span th:text="${'Página ' + (paginaVacantes.pagina + 1) + ' de ' + paginaVacantes.totalPaginas}"></span>
+                    <a class="btn btn-soft" th:if="${paginaVacantes.pagina + 1 < paginaVacantes.totalPaginas}" th:href="@{/panel/postulante/vacantes(pagina=${paginaVacantes.pagina + 1},busqueda=${filtros.busqueda},modalidad=${filtros.modalidad},idCarrera=${filtros.idCarrera},ciudad=${filtros.ciudad},idHabilidad=${filtros.idHabilidad})}">Siguiente</a>
+                </nav>
+            </div>
+            <noscript><p class="panel-aviso">Activa JavaScript para editar tu cuenta y cerrar sesión.</p></noscript>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/panel.js}"></script>
+</body>
+</html>

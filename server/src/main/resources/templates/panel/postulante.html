@@ -20,7 +20,7 @@
         <section id="panel" data-tipo-cuenta="postulante" aria-labelledby="panel-titulo"
                  th:attr="data-id-usuario=${usuario.idUsuario}">
             <div class="panel-sesion" aria-label="Estado de la sesión">
-                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true">Sesión activa.</p>
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
                 <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
             </div>
 
@@ -57,30 +57,32 @@
                                 <span class="panel-icono" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
                                 <h2 id="cuenta-titulo">Mi cuenta</h2>
                             </div>
-                            <p>Consulta los datos de tu registro y administra tu sesión.</p>
-                            <a class="btn btn-primary-custom" th:href="@{/cuenta}">Ver mi cuenta <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+                            <p>Actualiza tus datos personales y de contacto.</p>
+                            <a class="btn btn-primary-custom" th:href="@{/cuenta}">Editar mi cuenta <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
                         </section>
                     </div>
                 </div>
 
                 <section class="panel-modulos" aria-labelledby="modulos-titulo">
                     <div class="panel-seccion-encabezado">
-                        <h2 id="modulos-titulo">Lo que viene para ti</h2>
-                        <p>Estas funciones se habilitarán en las próximas etapas.</p>
+                        <h2 id="modulos-titulo">Tus herramientas</h2>
+                        <p>Explora vacantes y mantén tu información al día.</p>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <article class="panel-modulo h-100">
-                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-search"></i></span><span class="panel-proximamente">Próximamente</span></div>
+                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-search"></i></span><span class="panel-tipo">Disponible</span></div>
                                 <h3>Explorar oportunidades</h3>
-                                <p>Buscar vacantes por carrera, habilidades y modalidad.</p>
+                                <p>Encuentra vacantes por carrera, habilidades, modalidad y ciudad.</p>
+                                <a class="btn btn-primary-custom mt-3" th:href="@{/panel/postulante/vacantes}">Explorar vacantes <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
                             </article>
                         </div>
                         <div class="col-md-4">
                             <article class="panel-modulo h-100">
-                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-file-earmark-person"></i></span><span class="panel-proximamente">Próximamente</span></div>
-                                <h3>Mi perfil y CV</h3>
-                                <p>Actualizar tu información académica, habilidades y CV.</p>
+                                <div class="panel-modulo-encabezado"><span class="panel-icono" aria-hidden="true"><i class="bi bi-file-earmark-person"></i></span><span class="panel-tipo">Disponible</span></div>
+                                <h3>Mi formación</h3>
+                                <p>Actualiza tu institución, carrera y condición académica desde Mi cuenta.</p>
+                                <a class="btn btn-soft mt-3" th:href="@{/cuenta}">Actualizar formación</a>
                             </article>
                         </div>
                         <div class="col-md-4">
@@ -97,7 +99,7 @@
         </section>
     </main>
 
-    <div th:replace="~{fragments/footer :: authFooter(@{/}, 'Volver al inicio')}"></div>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script th:src="@{/js/auth.js}"></script>
     <script th:src="@{/js/sesion.js}"></script>

@@ -1,0 +1,47 @@
+.oportunidades-filtros { margin-bottom: 2rem; }
+.oportunidades-filtros .form-label { font-size: 0.9rem; font-weight: 650; }
+.oportunidades-filtros .form-control, .oportunidades-filtros .form-select { min-height: 2.8rem; }
+.oportunidades-botones { display: flex; align-items: center; gap: 0.75rem; margin-top: 1.25rem; }
+.oportunidades-resultados { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; }
+.oportunidades-resultados h2 { margin: 0; font-size: 1.2rem; font-weight: 750; }
+.oportunidades-resultados > span, .oportunidad-meta { font-size: 0.8rem; color: var(--color-muted); }
+.oportunidades-lista { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.oportunidad-tarjeta { display: flex; flex-direction: column; transition: box-shadow 160ms ease, border-color 160ms ease; }
+.oportunidad-tarjeta:hover { border-color: #b7c7ee; box-shadow: 0 8px 24px rgba(29, 46, 92, 0.075); }
+.oportunidad-meta { display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.oportunidad-tarjeta h2 { font-size: 1.15rem; line-height: 1.5; }
+.oportunidad-tarjeta h2 a { color: var(--color-ink); text-decoration: none; }
+.oportunidad-tarjeta h2 a:hover { color: var(--color-primary-dark); text-decoration: underline; }
+.oportunidad-tarjeta p { font-size: 0.9rem; }
+.oportunidad-empresa { margin: 0.5rem 0 1rem; color: var(--color-primary-dark); font-weight: 650; }
+.oportunidad-ubicacion { margin-bottom: 0.5rem; color: var(--color-muted); }
+.oportunidad-carrera { margin-bottom: 1rem; color: var(--color-muted); }
+.oportunidad-extracto { line-height: 1.65; color: #4b566a; }
+.oportunidad-habilidades { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+.oportunidad-habilidades span { padding: 0.3rem 0.65rem; font-size: 0.75rem; background: #f0f3fa; color: #45557b; border-radius: 0.4rem; overflow-wrap: anywhere; max-width: 100%; }
+.oportunidad-ver { margin-top: auto; align-self: flex-start; }
+.oportunidades-vacio { padding: 3rem 1.5rem; text-align: center; }
+.oportunidades-vacio > i { display: block; font-size: 2.5rem; color: var(--color-primary-dark); margin-bottom: 1rem; }
+.oportunidades-vacio h2 { margin-bottom: 0.75rem; }
+.oportunidades-vacio p { color: var(--color-muted); }
+.oportunidades-paginacion { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
+.oportunidad-volver { display: inline-block; margin: 0 0 1.5rem; color: var(--color-primary-dark); text-decoration: none; }
+.oportunidad-detalle { max-width: 56rem; margin: 0 auto; padding: 2.25rem; }
+.oportunidad-detalle h1 { font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 800; }
+.oportunidad-detalle h2 { margin: 1.8rem 0 0.75rem; }
+.oportunidad-datos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; padding: 1.25rem; margin: 1.5rem 0; background: #f7f9fc; border-radius: 0.8rem; }
+.oportunidad-datos dt { color: var(--color-muted); font-size: 0.85rem; font-weight: 500; }
+.oportunidad-datos dd { font-size: 0.925rem; margin: 0.4rem 0 0; }
+.oportunidad-descripcion { white-space: pre-wrap; line-height: 1.8; }
+.oportunidad-tarjeta, .oportunidad-detalle { overflow-wrap: anywhere; min-width: 0; }
+
+@media (max-width: 991.98px) {
+    .oportunidades-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 575.98px) {
+    .oportunidades-lista, .oportunidad-datos { grid-template-columns: minmax(0, 1fr); }
+    .oportunidades-resultados { flex-direction: column; gap: 0.4rem; }
+    .oportunidades-botones { flex-direction: column; align-items: stretch; }
+    .oportunidad-detalle { padding: 1.25rem; }
+}

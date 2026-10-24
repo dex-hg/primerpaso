@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Detalle de vacante en PrimerPaso.">
+    <title>Detalle de vacante | PrimerPaso</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <link rel="stylesheet" th:href="@{/css/panel.css}">
+    <link rel="stylesheet" th:href="@{/css/oportunidades.css}">
+</head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('oportunidades', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" data-tipo-cuenta="postulante" th:attr="data-id-usuario=${usuario.idUsuario}" aria-labelledby="pagina-titulo">
+            <div class="panel-sesion" aria-label="Estado de la sesión">
+                <p id="panel-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+                <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
+            </div>
+            <div id="panel-contenido">
+                <a class="oportunidad-volver" th:href="@{/panel/postulante/vacantes}"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Volver a vacantes</a>
+                <article class="panel-tarjeta oportunidad-detalle">
+                    <div class="oportunidad-meta"><span class="panel-tipo" th:text="${vacante.modalidad == 'hibrida' ? 'Híbrida' : #strings.capitalize(vacante.modalidad)}"></span><span th:text="${'Publicada el ' + formatoFecha.format(vacante.fechaPublicacion)}"></span></div>
+                    <h1 id="pagina-titulo" th:text="${vacante.titulo}"></h1><p class="oportunidad-empresa" th:text="${vacante.nombreEmpresa}"></p>
+                    <dl class="oportunidad-datos"><div><dt>Carrera</dt><dd th:text="${vacante.nombreCarrera}"></dd></div><div><dt>Ubicación</dt><dd th:text="${#strings.isEmpty(vacante.ciudad) ? 'Por confirmar' : vacante.ciudad + (#strings.isEmpty(vacante.codigoPais) ? '' : ', ' + vacante.codigoPais)}"></dd></div><div><dt>Vencimiento</dt><dd th:text="${vacante.fechaVencimiento == null ? 'Sin fecha definida' : formatoFecha.format(vacante.fechaVencimiento)}"></dd></div></dl>
+                    <h2>Acerca de la oportunidad</h2><p class="oportunidad-descripcion" th:text="${vacante.descripcion}"></p>
+                    <h2 th:unless="${#lists.isEmpty(vacante.habilidades)}">Habilidades solicitadas</h2><div class="oportunidad-habilidades"><span th:each="habilidad : ${vacante.habilidades}" th:text="${habilidad.nombre}"></span></div>
+                </article>
+            </div>
+            <noscript><p class="panel-aviso">Activa JavaScript para editar tu cuenta y cerrar sesión.</p></noscript>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/panel.js}"></script>
+</body>
+</html>
