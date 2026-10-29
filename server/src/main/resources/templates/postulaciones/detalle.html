@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{postulaciones/fragmentos :: cabecera('Detalle de postulación')}"></head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('postulaciones', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" aria-labelledby="pagina-titulo" th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
+            <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
+            <div id="panel-contenido" class="postulacion-contenido">
+                <a th:href="@{${rutaPostulaciones}}">Volver a postulaciones</a>
+                <div class="panel-bienvenida"><div><span class="panel-etiqueta" th:text="${detalle.postulacion.nombreEstado()}"></span><h1 id="pagina-titulo" th:text="${detalle.postulacion.tituloVacante}"></h1><p th:text="${detalle.postulacion.nombreEmpresa}"></p></div></div>
+                <div class="postulacion-columnas">
+                    <article class="panel-tarjeta">
+                        <h2 th:text="${detalle.postulacion.nombres + ' ' + detalle.postulacion.apellidos}"></h2>
+                        <p class="postulacion-fecha" th:text="${'Enviada el ' + formatoFecha.format(detalle.postulacion.fechaEnvio) + ' (Lima)'}"></p>
+                        <h3>Carta de presentación</h3><p class="postulacion-carta" th:text="${#strings.isEmpty(detalle.cartaPresentacion) ? 'Esta postulación no tiene carta de presentación.' : detalle.cartaPresentacion}"></p>
+                    </article>
+                    <aside class="panel-tarjeta">
+                        <h2>Datos actuales del perfil</h2>
+                        <dl class="postulacion-datos">
+                            <dt>Correo</dt><dd th:text="${detalle.perfil.correo}"></dd>
+                            <dt>Teléfono</dt><dd th:text="${#strings.isEmpty(detalle.perfil.telefono) ? 'No registrado' : detalle.perfil.telefono}"></dd>
+                            <dt>Ciudad</dt><dd th:text="${#strings.isEmpty(detalle.perfil.ciudad) ? 'No registrada' : detalle.perfil.ciudad}"></dd>
+                            <dt>Institución</dt><dd th:text="${detalle.perfil.institucion}"></dd>
+                            <dt>Carrera</dt><dd th:text="${detalle.perfil.carrera}"></dd>
+                            <dt>Condición académica</dt><dd th:text="${#strings.capitalize(detalle.perfil.condicionAcademica)}"></dd>
+                            <dt th:if="${detalle.perfil.cicloActual != null}">Ciclo actual</dt><dd th:if="${detalle.perfil.cicloActual != null}" th:text="${detalle.perfil.cicloActual}"></dd>
+                            <dt th:if="${detalle.perfil.anioEgreso != null}">Año de egreso</dt><dd th:if="${detalle.perfil.anioEgreso != null}" th:text="${detalle.perfil.anioEgreso}"></dd>
+                        </dl>
+                        <h3 th:unless="${#lists.isEmpty(detalle.perfil.habilidades)}">Habilidades</h3><ul class="postulacion-habilidades"><li th:each="habilidad : ${detalle.perfil.habilidades}" th:text="${habilidad}"></li></ul>
+                    </aside>
+                </div>
+                <section class="panel-tarjeta" aria-labelledby="seguimiento-titulo">
+                    <h2 id="seguimiento-titulo">Seguimiento de la postulación</h2>
+                    <p>Estado: <strong th:text="${detalle.postulacion.nombreEstado()}"></strong>. <span th:text="${'Última actualización: ' + formatoFecha.format(detalle.postulacion.version) + ' (Lima).'}"></span></p>
+                    <form id="formulario-estado-postulacion" class="postulacion-filtros" th:if="${esEmpresa and detalle.postulacion.estado != 'retirada'}" th:attr="data-id-postulacion=${detalle.postulacion.id},data-version=${detalle.postulacion.version.toString()}">
+                        <div><label class="form-label" for="nuevo-estado">Nuevo estado</label><select class="form-select" id="nuevo-estado" name="estado" required><option value="" th:selected="${detalle.postulacion.estado == 'enviada'}">Selecciona un estado</option><option value="en_revision" th:selected="${detalle.postulacion.estado == 'en_revision'}">En revisión</option><option value="seleccionada" th:selected="${detalle.postulacion.estado == 'seleccionada'}">Seleccionada</option><option value="descartada" th:selected="${detalle.postulacion.estado == 'descartada'}">Descartada</option></select></div><button class="btn btn-primary-custom" type="submit">Guardar estado</button>
+                    </form>
+                    <p class="postulacion-aviso" th:if="${esEmpresa}">El postulante verá el estado que guardes. Puedes corregirlo si la evaluación cambia.</p>
+                    <p id="postulacion-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+                    <div class="postulacion-acciones" th:if="${esEmpresa}"><a class="btn btn-soft" th:href="@{/panel/empresa/postulaciones(idVacante=${detalle.postulacion.idVacante})}">Ver postulantes de esta vacante</a><a class="btn btn-soft" th:href="@{/panel/empresa/vacantes/{id}/editar(id=${detalle.postulacion.idVacante})}">Ver vacante</a></div>
+                </section>
+                <noscript><p class="panel-aviso">Activa JavaScript para actualizar el estado y cerrar sesión.</p></noscript>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <th:block th:replace="~{postulaciones/fragmentos :: scripts}"></th:block>
+</body>
+</html>

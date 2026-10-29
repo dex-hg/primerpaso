@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{postulaciones/fragmentos :: cabecera('Postular a una vacante')}"></head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('oportunidades', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" data-tipo-cuenta="postulante" th:attr="data-id-usuario=${usuario.idUsuario}" aria-labelledby="pagina-titulo">
+            <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
+            <div id="panel-contenido" class="postulacion-contenido">
+                <a th:href="@{/panel/postulante/vacantes/{id}(id=${vacante.id})}">Volver al detalle de la vacante</a>
+                <div class="panel-bienvenida">
+                    <div><span class="panel-etiqueta">Nueva postulación</span><h1 id="pagina-titulo" th:text="${vacante.titulo}"></h1><p th:text="${vacante.nombreEmpresa}"></p></div>
+                </div>
+                <form id="formulario-postulacion" class="panel-tarjeta postulacion-formulario" th:attr="data-id-vacante=${vacante.id}">
+                    <h2>Preséntate a la empresa</h2>
+                    <p>Cuéntales quién eres, por qué te interesa la vacante y qué puedes aportar. Puedes mencionar tus estudios, proyectos, experiencia y disponibilidad, como en un correo de postulación.</p>
+                    <label class="form-label" for="carta-presentacion">Carta de presentación <span class="text-danger" aria-hidden="true">*</span></label>
+                    <textarea class="form-control" id="carta-presentacion" name="cartaPresentacion" rows="12" required maxlength="12000" aria-describedby="carta-ayuda carta-contador" placeholder="Hola, equipo de selección:&#10;&#10;Me presento y les cuento por qué me interesa esta oportunidad..."></textarea>
+                    <div class="postulacion-ayuda"><small id="carta-ayuda">Texto obligatorio. Conservaremos los párrafos que escribas.</small><small id="carta-contador" aria-live="off">0 / 12 000</small></div>
+                    <p class="postulacion-aviso">Compartiremos tu nombre, correo, contacto y formación del perfil con esta empresa. Puedes revisarlos en <a th:href="@{/cuenta}">Mi cuenta</a> antes de postular. La carta enviada se conserva y no se puede editar.</p>
+                    <p id="postulacion-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+                    <div class="postulacion-acciones"><button class="btn btn-primary-custom" type="submit">Enviar postulación</button><a class="btn btn-soft" th:href="@{/panel/postulante/postulaciones}">Mis postulaciones</a></div>
+                </form>
+                <noscript><p class="panel-aviso">Activa JavaScript para enviar tu postulación.</p></noscript>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <th:block th:replace="~{postulaciones/fragmentos :: scripts}"></th:block>
+</body>
+</html>

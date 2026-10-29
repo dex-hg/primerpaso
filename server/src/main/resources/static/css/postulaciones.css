@@ -1,0 +1,36 @@
+.postulacion-contenido { display: grid; gap: 1.5rem; }
+.postulacion-contenido > .panel-bienvenida { margin-bottom: 0; }
+.postulacion-contenido h1 { overflow-wrap: anywhere; }
+.postulacion-contenido h2 { font-size: 1.25rem; }
+.postulacion-contenido h3 { font-size: 1.05rem; margin-top: 1.5rem; }
+.postulacion-formulario { max-width: 54rem; width: 100%; }
+.postulacion-formulario textarea { line-height: 1.7; resize: vertical; min-height: 16rem; }
+.postulacion-ayuda { display: flex; justify-content: space-between; gap: 1rem; margin-top: .5rem; color: #526079; }
+.postulacion-aviso { margin: 1.25rem 0; color: #526079; font-size: .94rem; }
+.postulacion-acciones, .postulacion-filtros, .postulacion-paginacion { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; }
+.postulacion-filtros select { min-width: 13rem; }
+.postulacion-herramientas { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; }
+.postulacion-herramientas p { margin: 0; }
+.postulacion-lista { display: grid; gap: 1rem; }
+.postulacion-tarjeta { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+.postulacion-tarjeta > div { min-width: 0; overflow-wrap: anywhere; }
+.postulacion-tarjeta h2 { margin-top: .75rem; }
+.postulacion-tarjeta .btn { flex-shrink: 0; }
+.postulacion-fecha { color: #526079; font-size: .9rem; margin-bottom: 0; }
+.postulacion-vacio { text-align: center; padding: 2.5rem 1.5rem; }
+.postulacion-columnas { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.postulacion-carta { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; margin-bottom: 0; }
+.postulacion-datos { display: grid; gap: .25rem; }
+.postulacion-datos dt { margin-top: .75rem; color: #526079; font-size: .9rem; }
+.postulacion-datos dd { margin: 0; overflow-wrap: anywhere; }
+.postulacion-habilidades { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.postulacion-habilidades li { background: #eef1ff; border-radius: .5rem; padding: .3rem .6rem; overflow-wrap: anywhere; }
+.postulacion-paginacion { justify-content: center; align-items: center; }
+@media (max-width: 767px) {
+    .postulacion-columnas { grid-template-columns: minmax(0, 1fr); }
+    .postulacion-tarjeta { align-items: start; flex-direction: column; gap: .75rem; }
+    .postulacion-filtros { width: 100%; }
+    .postulacion-filtros > div { flex: 1; min-width: 0; }
+    .postulacion-filtros select { min-width: 0; }
+    .postulacion-ayuda { flex-wrap: wrap; gap: .25rem; }
+}

@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{postulaciones/fragmentos :: cabecera('Revisar postulaciones')}"></head>
+<body class="panel-page">
+    <div th:replace="~{fragments/header :: authHeader(@{/panel}, 'Volver a mi panel', true)}"></div>
+    <main class="container panel-main"><section class="panel-tarjeta"><h1>No se pudo mostrar la página</h1><p th:text="${mensaje}"></p><a class="btn btn-soft" th:href="@{/panel}">Volver a mi panel</a></section></main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+</body>
+</html>

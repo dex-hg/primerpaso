@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{postulaciones/fragmentos :: cabecera(${esEmpresa ? 'Postulaciones recibidas' : 'Mis postulaciones'})}"></head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('postulaciones', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" aria-labelledby="pagina-titulo" th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
+            <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
+            <div id="panel-contenido" class="postulacion-contenido">
+                <div class="panel-bienvenida"><div><span class="panel-etiqueta" th:text="${esEmpresa ? 'Selección de personal' : 'Tu búsqueda de oportunidades'}"></span><h1 id="pagina-titulo" th:text="${esEmpresa ? 'Postulaciones recibidas' : 'Mis postulaciones'}"></h1><p th:text="${esEmpresa ? 'Consulta quiénes postularon, cuándo enviaron su solicitud y su presentación.' : 'Consulta tus solicitudes enviadas y el estado que registra cada empresa.'}"></p></div></div>
+                <p th:if="${paginaPostulaciones.tituloVacante != null}">Vacante: <strong th:text="${paginaPostulaciones.tituloVacante}"></strong></p>
+                <div class="postulacion-herramientas">
+                    <form class="postulacion-filtros" method="get" th:action="@{${rutaPostulaciones}}">
+                        <input th:if="${idVacante != null}" type="hidden" name="idVacante" th:value="${idVacante}">
+                        <div><label class="form-label" for="estado-filtro">Estado de la postulación</label><select class="form-select" id="estado-filtro" name="estado"><option value="todos" th:selected="${estadoFiltro == 'todos'}">Todos los estados</option><option th:each="estado, indice : ${estados}" th:value="${estado}" th:selected="${estadoFiltro == estado}" th:text="${nombresEstados[indice.index]}"></option></select></div>
+                        <button class="btn btn-soft" type="submit">Aplicar</button>
+                        <a class="btn btn-soft" th:if="${idVacante != null}" th:href="@{${rutaPostulaciones}}">Ver todas las vacantes</a>
+                    </form>
+                    <p th:text="${paginaPostulaciones.total + (paginaPostulaciones.total == 1 ? ' postulación' : ' postulaciones')}"></p>
+                </div>
+                <section class="panel-tarjeta postulacion-vacio" th:if="${#lists.isEmpty(paginaPostulaciones.postulaciones)}">
+                    <h2>No hay postulaciones para mostrar</h2><p th:text="${esEmpresa ? 'Aquí aparecerán las solicitudes que envíen los postulantes a tus vacantes. También puedes probar otro filtro.' : 'Explora las vacantes y envía tu primera carta de presentación, o prueba otro filtro.'}"></p><a class="btn btn-primary-custom" th:href="@{${'/panel/' + usuario.tipoCuenta + '/vacantes'}}">Ver vacantes</a>
+                </section>
+                <div class="postulacion-lista">
+                    <article class="panel-tarjeta postulacion-tarjeta" th:each="postulacion : ${paginaPostulaciones.postulaciones}">
+                        <div><span class="panel-tipo" th:text="${postulacion.nombreEstado()}"></span><h2 th:text="${esEmpresa ? postulacion.nombres + ' ' + postulacion.apellidos : postulacion.tituloVacante}"></h2><p th:text="${esEmpresa ? postulacion.tituloVacante : postulacion.nombreEmpresa}"></p><p class="postulacion-fecha" th:text="${'Enviada el ' + formatoFecha.format(postulacion.fechaEnvio) + ' (Lima)'}"></p></div>
+                        <a class="btn btn-soft" th:href="@{${rutaPostulaciones + '/' + postulacion.id}}">Ver postulación</a>
+                    </article>
+                </div>
+                <nav class="postulacion-paginacion" aria-label="Páginas de postulaciones" th:if="${paginaPostulaciones.totalPaginas > 1}">
+                    <a class="btn btn-soft" th:if="${paginaPostulaciones.pagina > 0}" th:href="@{${rutaPostulaciones}(pagina=${paginaPostulaciones.pagina - 1},estado=${estadoFiltro},idVacante=${idVacante})}">Anterior</a>
+                    <span th:text="${'Página ' + (paginaPostulaciones.pagina + 1) + ' de ' + paginaPostulaciones.totalPaginas}"></span>
+                    <a class="btn btn-soft" th:if="${paginaPostulaciones.pagina + 1 < paginaPostulaciones.totalPaginas}" th:href="@{${rutaPostulaciones}(pagina=${paginaPostulaciones.pagina + 1},estado=${estadoFiltro},idVacante=${idVacante})}">Siguiente</a>
+                </nav>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <th:block th:replace="~{postulaciones/fragmentos :: scripts}"></th:block>
+</body>
+</html>
