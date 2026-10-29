@@ -35,7 +35,11 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
     private static final Pattern API_VACANTES = Pattern.compile(
             "/api/vacantes(?:/publicar|/[1-9][0-9]*(?:/(?:publicar|cerrar))?)?");
     private static final Pattern RUTAS_OPORTUNIDADES = Pattern.compile(
-            "/panel/postulante/vacantes(?:/[1-9][0-9]*)?");
+            "/panel/postulante/vacantes(?:/[1-9][0-9]*(?:/postular)?)?");
+    private static final Pattern RUTAS_POSTULACIONES = Pattern.compile(
+            "/panel/(postulante|empresa)/postulaciones(?:/[1-9][0-9]*)?");
+    private static final Pattern API_POSTULACIONES = Pattern.compile(
+            "/api/postulaciones(?:/[1-9][0-9]*(?:/estado)?)?");
     private final AccesoSesion acceso;
     private final SpringTemplateEngine plantillas;
 
@@ -73,8 +77,12 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
                 && (RUTAS_VACANTES.matcher(ruta).matches() || API_VACANTES.matcher(ruta).matches());
         boolean permisoPostulante = "postulante".equals(usuario.tipoCuenta())
                 && RUTAS_OPORTUNIDADES.matcher(ruta).matches();
+        boolean permisoPostulaciones = API_POSTULACIONES.matcher(ruta).matches()
+                || (RUTAS_POSTULACIONES.matcher(ruta).matches()
+                    && ruta.startsWith("/panel/" + usuario.tipoCuenta() + "/"));
         if (!RUTAS_COMUNES.contains(ruta) && !ruta.equals("/api/cuenta")
-                && !ruta.equals("/panel/" + usuario.tipoCuenta()) && !permisoEmpresa && !permisoPostulante) {
+                && !ruta.equals("/panel/" + usuario.tipoCuenta()) && !permisoEmpresa && !permisoPostulante
+                && !permisoPostulaciones) {
             mostrarError(solicitud, respuesta, 403);
             return;
         }
@@ -84,7 +92,8 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
 
     private boolean esApiPrivada(String ruta) {
         return ruta.equals("/api/vacantes") || ruta.startsWith("/api/vacantes/")
-                || ruta.equals("/api/cuenta") || ruta.startsWith("/api/cuenta/");
+                || ruta.equals("/api/cuenta") || ruta.startsWith("/api/cuenta/")
+                || ruta.equals("/api/postulaciones") || ruta.startsWith("/api/postulaciones/");
     }
 
     private String obtenerRuta(HttpServletRequest solicitud) {
