@@ -16,6 +16,8 @@ Requisitos: Java 21 o superior, PostgreSQL y la base de datos `PrimerPaso` con l
 
 Abrir `http://localhost:8080`. No es necesario iniciar un segundo servidor para el frontend.
 
+Para una demostración local con cuentas listas para usar, consultar [Cuentas de demostración](../db/README-demostracion.md). El script opcional `db/datos_demostracion.sql` agrega tres empresas con seis vacantes cada una, tres postulantes y quince solicitudes de ejemplo; conserva los datos existentes.
+
 `.env` está excluido de Git. `.env.example` contiene únicamente valores de ejemplo. La aplicación comprueba la conexión y las tablas al arrancar; no crea ni modifica el esquema automáticamente.
 
 Las plantillas requieren Spring y no se pueden abrir directamente con Live Server. La configuración CORS de la API conserva los orígenes locales de los puertos 5500, 4173 y 8000 para clientes externos; se pueden cambiar mediante `PRIMERPASO_CORS_ORIGENES`.
