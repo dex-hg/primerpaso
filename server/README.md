@@ -1,6 +1,6 @@
 # PrimerPaso
 
-El registro, el inicio de sesión, la edición de cuenta, la búsqueda de oportunidades y la gestión empresarial de vacantes están conectados a PostgreSQL. Las páginas se renderizan con Thymeleaf desde `src/main/resources/templates`; CSS, JavaScript e imágenes están en `src/main/resources/static`. Spring sirve la aplicación desde `http://localhost:8080`. Estos recursos también se incluyen en el JAR.
+El registro, el inicio de sesión, la edición de cuenta, la búsqueda de oportunidades, las postulaciones y la gestión empresarial de vacantes están conectados a PostgreSQL. Las páginas se renderizan con Thymeleaf desde `src/main/resources/templates`; CSS, JavaScript e imágenes están en `src/main/resources/static`. Spring sirve la aplicación desde `http://localhost:8080`. Estos recursos también se incluyen en el JAR.
 
 ## Ejecución local
 
@@ -53,7 +53,7 @@ Después de iniciar sesión, el navegador abre `/panel`. El servidor consulta el
 
 ## Paneles y permisos
 
-Los paneles muestran nombres, correo y tipo de cuenta obtenidos de PostgreSQL. El empresarial también muestra la empresa y el rol actual de la membresía (`administrador` o `reclutador`) y permite gestionar sus vacantes. Los postulantes pueden explorar vacantes y actualizar su formación. La carga de CV, las postulaciones y la revisión de candidatos siguen pendientes.
+Los paneles muestran nombres, correo y tipo de cuenta obtenidos de PostgreSQL. El empresarial también muestra la empresa y el rol actual de la membresía (`administrador` o `reclutador`) y permite gestionar sus vacantes. Los postulantes pueden explorar vacantes y actualizar su formación. Los postulantes pueden enviar cartas de presentación y consultar su historial; las empresas pueden revisar las solicitudes y actualizar su estado. La carga de CV sigue pendiente.
 
 | Ruta | Postulante | Empresa con membresía activa |
 | --- | --- | --- |
@@ -65,9 +65,14 @@ Los paneles muestran nombres, correo y tipo de cuenta obtenidos de PostgreSQL. E
 | `/api/vacantes` y sus operaciones | HTTP 403 | Solo vacantes de su empresa |
 | `/cuenta` y su alias | Solo datos de su sesión | Solo datos de su sesión |
 | `GET/PUT /api/cuenta` | Datos personales y formación propia | Contacto propio; datos empresariales solo para administradores |
+| `/panel/postulante/postulaciones` y su detalle | Solo solicitudes propias | HTTP 403 |
+| `/panel/empresa/postulaciones` y su detalle | HTTP 403 | Solo solicitudes recibidas por su empresa |
+| `GET /api/postulaciones` y su detalle | Solo solicitudes propias | Solo solicitudes recibidas por su empresa |
+| `POST /api/postulaciones` | Enviar carta a una vacante vigente | HTTP 403 |
+| `PUT /api/postulaciones/{id}/estado` | HTTP 403 | Evaluar solicitudes de su empresa |
 | Otra ruta bajo `/panel/` | HTTP 403 | HTTP 403 |
 
-El filtro `FiltroAccesoPanel` protege las páginas y la API de vacantes antes de ejecutar el controlador. `AccesoSesion` revalida el usuario y la empresa exacta guardados en la sesión. El tipo de cuenta y el identificador de empresa no se toman de parámetros de la URL. Sin sesión, las páginas redirigen a `/iniciar-sesion` y la API devuelve `401` en JSON. Si la cuenta se suspende o la membresía o empresa se desactiva, invalida la sesión y borra la cookie. Una falla temporal de PostgreSQL devuelve HTTP 503 con un mensaje genérico y permite reintentar sin revocar la sesión. Las respuestas privadas, incluidas las redirecciones y errores, usan `Cache-Control: no-store`.
+El filtro `FiltroAccesoPanel` protege las páginas privadas y las API de vacantes, cuenta y postulaciones antes de ejecutar el controlador. `AccesoSesion` revalida el usuario y la empresa exacta guardados en la sesión. El tipo de cuenta y el identificador de empresa no se toman de parámetros de la URL. Sin sesión, las páginas redirigen a `/iniciar-sesion` y la API devuelve `401` en JSON. Si la cuenta se suspende o la membresía o empresa se desactiva, invalida la sesión y borra la cookie. Una falla temporal de PostgreSQL devuelve HTTP 503 con un mensaje genérico y permite reintentar sin revocar la sesión. Las respuestas privadas, incluidas las redirecciones y errores, usan `Cache-Control: no-store`.
 
 La comprobación del backend se realiza en cada solicitud privada, de acuerdo con la [guía de autorización de OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html). Ambos roles empresariales pueden consultar, crear, editar, publicar y cerrar vacantes de su empresa. El navegador vuelve a comprobar la sesión al restaurar el panel o regresar a su pestaña y oculta los datos ante errores, expiración o cambio de cuenta, empresa o rol.
 
@@ -87,7 +92,7 @@ El servidor bloquea y revalida las filas antes de guardar y compara la versión 
 
 `/panel/postulante/vacantes` muestra las oportunidades publicadas, con fecha de publicación alcanzada, sin vencer y de empresas activas. Permite buscar por puesto, descripción, empresa, carrera o nombre de habilidad y combinar filtros de carrera, modalidad, ciudad y habilidad. Cada página muestra hasta nueve resultados, ordenados por publicación más reciente; la paginación conserva los filtros. No se agregan datos de demostración a este listado.
 
-`/panel/postulante/vacantes/{id}` muestra descripción, empresa, modalidad, ubicación, carrera, habilidades y vencimiento. Si la oportunidad se cierra, vence o su empresa se desactiva, deja de aparecer en la búsqueda y el detalle devuelve `404`. No expone correos, miembros de empresa ni versiones de edición. Los filtros inválidos devuelven `400`, y un fallo de PostgreSQL devuelve `503`. Las postulaciones todavía no están implementadas.
+`/panel/postulante/vacantes/{id}` muestra descripción, empresa, modalidad, ubicación, carrera, habilidades y vencimiento. Si la oportunidad se cierra, vence o su empresa se desactiva, deja de aparecer en la búsqueda y el detalle devuelve `404`. No expone correos, miembros de empresa ni versiones de edición. Los filtros inválidos devuelven `400`, y un fallo de PostgreSQL devuelve `503`. El detalle permite enviar una carta de presentación y muestra el enlace a la solicitud si el postulante ya participó.
 
 ## Publicación y gestión de vacantes
 
@@ -128,7 +133,28 @@ Para editar, enviar los mismos campos y `version` con el valor exacto devuelto p
 
 La API devuelve `400` para datos, catálogos o parámetros inválidos, `401` sin sesión, `403` por tipo de cuenta o token inválido, `404` si la vacante no está disponible para la empresa, `409` por versión anterior, transición inválida o conflicto de integridad y `503` durante fallos temporales. Los errores no exponen consultas ni credenciales.
 
-La publicación guarda el estado en PostgreSQL y permite encontrar la vacante desde el panel de postulante. El listado para visitantes sin sesión y las postulaciones siguen pendientes; las oportunidades y cifras del landing continúan siendo de demostración.
+La publicación guarda el estado en PostgreSQL y permite encontrar la vacante desde el panel de postulante. El listado para visitantes sin sesión sigue pendiente; las oportunidades y cifras del landing continúan siendo de demostración.
+
+## Postulaciones y revisión empresarial
+
+Desde el detalle de una vacante vigente, el postulante puede enviar una carta de presentación obligatoria de hasta 12 000 caracteres. El texto conserva los párrafos y puede incluir su presentación, motivación, estudios, proyectos y disponibilidad. Solo puede postular una vez por vacante; la carta enviada no es editable. El servidor obtiene al postulante de la sesión y comprueba nuevamente la vigencia de la vacante y la empresa durante la transacción.
+
+`/panel/postulante/postulaciones` muestra las solicitudes propias y `/panel/empresa/postulaciones` las recibidas por la empresa de la sesión. Ambas listas tienen filtros de estado y páginas de 12 resultados, ordenados por fecha de envío. El enlace **Ver postulaciones** de cada vacante empresarial conserva el filtro `idVacante`. Una empresa no puede usar ese filtro para consultar una vacante ajena.
+
+El detalle muestra la carta, fecha y hora de Lima, estado, nombre, correo, teléfono opcional, institución, carrera, condición académica y habilidades actuales del perfil. La carta y su fecha de envío se conservan; los datos del perfil se consultan en su versión actual, identificada así en pantalla. Las solicitudes siguen disponibles para sus participantes después de cerrar o vencer la vacante. Abrir un detalle no cambia su estado.
+
+Los administradores y reclutadores activos de la empresa pueden guardar **En revisión**, **Seleccionada** o **Descartada**. El postulante ve ese estado en su historial. Se permite corregir una evaluación, con control de versión para impedir sobrescrituras concurrentes. El estado `retirada` del esquema se respeta como solo lectura; retirar solicitudes aún no es una acción disponible. Adjuntar CV y enviar avisos por correo quedan pendientes.
+
+| Método y ruta | Resultado |
+| --- | --- |
+| `POST /api/postulaciones` | `201`, solicitud enviada; JSON con `idVacante` y `cartaPresentacion` |
+| `GET /api/postulaciones?pagina=0&estado=todos&idVacante=12` | `200`, historial propio o solicitudes de la empresa; `idVacante` es opcional |
+| `GET /api/postulaciones/{id}` | `200`, detalle autorizado de la solicitud |
+| `PUT /api/postulaciones/{id}/estado` | `200`, cambio empresarial; JSON con `estado` y la `version` exacta del detalle |
+
+La API requiere sesión y responde con `Cache-Control: no-store`. Las escrituras exigen `X-CSRF-Token`; los campos ajenos al contrato se rechazan. Los errores usan `400` por datos inválidos, `401` por sesión ausente o revocada, `403` por permisos o CSRF, `404` por recursos ajenos o vacantes no vigentes, `409` por duplicados o versiones anteriores y `503` por fallos temporales. La restricción única de PostgreSQL impide duplicados incluso entre envíos simultáneos. Se reutiliza la tabla `applications` sin migraciones.
+
+La verificación de este incremento y los archivos para cada commit sugerido están en [Postulaciones](POSTULACIONES.md).
 
 ## Verificación
 
