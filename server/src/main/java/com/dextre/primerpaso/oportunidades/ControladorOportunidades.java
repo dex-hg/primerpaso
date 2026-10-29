@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.dextre.primerpaso.oportunidades.DatosOportunidades.Filtros;
+import com.dextre.primerpaso.postulaciones.ServicioPostulaciones;
 import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 
 @Controller
@@ -21,9 +22,11 @@ public class ControladorOportunidades {
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             .withZone(ZoneId.of("America/Lima"));
     private final ServicioOportunidades servicio;
+    private final ServicioPostulaciones postulaciones;
 
-    public ControladorOportunidades(ServicioOportunidades servicio) {
+    public ControladorOportunidades(ServicioOportunidades servicio, ServicioPostulaciones postulaciones) {
         this.servicio = servicio;
+        this.postulaciones = postulaciones;
     }
 
     @GetMapping
@@ -45,6 +48,7 @@ public class ControladorOportunidades {
             Model modelo) {
         modelo.addAttribute("usuario", usuario);
         modelo.addAttribute("vacante", servicio.consultar(id));
+        modelo.addAttribute("idPostulacion", postulaciones.buscarPropia(usuario, id).orElse(null));
         modelo.addAttribute("formatoFecha", FECHA);
         return "oportunidades/detalle";
     }

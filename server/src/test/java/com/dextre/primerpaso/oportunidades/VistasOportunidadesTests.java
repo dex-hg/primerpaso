@@ -29,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.dextre.primerpaso.oportunidades.DatosOportunidades.Oportunidad;
 import com.dextre.primerpaso.oportunidades.DatosOportunidades.PaginaOportunidades;
 import com.dextre.primerpaso.panel.FiltroAccesoPanel;
+import com.dextre.primerpaso.postulaciones.ServicioPostulaciones;
 import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 import com.dextre.primerpaso.sesion.ServicioSesion;
 import com.dextre.primerpaso.vacantes.DatosVacantes.Catalogos;
@@ -44,6 +45,7 @@ class VistasOportunidadesTests {
     @Autowired private FiltroAccesoPanel filtro;
     @MockitoBean private ServicioSesion sesiones;
     @MockitoBean private ServicioOportunidades oportunidades;
+    @MockitoBean private ServicioPostulaciones postulaciones;
     private MockMvc cliente;
 
     @BeforeEach

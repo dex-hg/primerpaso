@@ -79,6 +79,7 @@
                         <div class="vacante-pie">
                             <p class="vacante-fecha" th:text="${'Creada el ' + #temporals.format(vacante.fechaCreacion.atZone(T(java.time.ZoneId).of('America/Lima')), 'dd/MM/yyyy')}"></p>
                             <div class="vacante-acciones">
+                                <a class="btn btn-soft btn-sm" th:href="@{/panel/empresa/postulaciones(idVacante=${vacante.id})}">Ver postulaciones</a>
                                 <a class="btn btn-soft btn-sm" th:href="@{/panel/empresa/vacantes/{id}/editar(id=${vacante.id})}"
                                    th:text="${vacante.editable() ? 'Editar' : 'Ver detalles'}"></a>
                                 <button class="btn btn-primary-custom btn-sm" type="button" data-accion="publicar" th:if="${vacante.estado == 'borrador'}"

@@ -56,6 +56,12 @@
                            th:classappend="${seccionActiva == 'oportunidades'} ? 'active'"
                            th:attr="aria-current=${seccionActiva == 'oportunidades'} ? 'page' : null">Vacantes</a>
                     </li>
+                    <li class="nav-item" th:if="${usuario != null}">
+                        <a class="nav-link" th:href="@{${'/panel/' + usuario.tipoCuenta + '/postulaciones'}}"
+                           th:classappend="${seccionActiva == 'postulaciones'} ? 'active'"
+                           th:attr="aria-current=${seccionActiva == 'postulaciones'} ? 'page' : null"
+                           th:text="${usuario.tipoCuenta == 'empresa' ? 'Postulaciones' : 'Mis postulaciones'}"></a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/cuenta}"
                            th:classappend="${seccionActiva == 'cuenta'} ? 'active'"

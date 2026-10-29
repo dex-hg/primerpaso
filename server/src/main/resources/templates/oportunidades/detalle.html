@@ -30,6 +30,10 @@
                     <dl class="oportunidad-datos"><div><dt>Carrera</dt><dd th:text="${vacante.nombreCarrera}"></dd></div><div><dt>Ubicación</dt><dd th:text="${#strings.isEmpty(vacante.ciudad) ? 'Por confirmar' : vacante.ciudad + (#strings.isEmpty(vacante.codigoPais) ? '' : ', ' + vacante.codigoPais)}"></dd></div><div><dt>Vencimiento</dt><dd th:text="${vacante.fechaVencimiento == null ? 'Sin fecha definida' : formatoFecha.format(vacante.fechaVencimiento)}"></dd></div></dl>
                     <h2>Acerca de la oportunidad</h2><p class="oportunidad-descripcion" th:text="${vacante.descripcion}"></p>
                     <h2 th:unless="${#lists.isEmpty(vacante.habilidades)}">Habilidades solicitadas</h2><div class="oportunidad-habilidades"><span th:each="habilidad : ${vacante.habilidades}" th:text="${habilidad.nombre}"></span></div>
+                    <div class="mt-4">
+                        <a class="btn btn-primary-custom" th:if="${idPostulacion == null}" th:href="@{/panel/postulante/vacantes/{id}/postular(id=${vacante.id})}">Postular a esta vacante</a>
+                        <th:block th:if="${idPostulacion != null}"><p>Ya enviaste una postulación a esta vacante.</p><a class="btn btn-soft" th:href="@{/panel/postulante/postulaciones/{id}(id=${idPostulacion})}">Ver mi postulación</a></th:block>
+                    </div>
                 </article>
             </div>
             <noscript><p class="panel-aviso">Activa JavaScript para editar tu cuenta y cerrar sesión.</p></noscript>
