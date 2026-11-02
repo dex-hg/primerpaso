@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" data-bs-theme="dark" xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="cabecera(titulo)">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/auth.css}">
     <link rel="stylesheet" th:href="@{/css/panel.css}">
     <link rel="stylesheet" th:href="@{/css/postulaciones.css}">
+    <th:block th:replace="~{fragments/tema :: recursos}"></th:block>
 </head>
 <body>
     <div th:fragment="estadoSesion" class="panel-sesion" aria-label="Estado de la sesión">
