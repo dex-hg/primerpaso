@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es" data-bs-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{chat/fragmentos :: cabecera('Conversación')}"></head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('mensajes', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" aria-labelledby="pagina-titulo" th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
+            <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
+            <div id="panel-contenido">
+                <a th:href="@{${rutaPanel + '/mensajes'}}">Volver a mensajes</a>
+                <div class="panel-bienvenida"><div><span class="panel-etiqueta">Chat de la postulación</span><h1 id="pagina-titulo" th:text="${chat.contexto.tituloVacante}"></h1><p><span th:text="${chat.contexto.nombreEmpresa}"></span> · <span th:text="${chat.contexto.nombrePostulante}"></span></p></div></div>
+                <section id="chat" class="panel-tarjeta chat-conversacion" th:attr="data-id-postulacion=${chat.contexto.idPostulacion},data-puede-enviar=${chat.puedeEnviar}">
+                    <div class="chat-herramientas"><h2>Conversación</h2><button id="chat-actualizar" class="btn btn-soft btn-sm" type="button">Actualizar</button></div>
+                    <p id="chat-aviso" class="chat-aviso" th:text="${chat.aviso}" th:hidden="${#strings.isEmpty(chat.aviso)}"></p>
+                    <button id="chat-anteriores" class="btn btn-soft btn-sm chat-anteriores" type="button" th:hidden="${!chat.hayAnteriores}">Cargar mensajes anteriores</button>
+                    <div id="chat-historial" class="chat-historial" tabindex="0" aria-label="Historial de mensajes">
+                        <p id="chat-vacio" th:hidden="${!chat.mensajes.isEmpty()}">Todavía no hay mensajes en esta postulación.</p>
+                        <ol id="chat-mensajes" class="chat-mensajes">
+                            <li th:each="mensaje : ${chat.mensajes}" class="chat-mensaje" th:classappend="${mensaje.idEmisor == usuario.idUsuario} ? 'chat-propio'" th:attr="data-id-mensaje=${mensaje.id},data-id-envio=${mensaje.idEnvio},data-id-emisor=${mensaje.idEmisor}">
+                                <p class="chat-autor" th:text="${mensaje.nombreEmisor + (mensaje.tipoEmisor == 'empresa' ? ' · Empresa' : ' · Postulante')}"></p>
+                                <p class="chat-texto" th:text="${mensaje.contenido}"></p>
+                                <time th:attr="datetime=${mensaje.fechaEnvio}" th:text="${formatoFecha.format(mensaje.fechaEnvio) + ' (Lima)'}"></time>
+                            </li>
+                        </ol>
+                    </div>
+                    <form id="chat-formulario" novalidate>
+                        <label class="form-label" for="chat-contenido">Tu mensaje</label>
+                        <textarea id="chat-contenido" class="form-control" rows="3" maxlength="4000" required th:disabled="${!chat.puedeEnviar}" aria-describedby="chat-ayuda chat-contador"></textarea>
+                        <div class="chat-pie-formulario"><small id="chat-ayuda">Puedes escribir varios párrafos. Envía con el botón.</small><small id="chat-contador">0 / 4000</small></div>
+                        <button id="chat-enviar" class="btn btn-primary-custom" type="submit" th:disabled="${!chat.puedeEnviar}">Enviar mensaje</button>
+                    </form>
+                    <p id="chat-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+                </section>
+                <p class="chat-enlace-postulacion"><a th:href="@{${rutaPanel + '/postulaciones/' + chat.contexto.idPostulacion}}">Ver carta, perfil y estado de la postulación</a></p>
+                <noscript><p class="panel-aviso">Activa JavaScript para enviar y actualizar mensajes. El historial guardado permanece disponible.</p></noscript>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <th:block th:replace="~{postulaciones/fragmentos :: scripts}"></th:block>
+    <script th:src="@{/js/chat.js}"></script>
+</body>
+</html>

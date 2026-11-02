@@ -7,9 +7,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dextre.primerpaso.chat.ControladorVistasChat;
+
 import jakarta.servlet.http.HttpServletResponse;
 
-@ControllerAdvice(assignableTypes = ControladorVistasPostulaciones.class)
+@ControllerAdvice(assignableTypes = {ControladorVistasPostulaciones.class, ControladorVistasChat.class})
 public class ManejadorErroresVistasPostulaciones {
 
     @ExceptionHandler(ResponseStatusException.class)

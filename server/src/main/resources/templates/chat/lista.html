@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es" data-bs-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{chat/fragmentos :: cabecera('Mensajes')}"></head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('mensajes', true)}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" aria-labelledby="pagina-titulo" th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
+            <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
+            <div id="panel-contenido">
+                <div class="panel-bienvenida"><div><span class="panel-etiqueta">Conversaciones</span><h1 id="pagina-titulo">Mensajes</h1><p>Coordina los siguientes pasos de cada postulación.</p></div></div>
+                <section class="panel-tarjeta" th:if="${bandeja.conversaciones.isEmpty()}">
+                    <h2>Todavía no hay conversaciones</h2>
+                    <p th:text="${esEmpresa ? 'Selecciona una postulación y envía el primer mensaje desde su detalle.' : 'Aquí aparecerán las conversaciones que inicie la empresa después de seleccionar tu postulación.'}"></p>
+                    <a class="btn btn-primary-custom" th:href="@{${rutaPanel + '/postulaciones'}}">Ver postulaciones</a>
+                </section>
+                <ul class="chat-bandeja" th:unless="${bandeja.conversaciones.isEmpty()}">
+                    <li th:each="conversacion : ${bandeja.conversaciones}">
+                        <a class="panel-tarjeta chat-resumen" th:href="@{${rutaPanel + '/postulaciones/' + conversacion.idPostulacion + '/chat'}}">
+                            <div class="chat-resumen-cabecera"><h2 th:text="${conversacion.tituloVacante}"></h2><time th:text="${formatoFecha.format(conversacion.fechaUltimoMensaje) + ' (Lima)'}" th:attr="datetime=${conversacion.fechaUltimoMensaje}"></time></div>
+                            <p class="chat-interlocutor" th:text="${esEmpresa ? conversacion.nombrePostulante : conversacion.nombreEmpresa}"></p>
+                            <p class="chat-extracto" th:text="${conversacion.ultimoMensaje}"></p>
+                            <span class="chat-lectura" th:if="${conversacion.estadoPostulacion != 'seleccionada'}">Solo lectura</span>
+                        </a>
+                    </li>
+                </ul>
+                <nav class="chat-paginacion" aria-label="Páginas de conversaciones" th:if="${bandeja.totalPaginas > 1}">
+                    <a class="btn btn-soft" th:if="${bandeja.pagina > 0}" th:href="@{${rutaPanel + '/mensajes'}(pagina=${bandeja.pagina - 1})}">Anterior</a>
+                    <span th:text="${'Página ' + (bandeja.pagina + 1) + ' de ' + bandeja.totalPaginas}"></span>
+                    <a class="btn btn-soft" th:if="${bandeja.pagina + 1 < bandeja.totalPaginas}" th:href="@{${rutaPanel + '/mensajes'}(pagina=${bandeja.pagina + 1})}">Siguiente</a>
+                </nav>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <th:block th:replace="~{postulaciones/fragmentos :: scripts}"></th:block>
+</body>
+</html>

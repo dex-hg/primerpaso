@@ -29,7 +29,7 @@
 </header>
 
 <header class="site-header panel-header" th:fragment="panelHeader(seccionActiva, mostrarCierre)">
-    <nav class="navbar navbar-expand-md" aria-label="Navegación de tu cuenta">
+    <nav class="navbar navbar-expand-xl" aria-label="Navegación de tu cuenta">
         <div class="container">
             <a class="navbar-brand brand-link" th:href="@{/panel}" aria-label="PrimerPaso, ir a mi panel">
                 <span class="brand-icon" aria-hidden="true"><i class="bi bi-person-workspace"></i></span>
@@ -66,6 +66,11 @@
                            th:classappend="${seccionActiva == 'postulaciones'} ? 'active'"
                            th:attr="aria-current=${seccionActiva == 'postulaciones'} ? 'page' : null"
                            th:text="${usuario.tipoCuenta == 'empresa' ? 'Postulaciones' : 'Mis postulaciones'}"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{${'/panel/' + usuario.tipoCuenta + '/mensajes'}}"
+                           th:classappend="${seccionActiva == 'mensajes'} ? 'active'"
+                           th:attr="aria-current=${seccionActiva == 'mensajes'} ? 'page' : null">Mensajes</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/cuenta}"

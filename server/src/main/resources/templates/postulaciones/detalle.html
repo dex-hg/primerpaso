@@ -41,6 +41,11 @@
                     <p id="postulacion-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
                     <div class="postulacion-acciones" th:if="${esEmpresa}"><a class="btn btn-soft" th:href="@{/panel/empresa/postulaciones(idVacante=${detalle.postulacion.idVacante})}">Ver postulantes de esta vacante</a><a class="btn btn-soft" th:href="@{/panel/empresa/vacantes/{id}/editar(id=${detalle.postulacion.idVacante})}">Ver vacante</a></div>
                 </section>
+                <section class="panel-tarjeta" aria-labelledby="chat-titulo">
+                    <h2 id="chat-titulo" th:text="${esEmpresa ? 'Conversación con el postulante' : 'Conversación con la empresa'}"></h2>
+                    <p>El reclutador envía el primer mensaje después de seleccionar la postulación. Podrás consultar aquí el historial de la conversación.</p>
+                    <a class="btn btn-primary-custom" th:href="@{${rutaPostulaciones + '/' + detalle.postulacion.id + '/chat'}}">Abrir conversación</a>
+                </section>
                 <noscript><p class="panel-aviso">Activa JavaScript para actualizar el estado y cerrar sesión.</p></noscript>
             </div>
         </section>
