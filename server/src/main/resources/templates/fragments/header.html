@@ -17,10 +17,13 @@
             </span>
         </a>
 
-        <a class="auth-back-link" th:href="${backUrl}">
-            <i th:if="${showIcon}" class="bi bi-arrow-left" aria-hidden="true"></i>
-            <span th:text="${backText}">Volver al inicio</span>
-        </a>
+        <div class="cabecera-herramientas">
+            <div th:replace="~{fragments/tema :: selector}"></div>
+            <a class="auth-back-link" th:href="${backUrl}">
+                <i th:if="${showIcon}" class="bi bi-arrow-left" aria-hidden="true"></i>
+                <span th:text="${backText}">Volver al inicio</span>
+            </a>
+        </div>
 
     </div>
 </header>
@@ -32,6 +35,8 @@
                 <span class="brand-icon" aria-hidden="true"><i class="bi bi-person-workspace"></i></span>
                 <span class="brand-copy"><strong>PrimerPaso</strong><small>Inicia tu camino</small></span>
             </a>
+
+            <div th:replace="~{fragments/tema :: selector}"></div>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#panel-navbar" aria-controls="panel-navbar"
@@ -92,6 +97,8 @@
                     <small>Inicia tu camino</small>
                 </span>
             </a>
+
+            <div th:replace="~{fragments/tema :: selector}"></div>
 
             <button class="navbar-toggler" type="button"
                     data-bs-toggle="collapse"
