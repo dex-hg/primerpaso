@@ -59,6 +59,15 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
         if (columnas == null || columnas != 3) {
             throw new IllegalStateException("Aplica db/registro_reclutador.sql antes de iniciar el servidor.");
         }
+        Integer columnasChat = jdbc.queryForObject("""
+                SELECT count(*) FROM information_schema.columns
+                WHERE table_schema = current_schema() AND table_name = 'mensajes_chat'
+                AND column_name IN ('id_mensaje', 'id_postulacion', 'id_emisor', 'id_envio',
+                    'nombre_emisor', 'tipo_emisor', 'contenido', 'fecha_envio')
+                """, Integer.class);
+        if (columnasChat == null || columnasChat != 8) {
+            throw new IllegalStateException("Aplica db/migraciones/V001__mensajes_chat.sql antes de iniciar el servidor.");
+        }
         REGISTRO.info("Conexión con PostgreSQL y tablas del proyecto comprobadas.");
     }
 }

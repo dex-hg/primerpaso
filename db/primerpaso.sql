@@ -282,6 +282,21 @@ CREATE INDEX idx_applications_candidate
 CREATE INDEX idx_applications_job_status
     ON applications (job_id_application, status_application);
 
+-- Cada postulación identifica una conversación; se inicia con el primer mensaje.
+CREATE TABLE mensajes_chat (
+    id_mensaje BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_postulacion BIGINT NOT NULL REFERENCES applications(id_application) ON DELETE RESTRICT,
+    id_emisor BIGINT NOT NULL REFERENCES users(id_user) ON DELETE RESTRICT,
+    id_envio UUID NOT NULL,
+    nombre_emisor VARCHAR(241) NOT NULL CHECK (length(btrim(nombre_emisor)) > 0),
+    tipo_emisor VARCHAR(10) NOT NULL CHECK (tipo_emisor IN ('empresa', 'postulante')),
+    contenido TEXT NOT NULL CHECK (length(btrim(contenido)) BETWEEN 1 AND 4000),
+    fecha_envio TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    CONSTRAINT uq_mensajes_chat_envio UNIQUE (id_postulacion, id_emisor, id_envio)
+);
+CREATE INDEX idx_mensajes_chat_historial ON mensajes_chat (id_postulacion, id_mensaje DESC);
+CREATE INDEX idx_mensajes_chat_frecuencia ON mensajes_chat (id_postulacion, id_emisor, fecha_envio DESC);
+
 COMMIT;
 
 -- Reglas del backend: crear cuenta y perfil/membresía en una transacción;
