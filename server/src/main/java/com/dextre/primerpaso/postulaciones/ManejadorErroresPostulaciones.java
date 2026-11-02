@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
-@RestControllerAdvice(assignableTypes = ControladorPostulaciones.class)
+import com.dextre.primerpaso.chat.ControladorChat;
+
+@RestControllerAdvice(assignableTypes = {ControladorPostulaciones.class, ControladorChat.class})
 public class ManejadorErroresPostulaciones {
 
     @ExceptionHandler(ResponseStatusException.class)
