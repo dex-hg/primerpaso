@@ -20,6 +20,8 @@ Para una demostración local con cuentas listas para usar, consultar [Cuentas de
 
 `.env` está excluido de Git. `.env.example` contiene únicamente valores de ejemplo. La aplicación comprueba la conexión y las tablas al arrancar; no crea ni modifica el esquema automáticamente.
 
+Esta versión incorpora chat por postulación. En una base existente, ejecutar `db/migraciones/V001__mensajes_chat.sql` antes de arrancar; en una base nueva, `db/primerpaso.sql` ya incluye la tabla. La migración agrega `mensajes_chat` y sus índices sin cambiar los registros existentes. Consultar [reglas, API y pruebas del chat](CHAT.md).
+
 Las plantillas requieren Spring y no se pueden abrir directamente con Live Server. La configuración CORS de la API conserva los orígenes locales de los puertos 5500, 4173 y 8000 para clientes externos; se pueden cambiar mediante `PRIMERPASO_CORS_ORIGENES`.
 
 ## Páginas y contribución
@@ -72,6 +74,10 @@ Los paneles muestran nombres, correo y tipo de cuenta obtenidos de PostgreSQL. E
 | `GET /api/postulaciones` y su detalle | Solo solicitudes propias | Solo solicitudes recibidas por su empresa |
 | `POST /api/postulaciones` | Enviar carta a una vacante vigente | HTTP 403 |
 | `PUT /api/postulaciones/{id}/estado` | HTTP 403 | Evaluar solicitudes de su empresa |
+| `/panel/postulante/mensajes` y `/panel/empresa/mensajes` | Solo bandeja de postulante | Solo bandeja de su empresa |
+| `/panel/{tipo}/postulaciones/{id}/chat` | Historial propio; responde al primer mensaje de la empresa | Historial de su empresa; inicia al seleccionar |
+| `GET /api/chat` y `/api/chat/postulaciones/{id}` | Solo conversaciones propias | Solo conversaciones de su empresa |
+| `POST /api/chat/postulaciones/{id}/mensajes` | Responder en una postulación seleccionada | Iniciar o responder en una postulación seleccionada |
 | Otra ruta bajo `/panel/` | HTTP 403 | HTTP 403 |
 
 El filtro `FiltroAccesoPanel` protege las páginas privadas y las API de vacantes, cuenta y postulaciones antes de ejecutar el controlador. `AccesoSesion` revalida el usuario y la empresa exacta guardados en la sesión. El tipo de cuenta y el identificador de empresa no se toman de parámetros de la URL. Sin sesión, las páginas redirigen a `/iniciar-sesion` y la API devuelve `401` en JSON. Si la cuenta se suspende o la membresía o empresa se desactiva, invalida la sesión y borra la cookie. Una falla temporal de PostgreSQL devuelve HTTP 503 con un mensaje genérico y permite reintentar sin revocar la sesión. Las respuestas privadas, incluidas las redirecciones y errores, usan `Cache-Control: no-store`.
