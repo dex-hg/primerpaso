@@ -3,6 +3,7 @@ HELP.md
 .env.*
 !.env.example
 target/
+__pycache__/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
