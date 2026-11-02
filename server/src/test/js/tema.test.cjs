@@ -19,10 +19,12 @@ function crearPagina(configuracion = {}) {
     const eventosDocumento = new Map();
     const eventosSistema = new Map();
     const meta = new Map();
-    const selectores = Array.from({ length: 2 }, () => ({
-        value: "oscuro",
+    const botones = Array.from({ length: 2 }, () => ({
+        atributos: new Map([["data-tema-actual", "oscuro"]]),
         disabled: true,
         eventos: new Map(),
+        setAttribute(nombre, valor) { this.atributos.set(nombre, valor); },
+        getAttribute(nombre) { return this.atributos.get(nombre); },
         addEventListener(nombre, manejador) { this.eventos.set(nombre, manejador); }
     }));
     const sistema = {
@@ -36,7 +38,7 @@ function crearPagina(configuracion = {}) {
             setAttribute(nombre, valor) { atributos.set(nombre, valor); }
         },
         querySelector() { return { setAttribute(nombre, valor) { meta.set(nombre, valor); } }; },
-        querySelectorAll() { return domListo ? selectores : []; },
+        querySelectorAll() { return domListo ? botones : []; },
         addEventListener(nombre, manejador) { eventosDocumento.set(nombre, manejador); }
     };
     const ventana = {
@@ -56,12 +58,10 @@ function crearPagina(configuracion = {}) {
 
     ejecutarEnContexto(codigo, { document: documento, window: ventana });
     return {
-        almacenamiento, atributos, meta, selectores,
+        almacenamiento, atributos, meta, botones,
         tema() { return atributos.get("data-bs-theme"); },
-        cambiar(preferencia, indice = 0) {
-            const selector = selectores[indice];
-            selector.value = preferencia;
-            selector.eventos.get("change")({ currentTarget: selector });
+        pulsar(indice = 0) {
+            botones[indice].eventos.get("click")();
         },
         cargarDom() {
             domListo = true;
@@ -84,25 +84,26 @@ prueba("la primera visita usa oscuro antes de construir el contenido", () => {
     const pagina = crearPagina({ domListo: false });
     comprobar.equal(pagina.tema(), "dark");
     comprobar.equal(pagina.meta.get("content"), "#101820");
-    comprobar.ok(pagina.selectores.every((selector) => selector.disabled));
+    comprobar.ok(pagina.botones.every((boton) => boton.disabled));
     pagina.cargarDom();
-    comprobar.ok(pagina.selectores.every((selector) => !selector.disabled));
+    comprobar.ok(pagina.botones.every((boton) => !boton.disabled));
 });
 
 prueba("la preferencia clara guardada se aplica desde la carga", () => {
     const pagina = crearPagina({ preferencia: "claro", sistemaOscuro: true });
     comprobar.equal(pagina.tema(), "light");
     comprobar.equal(pagina.meta.get("content"), "#ffffff");
-    comprobar.ok(pagina.selectores.every((selector) => selector.value === "claro"));
+    comprobar.ok(pagina.botones.every((boton) => boton.getAttribute("data-tema-actual") === "claro"));
 });
 
 prueba("la elección se conserva al abrir otra vista", () => {
     const primera = crearPagina();
-    primera.cambiar("claro");
+    primera.pulsar();
     const segunda = crearPagina({ almacenamiento: primera.almacenamiento });
     comprobar.equal(segunda.tema(), "light");
-    comprobar.equal(segunda.selectores[0].value, "claro");
-    segunda.cambiar("oscuro");
+    comprobar.equal(segunda.botones[0].getAttribute("data-tema-actual"), "claro");
+    segunda.pulsar();
+    segunda.pulsar();
     comprobar.equal(segunda.almacenamiento.get(clave), "oscuro");
     comprobar.equal(segunda.tema(), "dark");
 });
@@ -121,7 +122,8 @@ prueba("el sistema no altera una elección explícita", () => {
     const pagina = crearPagina({ preferencia: "claro" });
     pagina.cambiarSistema(true);
     comprobar.equal(pagina.tema(), "light");
-    pagina.cambiar("oscuro");
+    pagina.pulsar();
+    pagina.pulsar();
     pagina.cambiarSistema(false);
     comprobar.equal(pagina.tema(), "dark");
 });
@@ -130,22 +132,23 @@ prueba("los valores desconocidos recuperan el tema oscuro", () => {
     for (const preferencia of ["", "dark", "null", "{invalido}"]) {
         const pagina = crearPagina({ preferencia });
         comprobar.equal(pagina.tema(), "dark");
-        comprobar.equal(pagina.selectores[0].value, "oscuro");
+        comprobar.equal(pagina.botones[0].getAttribute("data-tema-actual"), "oscuro");
     }
 });
 
 prueba("los controles funcionan con lectura y escritura bloqueadas", () => {
     const pagina = crearPagina({ lecturaBloqueada: true, escrituraBloqueada: true });
     comprobar.equal(pagina.tema(), "dark");
-    comprobar.doesNotThrow(() => pagina.cambiar("claro"));
+    comprobar.doesNotThrow(() => pagina.pulsar());
     comprobar.equal(pagina.tema(), "light");
-    comprobar.ok(pagina.selectores.every((selector) => selector.value === "claro"));
+    comprobar.ok(pagina.botones.every((boton) => boton.getAttribute("data-tema-actual") === "claro"));
 });
 
-prueba("todos los selectores de la misma página se mantienen sincronizados", () => {
+prueba("todos los botones de la misma página se mantienen sincronizados", () => {
     const pagina = crearPagina();
-    pagina.cambiar("sistema", 1);
-    comprobar.ok(pagina.selectores.every((selector) => selector.value === "sistema"));
+    pagina.pulsar(1);
+    pagina.pulsar(1);
+    comprobar.ok(pagina.botones.every((boton) => boton.getAttribute("data-tema-actual") === "sistema"));
 });
 
 prueba("los cambios de otra pestaña se aplican y las claves ajenas se ignoran", () => {
@@ -154,7 +157,7 @@ prueba("los cambios de otra pestaña se aplican y las claves ajenas se ignoran",
     comprobar.equal(pagina.tema(), "dark");
     pagina.recibirCambio(clave, "claro");
     comprobar.equal(pagina.tema(), "light");
-    comprobar.equal(pagina.selectores[0].value, "claro");
+    comprobar.equal(pagina.botones[0].getAttribute("data-tema-actual"), "claro");
 });
 
 prueba("borrar la preferencia en otra pestaña recupera el valor inicial", () => {
@@ -171,14 +174,40 @@ prueba("volver desde el historial actualiza una página conservada en caché", (
     pagina.almacenamiento.set(clave, "claro");
     pagina.restaurarDesdeHistorial();
     comprobar.equal(pagina.tema(), "light");
-    comprobar.equal(pagina.selectores[0].value, "claro");
+    comprobar.equal(pagina.botones[0].getAttribute("data-tema-actual"), "claro");
 });
 
 prueba("sin consulta del sistema se puede elegir un tema explícito", () => {
     const pagina = crearPagina({ sinConsultaSistema: true });
     comprobar.equal(pagina.tema(), "dark");
-    comprobar.doesNotThrow(() => pagina.cambiar("sistema"));
+    comprobar.doesNotThrow(() => { pagina.pulsar(); pagina.pulsar(); });
     comprobar.equal(pagina.tema(), "light");
-    pagina.cambiar("oscuro");
+    pagina.pulsar();
     comprobar.equal(pagina.tema(), "dark");
+});
+
+prueba("cada clic recorre oscuro, claro y sistema y vuelve al inicio", () => {
+    const pagina = crearPagina();
+    for (const [preferencia, tema] of [["claro", "light"], ["sistema", "light"], ["oscuro", "dark"]]) {
+        pagina.pulsar();
+        comprobar.equal(pagina.botones[0].getAttribute("data-tema-actual"), preferencia);
+        comprobar.equal(pagina.almacenamiento.get(clave), preferencia);
+        comprobar.equal(pagina.tema(), tema);
+    }
+});
+
+prueba("el texto al pasar el cursor y el nombre accesible indican el modo actual y el siguiente", () => {
+    const pagina = crearPagina();
+    for (const etiqueta of ["Modo oscuro. Cambiar a modo claro", "Modo claro. Cambiar a tema del sistema",
+        "Tema del sistema. Cambiar a modo oscuro"]) {
+        comprobar.equal(pagina.botones[0].getAttribute("title"), etiqueta);
+        comprobar.equal(pagina.botones[0].getAttribute("aria-label"), etiqueta);
+        pagina.pulsar();
+    }
+    pagina.cambiarSistema(true);
+    pagina.pulsar();
+    pagina.pulsar();
+    comprobar.equal(pagina.botones[0].getAttribute("data-tema-actual"), "sistema");
+    pagina.cambiarSistema(false);
+    comprobar.equal(pagina.botones[0].getAttribute("data-tema-actual"), "sistema");
 });
