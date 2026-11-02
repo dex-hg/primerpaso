@@ -1,0 +1,199 @@
+/* Superficies públicas y privadas: se conservan la estructura y los espaciados. */
+:root[data-bs-theme="dark"] :is(
+    .auth-shell, .auth-footer, .category-card, .job-card, .process-card, .empty-state,
+    .panel-tarjeta, .panel-modulo, .navbar-collapse, .hero-stat-card
+) {
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border-color: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] .hero-panel {
+    background: radial-gradient(ellipse at 90% 0, rgba(72, 171, 157, 0.16), transparent 55%),
+        linear-gradient(120deg, #1a2836, #16232e);
+    border-color: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] .hero-search-form {
+    background: var(--color-surface-soft);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-card);
+}
+
+:root[data-bs-theme="dark"] #hero-carousel {
+    border-color: #334653;
+}
+
+:root[data-bs-theme="dark"] :is(.hero-description, .job-meta, .panel-bienvenida p,
+    .oportunidad-extracto, .postulacion-ayuda, .postulacion-aviso, .postulacion-fecha,
+    .postulacion-datos dt, .hero-stat-card > span:last-child, .auth-footer,
+    .save-job-button, .panel-proximamente) {
+    color: var(--color-muted);
+}
+
+:root[data-bs-theme="dark"] .hero-stat-card strong {
+    color: var(--color-ink);
+}
+
+:root[data-bs-theme="dark"] .company-panel {
+    background: linear-gradient(120deg, #1a413f, #1d3748);
+    border: 1px solid #3a5d60;
+    box-shadow: var(--shadow-soft);
+}
+
+:root[data-bs-theme="dark"] .company-panel .btn-light {
+    color: #143831;
+    background: #c2f1e9;
+    border-color: #c2f1e9;
+}
+
+:root[data-bs-theme="dark"] .process-icon {
+    color: var(--tema-sobre-acento);
+    box-shadow: none;
+}
+
+:root[data-bs-theme="dark"] .process-number {
+    color: #8a9cb4;
+}
+
+:root[data-bs-theme="dark"] :is(.company-logo-blue, .vacante-estado-borrador) {
+    color: var(--tema-info);
+    background: var(--tema-info-fondo);
+}
+
+:root[data-bs-theme="dark"] :is(.company-logo-violet, .vacante-estado-cerrada) {
+    color: var(--tema-violeta);
+    background: var(--tema-violeta-fondo);
+}
+
+:root[data-bs-theme="dark"] :is(.company-logo-teal, .vacante-estado-publicada, .cuenta-estado) {
+    color: var(--tema-exito);
+    background: var(--tema-exito-fondo);
+}
+
+:root[data-bs-theme="dark"] .company-logo-coral,
+:root[data-bs-theme="dark"] .cuenta-estado.is-error {
+    color: var(--tema-error);
+    background: var(--tema-error-fondo);
+}
+
+:root[data-bs-theme="dark"] .auth-page {
+    background: radial-gradient(ellipse at 15% 15%, rgba(63, 139, 135, 0.07), transparent 55%),
+        var(--color-surface-soft);
+}
+
+:root[data-bs-theme="dark"] :is(.role-toggle, .social-access-button, .role-card-icon,
+    .skill-chip, .interest-card, .auth-file-control, .auth-textarea, .panel-tipo,
+    .registration-progress li > span, .vacante-habilidades li, .vacante-habilidad-opcion) {
+    color: var(--color-ink);
+    background: var(--tema-control);
+    border-color: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] .social-access-button:is(:hover, :focus) {
+    background: var(--color-primary-soft);
+    border-color: var(--color-primary);
+}
+
+:root[data-bs-theme="dark"] .btn-check:checked + .role-tab {
+    color: var(--tema-sobre-acento);
+    background: var(--tema-acento);
+    box-shadow: none;
+}
+
+:root[data-bs-theme="dark"] .btn-check:checked + :is(.skill-chip, .interest-card),
+:root[data-bs-theme="dark"] .vacante-habilidad-opcion:has(input:checked) {
+    color: var(--color-primary-dark);
+    background: var(--color-primary-soft);
+    border-color: var(--color-primary);
+}
+
+:root[data-bs-theme="dark"] .role-card {
+    color: var(--color-ink);
+    background: linear-gradient(145deg, #254745, #213547);
+    border-color: #36595c;
+}
+
+:root[data-bs-theme="dark"] .form-divider::before,
+:root[data-bs-theme="dark"] .form-divider::after,
+:root[data-bs-theme="dark"] .registration-progress li:not(:last-child)::after {
+    background: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] .registration-progress .is-active > span,
+:root[data-bs-theme="dark"] .registration-progress .is-complete > span {
+    color: var(--tema-sobre-acento);
+    background: var(--tema-acento);
+}
+
+:root[data-bs-theme="dark"] .registration-progress li.is-complete {
+    color: var(--tema-exito);
+}
+
+:root[data-bs-theme="dark"] .panel-bienvenida {
+    background: radial-gradient(ellipse at 100% 0, rgba(99, 214, 197, 0.09), transparent 65%),
+        var(--color-surface);
+    border-color: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] .panel-simbolo {
+    background: var(--color-primary-soft);
+    border-color: #385253;
+}
+
+:root[data-bs-theme="dark"] .vacante-estado:not(.vacante-estado-publicada,
+    .vacante-estado-borrador, .vacante-estado-vencida, .vacante-estado-cerrada) {
+    color: var(--color-muted);
+    background: var(--tema-control);
+}
+
+:root[data-bs-theme="dark"] :is(.vacante-estado-vencida, .vacante-aviso) {
+    color: var(--tema-aviso);
+    background: var(--tema-aviso-fondo);
+    border-color: #6d5631;
+}
+
+:root[data-bs-theme="dark"] .vacante-confirmacion {
+    color: var(--tema-info);
+    background: var(--tema-info-fondo);
+    border-color: #415b86;
+}
+
+:root[data-bs-theme="dark"] .vacante-cerrar {
+    --bs-btn-color: var(--tema-error);
+    --bs-btn-hover-color: var(--tema-error);
+    --bs-btn-hover-bg: var(--tema-error-fondo);
+    color: var(--tema-error);
+}
+
+:root[data-bs-theme="dark"] .vacante-cerrar:hover {
+    color: var(--tema-error);
+    background: var(--tema-error-fondo);
+}
+
+:root[data-bs-theme="dark"] .cuenta-seccion fieldset:disabled .form-control {
+    color: var(--color-muted);
+    background: var(--color-surface-soft);
+}
+
+:root[data-bs-theme="dark"] :is(.postulacion-habilidades li, .oportunidad-habilidades span) {
+    color: var(--color-primary-dark);
+    background: var(--color-primary-soft);
+}
+
+:root[data-bs-theme="dark"] .oportunidad-datos {
+    background: var(--tema-control);
+}
+
+:root[data-bs-theme="dark"] .search-field .invalid-feedback {
+    color: var(--tema-error);
+    background: var(--color-surface);
+}
+
+@media (min-width: 1200px) {
+    :root[data-bs-theme="dark"] .site-header .navbar-collapse { background: transparent; }
+}
+
+@media (min-width: 768px) {
+    :root[data-bs-theme="dark"] .panel-header .navbar-collapse { background: transparent; }
+}

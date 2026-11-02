@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="recursos">
+        <meta name="theme-color" content="#101820">
+        <!-- Se ejecuta antes de mostrar la página para evitar un destello claro. -->
+        <script th:src="@{/js/tema.js}"></script>
+        <link rel="stylesheet" th:href="@{/css/tema.css}">
+        <link rel="stylesheet" th:href="@{/css/tema-vistas.css}">
+    </th:block>
+</head>
+<body>
+    <label class="selector-tema" th:fragment="selector">
+        <svg class="tema-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path class="tema-luna" d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/>
+            <g class="tema-sol">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>
+            </g>
+        </svg>
+        <select class="tema-selector" data-selector-tema aria-label="Tema de la interfaz" disabled>
+            <option value="oscuro">Oscuro</option>
+            <option value="claro">Claro</option>
+            <option value="sistema">Sistema</option>
+        </select>
+    </label>
+</body>
+</html>

@@ -1,0 +1,269 @@
+/* Paleta compartida con Bootstrap. El tema se resuelve antes de pintar la vista. */
+:root {
+    color-scheme: light;
+    --tema-acento: #4775f6;
+    --tema-acento-hover: #315fe1;
+    --tema-sobre-acento: #fff;
+    --tema-control: #f3f4f8;
+    --tema-cabecera: rgba(255, 255, 255, 0.96);
+    --tema-foco: #315fe1;
+}
+
+:root[data-bs-theme="dark"] {
+    color-scheme: dark;
+    --color-primary: #63d6c5;
+    --color-primary-dark: #8ce5d7;
+    --color-primary-soft: #1a3638;
+    --color-ink: #edf2f7;
+    --color-muted: #a6b4c5;
+    --color-border: #334353;
+    --color-surface: #17232f;
+    --color-surface-soft: #101820;
+    --color-footer: #0d141c;
+    --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.18);
+    --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.16);
+    --tema-acento: #63d6c5;
+    --tema-acento-hover: #8ce5d7;
+    --tema-sobre-acento: #102724;
+    --tema-control: #1e2c3a;
+    --tema-cabecera: rgba(16, 24, 32, 0.96);
+    --tema-foco: #8ce5d7;
+    --tema-exito: #91dfb3;
+    --tema-exito-fondo: #17372c;
+    --tema-error: #ffb4ad;
+    --tema-error-fondo: #40272c;
+    --tema-aviso: #f3ce8d;
+    --tema-aviso-fondo: #372f22;
+    --tema-info: #b4cbff;
+    --tema-info-fondo: #22334f;
+    --tema-violeta: #d4baf5;
+    --tema-violeta-fondo: #322a46;
+    --bs-body-color: var(--color-ink);
+    --bs-body-color-rgb: 237, 242, 247;
+    --bs-body-bg: var(--color-surface-soft);
+    --bs-body-bg-rgb: 16, 24, 32;
+    --bs-emphasis-color: var(--color-ink);
+    --bs-secondary-color: var(--color-muted);
+    --bs-secondary-rgb: 166, 180, 197;
+    --bs-danger-rgb: 255, 180, 173;
+    --bs-secondary-bg: var(--tema-control);
+    --bs-tertiary-bg: var(--color-surface);
+    --bs-border-color: var(--color-border);
+    --bs-primary: var(--tema-acento);
+    --bs-primary-rgb: 99, 214, 197;
+    --bs-link-color: var(--color-primary);
+    --bs-link-hover-color: var(--color-primary-dark);
+    --bs-form-valid-color: var(--tema-exito);
+    --bs-form-valid-border-color: var(--tema-exito);
+    --bs-form-invalid-color: var(--tema-error);
+    --bs-form-invalid-border-color: var(--tema-error);
+}
+
+:root[data-bs-theme="dark"] body {
+    background: var(--color-surface-soft);
+}
+
+/* Se mantiene visible fuera del menú plegable, también en pantallas pequeñas. */
+.selector-tema {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.65rem;
+    margin: 0;
+    padding: 0 0.55rem 0 0.8rem;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+}
+
+.tema-icono {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-primary-dark);
+}
+
+:root[data-bs-theme="light"] .tema-luna,
+:root[data-bs-theme="dark"] .tema-sol {
+    display: none;
+}
+
+.tema-selector {
+    width: 5.1rem;
+    min-height: 2.5rem;
+    padding: 0 0.1rem;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: 0.4rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.tema-selector option {
+    color: var(--color-ink);
+    background: var(--color-surface);
+}
+
+.selector-tema:focus-within {
+    outline: 2px solid var(--tema-foco);
+    outline-offset: 3px;
+}
+
+.tema-selector:focus {
+    outline: none;
+}
+
+.cabecera-herramientas {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.site-header .selector-tema {
+    margin-left: auto;
+    margin-right: 0.75rem;
+}
+
+.site-header .navbar-brand {
+    margin-right: 0.75rem;
+}
+
+:root[data-bs-theme="dark"] :is(.site-header, .auth-header) {
+    background: var(--tema-cabecera);
+    border-bottom-color: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] .navbar .nav-link {
+    color: var(--color-muted);
+}
+
+:root[data-bs-theme="dark"] .navbar .nav-link:is(:hover, :focus, .active) {
+    color: var(--color-primary-dark);
+    background: var(--color-primary-soft);
+}
+
+:root[data-bs-theme="dark"] .btn-primary-custom {
+    --bs-btn-color: var(--tema-sobre-acento);
+    --bs-btn-bg: var(--tema-acento);
+    --bs-btn-border-color: var(--tema-acento);
+    --bs-btn-hover-color: var(--tema-sobre-acento);
+    --bs-btn-hover-bg: var(--tema-acento-hover);
+    --bs-btn-hover-border-color: var(--tema-acento-hover);
+    --bs-btn-active-color: var(--tema-sobre-acento);
+    --bs-btn-active-bg: var(--tema-acento-hover);
+    --bs-btn-active-border-color: var(--tema-acento-hover);
+    --bs-btn-disabled-color: var(--tema-sobre-acento);
+    --bs-btn-disabled-bg: var(--tema-acento);
+    --bs-btn-disabled-border-color: var(--tema-acento);
+    box-shadow: 0 6px 18px rgba(58, 168, 151, 0.12);
+}
+
+:root[data-bs-theme="dark"] :is(.btn-soft, .btn-dark-custom, .btn-outline-primary-custom) {
+    --bs-btn-color: var(--color-ink);
+    --bs-btn-bg: var(--tema-control);
+    --bs-btn-border-color: var(--color-border);
+    --bs-btn-hover-color: var(--color-primary-dark);
+    --bs-btn-hover-bg: var(--color-primary-soft);
+    --bs-btn-hover-border-color: var(--color-primary);
+    --bs-btn-active-color: var(--color-primary-dark);
+    --bs-btn-active-bg: var(--color-primary-soft);
+    --bs-btn-active-border-color: var(--color-primary);
+    --bs-btn-disabled-color: var(--color-muted);
+    --bs-btn-disabled-bg: var(--tema-control);
+    --bs-btn-disabled-border-color: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] :is(.form-control, .form-select) {
+    color: var(--color-ink);
+    background-color: var(--tema-control);
+    border-color: var(--color-border);
+}
+
+:root[data-bs-theme="dark"] :is(.form-control, .form-select):focus {
+    background-color: var(--color-surface);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(99, 214, 197, 0.16);
+}
+
+:root[data-bs-theme="dark"] :is(.form-control, .form-select):disabled,
+:root[data-bs-theme="dark"] .form-control[readonly] {
+    color: var(--color-muted);
+    background-color: var(--color-surface-soft);
+    opacity: 1;
+}
+
+:root[data-bs-theme="dark"] .form-control::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+}
+
+:root[data-bs-theme="dark"] .was-validated :is(.form-control, .form-select):invalid,
+:root[data-bs-theme="dark"] :is(.form-control, .form-select).is-invalid {
+    border-color: var(--tema-error);
+}
+
+:root[data-bs-theme="dark"] .was-validated :is(.form-control, .form-select):valid,
+:root[data-bs-theme="dark"] :is(.form-control, .form-select).is-valid {
+    border-color: var(--tema-exito);
+}
+
+:root[data-bs-theme="dark"] .form-check-input:checked {
+    background-color: #278578;
+    border-color: var(--color-primary);
+}
+
+:root[data-bs-theme="dark"] :is(.form-status, .auth-form-status, .panel-estado, .vacantes-estado) {
+    color: var(--tema-exito);
+}
+
+:root[data-bs-theme="dark"] :is(.is-error, .vacante-alerta, .vacante-error-campo, .vacante-errores) {
+    color: var(--tema-error);
+}
+
+:root[data-bs-theme="dark"] .skip-link {
+    color: var(--tema-sobre-acento);
+    background: var(--tema-acento);
+}
+
+:focus-visible {
+    outline: 2px solid var(--tema-foco);
+    outline-offset: 3px;
+}
+
+@media (min-width: 1200px) {
+    .site-header .selector-tema { order: 3; margin: 0 0 0 1rem; }
+}
+
+@media (min-width: 768px) {
+    .panel-header .selector-tema { order: 3; margin: 0 0 0 1rem; }
+}
+
+@media (max-width: 575.98px) {
+    body { min-width: 0; }
+    .row.g-5 { --bs-gutter-x: 1.5rem; }
+    .auth-header-inner { flex-wrap: wrap; gap: 0.8rem; padding-block: 1rem; }
+    .cabecera-herramientas { flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; }
+    .auth-back-link { font-size: 0.8rem; }
+    .site-header .selector-tema { margin-right: 0.25rem; }
+    .site-header .brand-copy strong { font-size: 0.82rem; }
+    .site-header .navbar-toggler { padding-inline: 0.35rem; }
+}
+
+@media (max-width: 359.98px) {
+    .site-header .navbar-brand { gap: 0.4rem; margin-right: 0.25rem; }
+    .site-header .brand-copy strong { font-size: 0.75rem; }
+    .site-header .selector-tema { gap: 0.2rem; padding-inline: 0.4rem; margin-right: 0.15rem; }
+    .site-header .tema-selector { width: 4.5rem; font-size: 0.75rem; }
+    .site-header .tema-icono { width: 0.85rem; }
+    .hero-stat-card { overflow-wrap: anywhere; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
