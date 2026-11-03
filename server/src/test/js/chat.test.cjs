@@ -37,7 +37,7 @@ const preparar = (respuestas, opciones = {}) => {
     const eventos = new Map(), eventosVentana = new Map(), temporizadores = new Map();
     let numero = 0;
     const elementos = Object.fromEntries(["chat", "panel", "panel-contenido", "chat-formulario", "chat-contenido", "chat-enviar",
-        "chat-actualizar", "chat-anteriores", "chat-historial", "chat-mensajes", "chat-estado", "chat-aviso", "chat-vacio", "chat-contador"]
+        "chat-anteriores", "chat-historial", "chat-mensajes", "chat-estado", "chat-aviso", "chat-vacio"]
         .map((id) => [id, elemento()]));
     elementos.panel.dataset = { idUsuario: "8", tipoCuenta: "empresa", idEmpresa: "9", rolEmpresa: "reclutador" };
     elementos.chat.dataset = { idPostulacion: "15", puedeEnviar: String(opciones.puedeEnviar ?? true) };
@@ -64,7 +64,12 @@ const preparar = (respuestas, opciones = {}) => {
     eventos.get("DOMContentLoaded").forEach((accion) => accion());
     return { elementos, documento, destinos, solicitudes, temporizadores, eventosVentana,
         enviar: () => elementos["chat-formulario"].emitir("submit", { preventDefault() {} }),
-        actualizar: () => elementos["chat-actualizar"].emitir("click"),
+        esperarActualizacion: async () => {
+            const [id, temporizador] = [...temporizadores].sort((primero, segundo) => primero[1].demora - segundo[1].demora)[0];
+            temporizadores.delete(id);
+            temporizador.accion();
+            await new Promise(setImmediate);
+        },
         anteriores: () => elementos["chat-anteriores"].emitir("click") };
 };
 
@@ -99,10 +104,10 @@ prueba("un fallo de red conserva el borrador y el reintento usa el mismo id de e
     comprobar.equal(entorno.elementos["chat-mensajes"].children.length, 1);
 });
 
-prueba("si el envío se guardó pero se perdió la respuesta, actualizar confirma el mensaje y limpia el borrador", async () => {
+prueba("la actualización automática confirma un envío cuya respuesta se perdió y limpia el borrador", async () => {
     const entorno = preparar([identidad(), seguridad(), new Error("Sin conexión"), identidad(), respuesta(200, detalle([mensaje()]))]);
     await entorno.enviar();
-    await entorno.actualizar();
+    await entorno.esperarActualizacion();
     comprobar.equal(entorno.elementos["chat-contenido"].value, "");
     comprobar.equal(entorno.solicitudes.filter((item) => item.method === "POST").length, 1);
 });
@@ -132,14 +137,14 @@ prueba("una sesión vencida vuelve al acceso sin enviar datos", async () => {
 
 prueba("el estado de solo lectura impide enviar y conserva el texto al cambiar durante la conversación", async () => {
     const entorno = preparar([identidad(), respuesta(200, detalle([], { puedeEnviar: false, aviso: "La postulación ya no está seleccionada." }))]);
-    await entorno.actualizar();
+    await entorno.esperarActualizacion();
     await entorno.enviar();
     comprobar.equal(entorno.elementos["chat-contenido"].disabled, true);
     comprobar.match(entorno.elementos["chat-aviso"].textContent, /ya no está seleccionada/);
     comprobar.equal(entorno.solicitudes.length, 2);
 });
 
-prueba("un conflicto conserva el borrador y suspende el envío hasta actualizar", async () => {
+prueba("un conflicto conserva el borrador y suspende el envío hasta comprobar el estado", async () => {
     const entorno = preparar([identidad(), seguridad(), respuesta(409, { mensaje: "La postulación cambió." })]);
     await entorno.enviar();
     comprobar.equal(entorno.elementos["chat-enviar"].disabled, true);
@@ -153,7 +158,7 @@ prueba("carga páginas anteriores sin duplicar mensajes ni modificar el cursor d
     await entorno.anteriores();
     comprobar.equal(entorno.solicitudes[1].url, "/api/chat/postulaciones/15?antesDe=10");
     comprobar.deepEqual(entorno.elementos["chat-mensajes"].children.map((nodo) => Number(nodo.dataset.idMensaje)), [8, 9, 10]);
-    await entorno.actualizar();
+    await entorno.esperarActualizacion();
     comprobar.equal(entorno.solicitudes.at(-1).url, "/api/chat/postulaciones/15?despuesDe=10");
 });
 
@@ -195,4 +200,17 @@ prueba("posiciona el historial al final después de que el panel revalida la ses
     await new Promise(setImmediate);
     comprobar.equal(entorno.elementos["chat-historial"].scrollTop, 300);
     comprobar.equal(entorno.solicitudes.at(-1).url, "/api/chat/postulaciones/15?despuesDe=10");
+});
+
+prueba("recibe mensajes nuevos automáticamente y continúa consultando sin controles de actualización manual", async () => {
+    const primero = mensaje(11, { idEmisor: 7, idEnvio: "respuesta-1", contenido: "Tengo disponibilidad." });
+    const segundo = mensaje(12, { idEmisor: 7, idEnvio: "respuesta-2", contenido: "Podemos coordinar el horario." });
+    const entorno = preparar([identidad(), respuesta(200, detalle([primero])), identidad(), respuesta(200, detalle([segundo]))],
+        { iniciales: [10] });
+    await entorno.esperarActualizacion();
+    comprobar.deepEqual(entorno.elementos["chat-mensajes"].children.map((nodo) => Number(nodo.dataset.idMensaje)), [10, 11]);
+    comprobar.ok([...entorno.temporizadores.values()].some((temporizador) => temporizador.demora === 5000));
+    await entorno.esperarActualizacion();
+    comprobar.deepEqual(entorno.elementos["chat-mensajes"].children.map((nodo) => Number(nodo.dataset.idMensaje)), [10, 11, 12]);
+    comprobar.equal(entorno.solicitudes.filter((solicitud) => solicitud.method === "POST").length, 0);
 });

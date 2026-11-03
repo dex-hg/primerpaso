@@ -8,14 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const formulario = document.getElementById("chat-formulario");
     const texto = document.getElementById("chat-contenido");
     const enviar = document.getElementById("chat-enviar");
-    const actualizar = document.getElementById("chat-actualizar");
     const anteriores = document.getElementById("chat-anteriores");
     const historial = document.getElementById("chat-historial");
     const lista = document.getElementById("chat-mensajes");
     const estado = document.getElementById("chat-estado");
     const aviso = document.getElementById("chat-aviso");
     const vacio = document.getElementById("chat-vacio");
-    const contador = document.getElementById("chat-contador");
     if (!sesion || !panel || !formulario || !texto || !lista) return;
     if (!window.crypto?.randomUUID) {
         texto.disabled = true;
@@ -35,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const mostrar = (mensaje, error = false) => sesion.mostrarEstado(estado, mensaje, error);
-    const contar = () => { contador.textContent = `${texto.value.length} / 4000`; texto.setCustomValidity(""); };
     const ajustarControles = () => {
         texto.disabled = enviando || !puedeEnviar;
         enviar.disabled = enviando || !puedeEnviar;
@@ -56,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (resultado.estado === 401) salir("iniciar-sesion");
         const usuario = resultado.contenido;
         if (resultado.estado !== 200 || !sesion.validarUsuario(usuario)) {
-            throw new Error("No se pudo comprobar tu sesión. Vuelve a actualizar antes de continuar.");
+            throw new Error("No se pudo comprobar tu sesión. Reintentaremos automáticamente.");
         }
         if (String(usuario.idUsuario) !== panel.dataset.idUsuario || usuario.tipoCuenta !== panel.dataset.tipoCuenta ||
                 (usuario.tipoCuenta === "empresa" && (String(usuario.idEmpresa) !== panel.dataset.idEmpresa ||
@@ -117,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 nodos.set(mensaje.id, nodo);
             }
             if (pendiente && mensaje.idEnvio === pendiente.idEnvio && String(mensaje.idEmisor) === panel.dataset.idUsuario) {
-                if (texto.value.trim() === pendiente.contenido) { texto.value = ""; contar(); }
+                if (texto.value.trim() === pendiente.contenido) texto.value = "";
                 pendiente = null;
             }
         }
@@ -140,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const consultar = async (cargarAnteriores = false) => {
         if (consultando || enviando || !activo) return;
         consultando = true;
-        actualizar.disabled = true;
         anteriores.disabled = true;
         let haySiguientes = false;
         try {
@@ -157,10 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
             haySiguientes = !cargarAnteriores && detalle.haySiguientes;
             mostrar("");
         } catch (error) {
-            if (!error.navegando) mostrar(error.name === "AbortError" ? "La actualización tardó demasiado. Vuelve a intentarlo." : error.message, true);
+            if (!error.navegando) mostrar(error.name === "AbortError" ? "La conexión está tardando. Reintentaremos automáticamente." : error.message, true);
         } finally {
             consultando = false;
-            actualizar.disabled = false;
             anteriores.disabled = false;
             ajustarControles();
             programar(haySiguientes ? 100 : 5000);
@@ -183,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
             historialPosicionado = true;
             texto.value = "";
             pendiente = null;
-            contar();
             mostrar("Mensaje guardado.");
             guardado = true;
         } catch (error) {
@@ -198,8 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
             else programar();
         }
     });
-    texto.addEventListener("input", contar);
-    actualizar.addEventListener("click", () => consultar());
+    texto.addEventListener("input", () => texto.setCustomValidity(""));
     anteriores.addEventListener("click", () => consultar(true));
     window.addEventListener("pagehide", () => { activo = false; window.clearTimeout(temporizador); });
     window.addEventListener("pageshow", (evento) => { if (evento.persisted) { activo = true; programar(100); } });
@@ -207,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.clearTimeout(temporizador);
         if (document.visibilityState === "visible") programar(100);
     });
-    contar();
     ajustarControles();
     programar(100);
 });

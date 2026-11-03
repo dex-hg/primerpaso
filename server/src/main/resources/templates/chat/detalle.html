@@ -7,11 +7,11 @@
     <main class="panel-main container" id="main-content">
         <section id="panel" aria-labelledby="pagina-titulo" th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
             <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
-            <div id="panel-contenido">
-                <a th:href="@{${rutaPanel + '/mensajes'}}">Volver a mensajes</a>
+            <div id="panel-contenido" class="chat-contenido">
+                <a class="panel-enlace panel-enlace-volver" th:href="@{${rutaPanel + '/mensajes'}}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mensajes</a>
                 <div class="panel-bienvenida"><div><span class="panel-etiqueta">Chat de la postulación</span><h1 id="pagina-titulo" th:text="${chat.contexto.tituloVacante}"></h1><p><span th:text="${chat.contexto.nombreEmpresa}"></span> · <span th:text="${chat.contexto.nombrePostulante}"></span></p></div></div>
                 <section id="chat" class="panel-tarjeta chat-conversacion" th:attr="data-id-postulacion=${chat.contexto.idPostulacion},data-puede-enviar=${chat.puedeEnviar}">
-                    <div class="chat-herramientas"><h2>Conversación</h2><button id="chat-actualizar" class="btn btn-soft btn-sm" type="button">Actualizar</button></div>
+                    <div class="chat-herramientas"><h2>Conversación</h2></div>
                     <p id="chat-aviso" class="chat-aviso" th:text="${chat.aviso}" th:hidden="${#strings.isEmpty(chat.aviso)}"></p>
                     <button id="chat-anteriores" class="btn btn-soft btn-sm chat-anteriores" type="button" th:hidden="${!chat.hayAnteriores}">Cargar mensajes anteriores</button>
                     <div id="chat-historial" class="chat-historial" tabindex="0" aria-label="Historial de mensajes">
@@ -26,13 +26,12 @@
                     </div>
                     <form id="chat-formulario" novalidate>
                         <label class="form-label" for="chat-contenido">Tu mensaje</label>
-                        <textarea id="chat-contenido" class="form-control" rows="3" maxlength="4000" required th:disabled="${!chat.puedeEnviar}" aria-describedby="chat-ayuda chat-contador"></textarea>
-                        <div class="chat-pie-formulario"><small id="chat-ayuda">Puedes escribir varios párrafos. Envía con el botón.</small><small id="chat-contador">0 / 4000</small></div>
+                        <textarea id="chat-contenido" class="form-control" rows="3" maxlength="4000" required th:disabled="${!chat.puedeEnviar}"></textarea>
                         <button id="chat-enviar" class="btn btn-primary-custom" type="submit" th:disabled="${!chat.puedeEnviar}">Enviar mensaje</button>
                     </form>
                     <p id="chat-estado" class="panel-estado" role="status" aria-live="polite" aria-atomic="true" hidden></p>
                 </section>
-                <p class="chat-enlace-postulacion"><a th:href="@{${rutaPanel + '/postulaciones/' + chat.contexto.idPostulacion}}">Ver carta, perfil y estado de la postulación</a></p>
+                <p class="chat-enlace-postulacion"><a class="panel-enlace" th:href="@{${rutaPanel + '/postulaciones/' + chat.contexto.idPostulacion}}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Ver carta, perfil y estado de la postulación</a></p>
                 <noscript><p class="panel-aviso">Activa JavaScript para enviar y actualizar mensajes. El historial guardado permanece disponible.</p></noscript>
             </div>
         </section>

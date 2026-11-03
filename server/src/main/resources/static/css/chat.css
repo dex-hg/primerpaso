@@ -1,18 +1,19 @@
 .chat-bandeja, .chat-mensajes { list-style: none; margin: 0; padding: 0; }
 .chat-bandeja { display: grid; gap: 1rem; }
+.chat-contenido { display: grid; gap: 1.5rem; }
+.chat-contenido > .panel-bienvenida { margin-bottom: 0; }
 .chat-resumen { display: block; color: var(--bs-body-color); text-decoration: none; }
 .chat-resumen:hover, .chat-resumen:focus-visible { border-color: var(--bs-primary); }
-.chat-resumen-cabecera, .chat-herramientas, .chat-pie-formulario, .chat-paginacion {
+.chat-resumen-cabecera, .chat-paginacion {
     display: flex; align-items: center; justify-content: space-between; gap: 1rem;
 }
 .chat-resumen h2, .chat-herramientas h2 { font-size: 1.15rem; margin: 0; }
-.chat-resumen time, .chat-mensaje time, .chat-pie-formulario { font-size: .8rem; color: var(--bs-secondary-color); }
+.chat-resumen time, .chat-mensaje time { font-size: .8rem; color: var(--bs-secondary-color); }
 .chat-interlocutor { margin: .65rem 0 .3rem; font-weight: 600; }
 .chat-extracto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
 .chat-lectura { display: inline-block; margin-top: .6rem; font-size: .8rem; }
-.chat-conversacion { max-width: 900px; margin-inline: auto; }
+.chat-conversacion { max-width: 900px; width: 100%; margin-inline: auto; }
 .chat-herramientas { margin-bottom: 1rem; }
-.chat-herramientas button { flex-shrink: 0; }
 .chat-aviso { padding: .85rem; background: var(--bs-tertiary-bg); border-radius: .6rem; }
 .chat-historial { max-height: 480px; min-height: 180px; overflow-y: auto; padding: .3rem; margin-bottom: 1.2rem; }
 .chat-mensajes { display: flex; flex-direction: column; gap: .85rem; }
@@ -21,10 +22,8 @@
 .chat-autor { font-weight: 600; font-size: .8rem; margin: 0 0 .4rem; }
 .chat-texto { white-space: pre-wrap; margin: 0 0 .4rem; }
 .chat-anteriores { margin-bottom: .9rem; }
-.chat-pie-formulario { align-items: flex-start; margin: .5rem 0 .8rem; }
-#chat-contador { white-space: nowrap; }
-#chat-contenido { resize: vertical; }
-.chat-enlace-postulacion { text-align: center; margin: 1rem 0 0; }
+#chat-contenido { resize: vertical; margin-bottom: 1rem; }
+.chat-enlace-postulacion { text-align: center; margin: 0; }
 .chat-paginacion { justify-content: center; margin-top: 1.25rem; flex-wrap: wrap; }
 .chat-resumen-cabecera h2, #pagina-titulo { overflow-wrap: anywhere; }
 @media (max-width: 575px) {
