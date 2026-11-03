@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const panel = document.getElementById("panel");
     const estado = document.getElementById("postulacion-estado");
     const carta = formulario.elements.namedItem("cartaPresentacion");
-    const contador = document.getElementById("carta-contador");
     const controles = [...formulario.querySelectorAll("input, textarea, select, button")];
     const boton = formulario.querySelector('button[type="submit"]');
     let enProceso = false;
@@ -18,13 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const actualizarContador = () => {
-        if (carta && contador) contador.textContent = `${carta.value.length.toLocaleString("es-PE")} / 12 000`;
-    };
-    if (carta) {
-        carta.addEventListener("input", () => { carta.setCustomValidity(""); actualizarContador(); });
-        actualizarContador();
-    }
+    if (carta) carta.addEventListener("input", () => carta.setCustomValidity(""));
 
     const coincideUsuario = (usuario) => sesion.validarUsuario(usuario) &&
         String(usuario.idUsuario) === panel.dataset.idUsuario && usuario.tipoCuenta === panel.dataset.tipoCuenta &&

@@ -38,7 +38,7 @@ const preparar = (respuestas, opciones = {}) => {
     const elementos = { panel: crearElemento({ dataset: { tipoCuenta: opciones.empresa ? "empresa" : "postulante",
         idUsuario: "7", idEmpresa: "9", rolEmpresa: "reclutador" } }),
         "panel-contenido": crearElemento(), "postulacion-estado": crearElemento({ hidden: true }),
-        "carta-contador": crearElemento(), [opciones.empresa ? "formulario-estado-postulacion" : "formulario-postulacion"]: formulario };
+        [opciones.empresa ? "formulario-estado-postulacion" : "formulario-postulacion"]: formulario };
     const eventos = [];
     const documento = { body: { dataset: { rutaBase: opciones.contexto || "/" } },
         getElementById: (id) => elementos[id] || null, addEventListener: (tipo, escucha) => eventos.push(escucha) };

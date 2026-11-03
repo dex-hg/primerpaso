@@ -25,7 +25,7 @@
                 <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
             </div>
             <div id="panel-contenido">
-                <a class="vacantes-volver" th:href="@{/panel/empresa/vacantes}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mis vacantes</a>
+                <a class="vacantes-volver panel-enlace" th:href="@{/panel/empresa/vacantes}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mis vacantes</a>
                 <div class="vacantes-formulario-encabezado">
                     <div>
                         <span class="panel-etiqueta"><i class="bi bi-briefcase" aria-hidden="true"></i> <span th:text="${usuario.nombreEmpresa}"></span></span>
@@ -81,9 +81,8 @@
                         <div class="vacante-form-seccion">
                             <label class="form-label" for="descripcion">Descripción de la vacante</label>
                             <textarea class="form-control" id="descripcion" name="descripcion" required maxlength="12000" rows="8"
-                                      aria-describedby="descripcion-ayuda" th:text="${esNueva ? '' : vacante.descripcion}"
+                                      th:text="${esNueva ? '' : vacante.descripcion}"
                                       placeholder="Describe las funciones, los requisitos y lo que ofrece la oportunidad."></textarea>
-                            <p class="vacante-ayuda" id="descripcion-ayuda">Texto de hasta 12 000 caracteres. Se conservarán los saltos de línea.</p>
                             <div class="invalid-feedback">Ingresa la descripción de la vacante.</div>
                         </div>
                         <fieldset class="vacante-form-seccion vacante-seleccion-habilidades" aria-describedby="habilidades-ayuda">

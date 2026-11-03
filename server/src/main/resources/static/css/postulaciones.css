@@ -5,7 +5,6 @@
 .postulacion-contenido h3 { font-size: 1.05rem; margin-top: 1.5rem; }
 .postulacion-formulario { max-width: 54rem; width: 100%; }
 .postulacion-formulario textarea { line-height: 1.7; resize: vertical; min-height: 16rem; }
-.postulacion-ayuda { display: flex; justify-content: space-between; gap: 1rem; margin-top: .5rem; color: #526079; }
 .postulacion-aviso { margin: 1.25rem 0; color: #526079; font-size: .94rem; }
 .postulacion-acciones, .postulacion-filtros, .postulacion-paginacion { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; }
 .postulacion-filtros select { min-width: 13rem; }
@@ -32,5 +31,4 @@
     .postulacion-filtros { width: 100%; }
     .postulacion-filtros > div { flex: 1; min-width: 0; }
     .postulacion-filtros select { min-width: 0; }
-    .postulacion-ayuda { flex-wrap: wrap; gap: .25rem; }
 }
