@@ -19,6 +19,32 @@
     padding-bottom: 3.5rem;
 }
 
+.panel-enlace {
+    color: var(--color-primary-dark);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+    border-radius: 0.25rem;
+}
+
+.panel-enlace:hover {
+    color: var(--color-ink);
+}
+
+.panel-enlace:focus-visible {
+    outline: 2px solid var(--color-primary-dark);
+    outline-offset: 4px;
+}
+
+.panel-enlace-volver {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+}
+
 .panel-sesion {
     display: flex;
     min-height: 2.25rem;

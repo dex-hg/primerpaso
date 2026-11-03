@@ -24,7 +24,7 @@
                 <button id="panel-reintentar" class="btn btn-soft btn-sm" type="button" hidden>Reintentar</button>
             </div>
             <div id="panel-contenido">
-                <a class="oportunidad-volver" th:href="@{/panel/postulante/vacantes}"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Volver a vacantes</a>
+                <a class="oportunidad-volver panel-enlace" th:href="@{/panel/postulante/vacantes}"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Volver a vacantes</a>
                 <article class="panel-tarjeta oportunidad-detalle">
                     <div class="oportunidad-meta"><span class="panel-tipo" th:text="${vacante.modalidad == 'hibrida' ? 'Híbrida' : #strings.capitalize(vacante.modalidad)}"></span><span th:text="${'Publicada el ' + formatoFecha.format(vacante.fechaPublicacion)}"></span></div>
                     <h1 id="pagina-titulo" th:text="${vacante.titulo}"></h1><p class="oportunidad-empresa" th:text="${vacante.nombreEmpresa}"></p>

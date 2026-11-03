@@ -8,7 +8,7 @@
         <section id="panel" aria-labelledby="pagina-titulo" th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
             <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
             <div id="panel-contenido" class="postulacion-contenido">
-                <a th:href="@{${rutaPostulaciones}}">Volver a postulaciones</a>
+                <a class="panel-enlace panel-enlace-volver" th:href="@{${rutaPostulaciones}}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a postulaciones</a>
                 <div class="panel-bienvenida"><div><span class="panel-etiqueta" th:text="${detalle.postulacion.nombreEstado()}"></span><h1 id="pagina-titulo" th:text="${detalle.postulacion.tituloVacante}"></h1><p th:text="${detalle.postulacion.nombreEmpresa}"></p></div></div>
                 <div class="postulacion-columnas">
                     <article class="panel-tarjeta">
