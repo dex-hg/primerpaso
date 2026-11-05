@@ -25,7 +25,6 @@ import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 @RequestMapping("/api/sesion")
 public class ControladorSesion {
 
-    private static final String ATRIBUTO_CSRF = "primerpaso.tokenCsrf";
     private final SecureRandom aleatorio = new SecureRandom();
     private final ServicioSesion servicio;
     private final AccesoSesion acceso;
@@ -77,13 +76,14 @@ public class ControladorSesion {
     }
 
     private String obtenerToken(HttpSession sesion) {
-        if (sesion.getAttribute(ATRIBUTO_CSRF) instanceof String token) {
-            return token;
+        String actual = acceso.tokenActual(sesion);
+        if (actual != null) {
+            return actual;
         }
         byte[] bytes = new byte[32];
         aleatorio.nextBytes(bytes);
         String token = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-        sesion.setAttribute(ATRIBUTO_CSRF, token);
+        sesion.setAttribute(AccesoSesion.ATRIBUTO_CSRF, token);
         return token;
     }
 

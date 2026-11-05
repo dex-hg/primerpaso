@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es" data-bs-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{postulaciones/fragmentos :: cabecera('Notificaciones')}"></head>
+<body class="panel-page" th:attr="data-ruta-base=@{/}">
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+    <div th:replace="~{fragments/header :: panelHeader('notificaciones')}"></div>
+    <main class="panel-main container" id="main-content">
+        <section id="panel" aria-labelledby="pagina-titulo"
+                 th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
+            <div th:replace="~{postulaciones/fragmentos :: estadoSesion}"></div>
+            <div id="panel-contenido" class="postulacion-contenido">
+                <div class="panel-bienvenida">
+                    <div>
+                        <span class="panel-etiqueta"><i class="bi bi-bell" aria-hidden="true"></i> Bandeja de entrada</span>
+                        <h1 id="pagina-titulo">Notificaciones</h1>
+                        <p>Consulta las novedades sobre postulaciones, ofertas y resultados.</p>
+                    </div>
+                </div>
+
+                <div class="postulacion-herramientas">
+                    <nav class="d-flex flex-wrap gap-2" aria-label="Filtrar notificaciones">
+                        <a class="btn btn-soft" th:href="@{/panel/notificaciones}"
+                           th:attr="aria-current=${estadoFiltro == 'todas' ? 'page' : null}">Todas</a>
+                        <a class="btn btn-soft" th:href="@{/panel/notificaciones(estado='sin_leer')}"
+                           th:attr="aria-current=${estadoFiltro == 'sin_leer' ? 'page' : null}"
+                           th:text="|Sin leer (${bandeja.pendientes})|"></a>
+                    </nav>
+                    <form method="post" th:action="@{/panel/notificaciones/leer-todas}" th:if="${bandeja.pendientes > 0}">
+                        <input type="hidden" name="tokenCsrf" th:value="${tokenCsrf}">
+                        <input type="hidden" name="estado" th:value="${estadoFiltro}">
+                        <button class="btn btn-soft" type="submit">Marcar todas como leídas</button>
+                    </form>
+                </div>
+
+                <section class="panel-tarjeta postulacion-vacio" th:if="${#lists.isEmpty(bandeja.pagina.elementos)}">
+                    <h2 th:text="${estadoFiltro == 'sin_leer' ? 'Estás al día' : 'No hay notificaciones en esta página'}"></h2>
+                    <p class="mb-0" th:text="${estadoFiltro == 'sin_leer' ? 'Las próximas notificaciones sin leer aparecerán aquí.' : 'Aquí encontrarás las novedades de tus procesos de selección.'}"></p>
+                </section>
+
+                <div class="postulacion-lista">
+                    <article class="panel-tarjeta postulacion-tarjeta" th:each="aviso : ${bandeja.pagina.elementos}">
+                        <div>
+                            <span class="panel-tipo" th:unless="${aviso.leida}">Sin leer</span>
+                            <h2 th:text="${aviso.titulo()}"></h2>
+                            <p class="mb-1"><strong th:text="${aviso.tituloVacante}"></strong> · <span th:text="${aviso.nombreEmpresa}"></span></p>
+                            <time class="postulacion-fecha" th:attr="datetime=${aviso.fecha}"
+                                  th:text="|${formatoFecha.format(aviso.fecha)} (Lima)|"></time>
+                        </div>
+                        <a class="btn btn-soft" th:if="${aviso.leida}"
+                           th:href="@{${rutaPostulaciones + '/' + aviso.idPostulacion}}">Ver postulación</a>
+                        <form class="postulacion-acciones" th:unless="${aviso.leida}" method="post"
+                              th:action="@{/panel/notificaciones/{id}/leer(id=${aviso.id})}">
+                            <input type="hidden" name="tokenCsrf" th:value="${tokenCsrf}">
+                            <input type="hidden" name="estado" th:value="${estadoFiltro}">
+                            <button class="btn btn-primary-custom" type="submit" name="abrir" value="true">Ver postulación</button>
+                            <button class="btn btn-soft" type="submit">Marcar como leída</button>
+                        </form>
+                    </article>
+                </div>
+
+                <nav class="postulacion-paginacion" aria-label="Páginas de notificaciones"
+                     th:if="${bandeja.pagina.numero > 0 or bandeja.pagina.haySiguiente}">
+                    <a class="btn btn-soft" th:if="${bandeja.pagina.numero > 0}"
+                       th:href="@{/panel/notificaciones(estado=${estadoFiltro},pagina=${bandeja.pagina.numero - 1})}">Anterior</a>
+                    <span th:text="|Página ${bandeja.pagina.numero + 1}|"></span>
+                    <a class="btn btn-soft" th:if="${bandeja.pagina.haySiguiente}"
+                       th:href="@{/panel/notificaciones(estado=${estadoFiltro},pagina=${bandeja.pagina.numero + 1})}">Siguiente</a>
+                </nav>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>
+    <th:block th:replace="~{postulaciones/fragmentos :: scripts}"></th:block>
+</body>
+</html>

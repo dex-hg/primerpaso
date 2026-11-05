@@ -77,6 +77,12 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
         if (!Boolean.TRUE.equals(esquemaContratacion)) {
             throw new IllegalStateException("Aplica db/migraciones/V002__contratacion.sql antes de iniciar el servidor.");
         }
+        Boolean esquemaNotificaciones = jdbc.queryForObject("""
+                SELECT to_regclass('lecturas_notificaciones') IS NOT NULL
+                """, Boolean.class);
+        if (!Boolean.TRUE.equals(esquemaNotificaciones)) {
+            throw new IllegalStateException("Aplica db/migraciones/V003__lecturas_notificaciones.sql antes de iniciar el servidor.");
+        }
         REGISTRO.info("Conexión con PostgreSQL y tablas del proyecto comprobadas.");
     }
 }

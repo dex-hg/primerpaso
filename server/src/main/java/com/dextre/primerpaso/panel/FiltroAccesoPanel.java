@@ -29,7 +29,10 @@ import jakarta.servlet.http.HttpServletResponse;
 @Order(Ordered.LOWEST_PRECEDENCE - 10)
 public class FiltroAccesoPanel extends OncePerRequestFilter {
 
-    private static final Set<String> RUTAS_COMUNES = Set.of("/panel", "/cuenta", "/html/cuenta.html");
+    private static final Set<String> RUTAS_COMUNES = Set.of("/panel", "/cuenta", "/cuenta/historial",
+            "/html/cuenta.html", "/panel/notificaciones", "/panel/notificaciones/leer-todas",
+            "/api/notificaciones/pendientes");
+    private static final Pattern LEER_NOTIFICACION = Pattern.compile("/panel/notificaciones/[1-9][0-9]*/leer");
     private static final Pattern RUTAS_VACANTES = Pattern.compile(
             "/panel/empresa/vacantes(?:/nueva|/[1-9][0-9]*/editar)?");
     private static final Pattern API_VACANTES = Pattern.compile(
@@ -88,7 +91,7 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
                 && ruta.startsWith("/panel/" + usuario.tipoCuenta() + "/"));
         if (!RUTAS_COMUNES.contains(ruta) && !ruta.equals("/api/cuenta")
                 && !ruta.equals("/panel/" + usuario.tipoCuenta()) && !permisoEmpresa && !permisoPostulante
-                && !permisoPostulaciones && !permisoChat) {
+                && !permisoPostulaciones && !permisoChat && !LEER_NOTIFICACION.matcher(ruta).matches()) {
             mostrarError(solicitud, respuesta, 403);
             return;
         }
@@ -100,7 +103,8 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
         return ruta.equals("/api/vacantes") || ruta.startsWith("/api/vacantes/")
                 || ruta.equals("/api/cuenta") || ruta.startsWith("/api/cuenta/")
                 || ruta.equals("/api/postulaciones") || ruta.startsWith("/api/postulaciones/")
-                || ruta.equals("/api/chat") || ruta.startsWith("/api/chat/");
+                || ruta.equals("/api/chat") || ruta.startsWith("/api/chat/")
+                || ruta.equals("/api/notificaciones") || ruta.startsWith("/api/notificaciones/");
     }
 
     private String obtenerRuta(HttpServletRequest solicitud) {

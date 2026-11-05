@@ -24,6 +24,7 @@ public class AccesoSesion {
     private static final String ATRIBUTO_USUARIO = "primerpaso.idUsuario";
     private static final String ATRIBUTO_TIPO = "primerpaso.tipoCuenta";
     private static final String ATRIBUTO_EMPRESA = "primerpaso.idEmpresa";
+    static final String ATRIBUTO_CSRF = "primerpaso.tokenCsrf";
     private final ServicioSesion servicio;
     private final boolean cookieSegura;
 
@@ -80,9 +81,14 @@ public class AccesoSesion {
                 .maxAge(Duration.ZERO).build().toString());
     }
 
+    public String tokenActual(HttpSession sesion) {
+        Object guardado = sesion == null ? null : sesion.getAttribute(ATRIBUTO_CSRF);
+        return guardado instanceof String token ? token : null;
+    }
+
     public void comprobarToken(HttpSession sesion, String recibido) {
-        Object guardado = sesion == null ? null : sesion.getAttribute("primerpaso.tokenCsrf");
-        if (!(guardado instanceof String esperado) || recibido == null || recibido.length() != 43
+        String esperado = tokenActual(sesion);
+        if (esperado == null || recibido == null || recibido.length() != 43
                 || !MessageDigest.isEqual(esperado.getBytes(StandardCharsets.US_ASCII),
                         recibido.getBytes(StandardCharsets.US_ASCII))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,

@@ -359,6 +359,13 @@ CREATE TABLE avisos_contratacion (
 );
 CREATE INDEX idx_avisos_postulacion ON avisos_contratacion (id_postulacion, destinatario, id_aviso DESC);
 
+CREATE TABLE lecturas_notificaciones (
+    id_aviso BIGINT NOT NULL REFERENCES avisos_contratacion(id_aviso) ON DELETE CASCADE,
+    id_usuario BIGINT NOT NULL REFERENCES users(id_user) ON DELETE CASCADE,
+    leida_en TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+    PRIMARY KEY (id_aviso, id_usuario)
+);
+
 COMMIT;
 
 -- Reglas del backend: crear cuenta y perfil/membresía en una transacción;
