@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
         confirmar.id = "vacante-confirmar";
         confirmar.type = "button";
         confirmar.className = "btn btn-primary-custom";
-        confirmar.textContent = accion === "publicar" ? "Confirmar publicación" : "Confirmar cierre";
+        confirmar.textContent = accion === "publicar" ? "Confirmar publicación" : "Cerrar recepción";
         cancelar.addEventListener("click", () => cerrarConfirmacion());
         confirmar.addEventListener("click", async () => {
             if (enProceso) return;
@@ -167,11 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         const pregunta = accion === "publicar" ? "¿Publicar esta vacante con la última información guardada?" :
-            "¿Cerrar esta vacante? Pasará a Cerrada y conservará su información e historial." +
+            "¿Dejar de recibir postulaciones? Pasará a Cerrada y podrás continuar con las solicitudes recibidas." +
             (cambiosPendientes ? " Los cambios del formulario sin guardar se descartarán." : "");
         mostrarConfirmacion(boton, pregunta, accion, () =>
             ejecutarCambio(`api/vacantes/${identificador}/${accion}`, "POST", { version },
-                accion === "publicar" ? "Publicando vacante…" : "Cerrando vacante…",
+                accion === "publicar" ? "Publicando vacante…" : "Cerrando la recepción…",
                 () => window.location.assign(sesion.obtenerRuta("panel/empresa/vacantes"))));
     }));
 
@@ -232,7 +232,8 @@ document.addEventListener("DOMContentLoaded", () => {
             titulo: campo("titulo").value, descripcion: campo("descripcion").value,
             idCarrera: Number(carrera.value), habilidades: habilidades.filter((habilidad) => habilidad.checked).map((habilidad) => Number(habilidad.value)),
             modalidad: campo("modalidad").value, ciudad: campo("ciudad").value,
-            codigoPais: campo("codigoPais").value, fechaVencimiento: fechaLimite.toISOString()
+            codigoPais: campo("codigoPais").value, fechaVencimiento: fechaLimite.toISOString(),
+            plazas: Number(campo("plazas").value)
         };
         // Conserva la precisión de la versión de PostgreSQL, sin convertirla a Date.
         if (identificador) datos.version = version;

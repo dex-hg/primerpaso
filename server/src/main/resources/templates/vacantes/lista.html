@@ -64,8 +64,12 @@
                         <div class="vacante-encabezado">
                             <div>
                                 <span class="vacante-estado" th:classappend="${vacante.vencida ? 'vacante-estado-vencida' : 'vacante-estado-' + vacante.estado}"
-                                      th:text="${vacante.vencida ? 'Vencida' : (vacante.estado == 'borrador' ? 'Borrador' : (vacante.estado == 'publicada' ? 'Publicada' : 'Cerrada'))}"></span>
+                                      th:text="${vacante.nombreEstado()}"></span>
                                 <h2><a th:href="@{/panel/empresa/vacantes/{id}/editar(id=${vacante.id})}" th:text="${vacante.titulo}"></a></h2>
+                                <p class="mb-1" th:text="|${vacante.plazasCubiertas} de ${vacante.plazas} plazas cubiertas|"></p>
+                                <p class="mb-1" th:if="${vacante.procesoActivo() and (vacante.estado == 'cerrada' or vacante.vencida) and vacante.postulacionesActivas > 0}">
+                                    Proceso por resolver
+                                </p>
                             </div>
                             <span class="vacante-carrera" th:text="${vacante.nombreCarrera}"></span>
                         </div>
@@ -86,7 +90,7 @@
                                 <button class="btn btn-primary-custom btn-sm" type="button" data-accion="publicar" th:if="${vacante.estado == 'borrador'}"
                                         th:attr="data-id-vacante=${vacante.id},data-version=${vacante.version.toString()}">Publicar</button>
                                 <button class="btn btn-soft btn-sm vacante-cerrar" type="button" data-accion="cerrar" th:if="${vacante.estado == 'publicada'}"
-                                        th:attr="data-id-vacante=${vacante.id},data-version=${vacante.version.toString()}">Cerrar</button>
+                                        th:attr="data-id-vacante=${vacante.id},data-version=${vacante.version.toString()}">Dejar de recibir</button>
                             </div>
                         </div>
                     </article>

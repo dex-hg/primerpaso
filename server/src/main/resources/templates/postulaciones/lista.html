@@ -10,6 +10,18 @@
             <div id="panel-contenido" class="postulacion-contenido">
                 <div class="panel-bienvenida"><div><span class="panel-etiqueta" th:text="${esEmpresa ? 'Selección de personal' : 'Tu búsqueda de oportunidades'}"></span><h1 id="pagina-titulo" th:text="${esEmpresa ? 'Postulaciones recibidas' : 'Mis postulaciones'}"></h1><p th:text="${esEmpresa ? 'Consulta quiénes postularon, cuándo enviaron su solicitud y su presentación.' : 'Consulta tus solicitudes enviadas y el estado que registra cada empresa.'}"></p></div></div>
                 <p th:if="${paginaPostulaciones.tituloVacante != null}">Vacante: <strong th:text="${paginaPostulaciones.tituloVacante}"></strong></p>
+                <details class="panel-tarjeta" th:if="${!#lists.isEmpty(avisosContratacion)}"
+                         th:open="${#lists.size(avisosContratacion) <= 3}">
+                    <summary class="fw-semibold" th:text="|Avisos recientes (${#lists.size(avisosContratacion)})|"></summary>
+                    <ul class="list-unstyled d-grid gap-3 mt-3 mb-0">
+                        <li th:each="aviso : ${avisosContratacion}">
+                            <a class="panel-enlace" th:href="@{${rutaPostulaciones + '/' + aviso.idPostulacion}}"
+                               th:text="${aviso.tituloVacante}"></a>
+                            <p class="mb-0" th:text="${aviso.mensaje()}"></p>
+                            <small class="postulacion-fecha" th:text="|${formatoFecha.format(aviso.fecha)} (Lima)|"></small>
+                        </li>
+                    </ul>
+                </details>
                 <div class="postulacion-herramientas">
                     <form class="postulacion-filtros" method="get" th:action="@{${rutaPostulaciones}}">
                         <input th:if="${idVacante != null}" type="hidden" name="idVacante" th:value="${idVacante}">

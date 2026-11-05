@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <section th:fragment="detalle" class="panel-tarjeta d-grid gap-3" aria-labelledby="contratacion-titulo"
+             th:with="rutaOfertas=|api/postulaciones/${detalle.postulacion.id}/ofertas|,progreso=${contratacion.progreso}">
+        <h2 id="contratacion-titulo" class="mb-0">Ofertas y contratación</h2>
+        <p class="mb-0" th:if="${esEmpresa}"
+           th:text="${progreso.cubiertas + ' de ' + progreso.plazas + ' plazas cubiertas · ' + progreso.reservadas + ' reservadas'}"></p>
+        <p class="mb-0" th:if="${#lists.isEmpty(contratacion.ofertas) and !contratacion.puedeOfertar}">
+            Todavía no hay ofertas para esta postulación.
+        </p>
+
+        <article class="border-top pt-3" th:each="oferta, iteracion : ${contratacion.ofertas}"
+                 th:with="rutaOferta=${rutaOfertas + '/' + oferta.id}">
+            <h3 class="mt-0" th:text="${oferta.nombreEstado()}"></h3>
+            <p class="postulacion-carta" th:text="${oferta.condiciones}"></p>
+            <dl class="postulacion-datos">
+                <dt>Fecha prevista de inicio</dt><dd th:text="${formatoFechaInicio.format(oferta.fechaInicio)}"></dd>
+                <dt>Enviada (Lima)</dt><dd th:text="${formatoFecha.format(oferta.enviadaEn)}"></dd>
+                <dt>Plazo de respuesta (Lima)</dt><dd th:text="${formatoFecha.format(oferta.venceEn)}"></dd>
+                <th:block th:if="${oferta.respondidaEn != null}">
+                    <dt>Respuesta (Lima)</dt><dd th:text="${formatoFecha.format(oferta.respondidaEn)}"></dd>
+                </th:block>
+                <th:block th:if="${oferta.resueltaEn != null}">
+                    <dt>Resolución (Lima)</dt><dd th:text="${formatoFecha.format(oferta.resueltaEn)}"></dd>
+                </th:block>
+            </dl>
+
+            <form class="postulacion-acciones" method="post"
+                  th:if="${iteracion.first and !esEmpresa and contratacion.puedeGestionarOferta and oferta.estado == 'pendiente'}"
+                  th:attr="data-contratacion-ruta=${rutaOferta + '/respuesta'}">
+                <button class="btn btn-primary-custom" type="submit" name="aceptada" value="true">Aceptar oferta</button>
+                <button class="btn btn-soft" type="submit" name="aceptada" value="false">Rechazar oferta</button>
+            </form>
+
+            <details class="mb-3"
+                     th:if="${iteracion.first and esEmpresa and contratacion.puedeGestionarOferta and oferta.estado == 'aceptada'}">
+                <summary class="fw-semibold">Confirmar contratación</summary>
+                <form class="mt-3" method="post" th:attr="data-contratacion-ruta=${rutaOferta + '/confirmar'}">
+                    <input type="hidden" name="versionVacante" th:value="${progreso.versionVacante.toString()}">
+                    <input type="hidden" name="postulacionesAFinalizar" th:value="${progreso.alFinalizarUltimaPlaza()}">
+                    <p th:if="${progreso.ultimaPlaza()}" th:text="|Esta contratación cubre la última plaza. Se cerrará la vacante, se finalizarán ${progreso.alFinalizarUltimaPlaza()} postulaciones pendientes y se avisará a sus titulares.|"></p>
+                    <p th:unless="${progreso.ultimaPlaza()}">Esta contratación cubre una plaza. El proceso continuará para las plazas restantes.</p>
+                    <button class="btn btn-primary-custom" type="submit">Registrar contratación</button>
+                </form>
+            </details>
+
+            <details th:if="${iteracion.first and contratacion.puedeRetirarOferta}">
+                <summary class="fw-semibold">Retirar oferta</summary>
+                <form class="mt-3" method="post" th:attr="data-contratacion-ruta=${rutaOferta + '/retirar'}">
+                    <p>Se liberará la plaza reservada y el postulante recibirá un aviso.</p>
+                    <button class="btn btn-soft" type="submit">Confirmar retiro de oferta</button>
+                </form>
+            </details>
+        </article>
+
+        <form class="d-grid gap-3" method="post" th:if="${contratacion.puedeOfertar}"
+              th:attr="data-contratacion-ruta=${rutaOfertas}">
+            <h3 class="mt-0 mb-0">Enviar una oferta</h3>
+            <input type="hidden" name="version" th:value="${detalle.postulacion.version.toString()}">
+            <input type="hidden" name="idEnvio" th:value="${idEnvioOferta}">
+            <div>
+                <label class="form-label" for="oferta-condiciones">Condiciones acordadas</label>
+                <textarea class="form-control" id="oferta-condiciones" name="condiciones" required rows="4" maxlength="4000"></textarea>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label" for="oferta-inicio">Fecha prevista de inicio</label>
+                    <input class="form-control" id="oferta-inicio" name="fechaInicio" type="date" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="oferta-vence">Plazo de respuesta (hora de Lima)</label>
+                    <input class="form-control" id="oferta-vence" name="venceEn" type="datetime-local" required>
+                </div>
+            </div>
+            <div><button class="btn btn-primary-custom" type="submit">Enviar oferta</button></div>
+        </form>
+
+        <details th:if="${contratacion.puedeRetirarPostulacion}">
+            <summary class="fw-semibold">Retirar postulación</summary>
+            <form class="mt-3" method="post" th:attr="data-contratacion-ruta=|api/postulaciones/${detalle.postulacion.id}/retirar|">
+                <input type="hidden" name="version" th:value="${detalle.postulacion.version.toString()}">
+                <p>La empresa recibirá un aviso. Si había una oferta pendiente o aceptada, se liberará su plaza.</p>
+                <button class="btn btn-soft" type="submit">Confirmar retiro de postulación</button>
+            </form>
+        </details>
+        <p id="contratacion-estado" class="panel-estado" role="status" aria-live="polite" tabindex="-1" hidden></p>
+    </section>
+</body>
+</html>

@@ -51,7 +51,7 @@ const prepararVacantes = (respuestas, opciones = {}) => {
     const valores = {
         titulo: "  Practicante web  ", descripcion: "  Funciones y requisitos\nSegunda línea  ",
         idCarrera: "3", modalidad: "hibrida", ciudad: " Lima ", codigoPais: "pe",
-        fechaVencimiento: "2040-06-05T11:30"
+        fechaVencimiento: "2040-06-05T11:30", plazas: "2"
     };
     const campos = Object.fromEntries(Object.entries(valores).map(([nombre, value]) =>
         [nombre, crearElemento({ name: nombre, value, requerido: true })]));
@@ -129,7 +129,7 @@ prueba("crear un borrador envía habilidades y fecha de Lima con CSRF y contexto
     comprobar.deepEqual(JSON.parse(solicitud.body), {
         titulo: "Practicante web", descripcion: "Funciones y requisitos\nSegunda línea",
         idCarrera: 3, habilidades: [2, 4], modalidad: "hibrida", ciudad: "Lima",
-        codigoPais: "PE", fechaVencimiento: "2040-06-05T16:30:00.000Z"
+        codigoPais: "PE", fechaVencimiento: "2040-06-05T16:30:00.000Z", plazas: 2
     });
     comprobar.deepEqual(entorno.destinos, ["/primerpaso/panel/empresa/vacantes/29/editar"]);
 });
@@ -184,7 +184,7 @@ prueba("cancelar la confirmación evita cerrar una vacante", async () => {
     comprobar.equal(entorno.solicitudes.length, 0);
     const pregunta = entorno.documento.getElementById("vacante-confirmacion").hijos[0].textContent;
     comprobar.match(pregunta, /Pasará a Cerrada/);
-    comprobar.doesNotMatch(pregunta, /postulaciones/);
+    comprobar.match(pregunta, /podrás continuar con las solicitudes recibidas/);
     await entorno.cancelar();
     comprobar.equal(entorno.documento.getElementById("vacante-confirmacion"), null);
     comprobar.equal(entorno.cerrar.enfocado, true);

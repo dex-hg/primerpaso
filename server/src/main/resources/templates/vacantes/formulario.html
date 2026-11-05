@@ -34,9 +34,9 @@
                         <p th:unless="${esNueva}" th:text="${soloLectura ? 'Consulta la información de esta oportunidad.' : 'Actualiza la información de la oportunidad de tu empresa.'}"></p>
                     </div>
                     <span th:if="${!esNueva}" class="vacante-estado" th:classappend="${vacante.vencida ? 'vacante-estado-vencida' : 'vacante-estado-' + vacante.estado}"
-                          th:text="${vacante.vencida ? 'Vencida' : (vacante.estado == 'borrador' ? 'Borrador' : (vacante.estado == 'publicada' ? 'Publicada' : 'Cerrada'))}"></span>
+                          th:text="${vacante.nombreEstado()}"></span>
                 </div>
-                <p class="vacante-aviso" th:if="${soloLectura}">Esta vacante se conserva para mantener su historial y ya no admite cambios.</p>
+                <p class="vacante-aviso" th:if="${soloLectura}">Puedes consultar la información guardada y el estado del proceso de selección.</p>
                 <p class="vacante-aviso" th:if="${#lists.isEmpty(catalogos.carreras) or #lists.isEmpty(catalogos.habilidades)}">
                     No hay carreras o habilidades disponibles. Contacta al administrador para completar los catálogos antes de guardar una vacante.
                 </p>
@@ -102,9 +102,9 @@
                             <p id="habilidades-error" class="vacante-error-campo" role="status" hidden></p>
                         </fieldset>
                         <div class="vacante-form-seccion">
-                            <h2>Ubicación y vigencia</h2>
+                            <h2>Ubicación, vigencia y plazas</h2>
                             <div class="row g-4 mt-0">
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <label class="form-label" for="ciudad">Ciudad</label>
                                     <input class="form-control" id="ciudad" name="ciudad" type="text" required maxlength="120"
                                            th:value="${esNueva ? '' : vacante.ciudad}" placeholder="Por ejemplo: Lima">
@@ -117,12 +117,19 @@
                                     <p class="vacante-ayuda" id="pais-ayuda">Código de 2 letras. Perú: PE.</p>
                                     <div class="invalid-feedback">Usa 2 letras, por ejemplo PE.</div>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <label class="form-label" for="fechaVencimiento">Fecha de vencimiento</label>
                                     <input class="form-control" id="fechaVencimiento" name="fechaVencimiento" type="datetime-local" required
                                            aria-describedby="fecha-ayuda" th:value="${fechaVencimientoLocal}">
                                     <p class="vacante-ayuda" id="fecha-ayuda">Hora de Lima (UTC−5). Debe ser una fecha futura.</p>
                                     <div class="invalid-feedback">Selecciona una fecha y hora futuras.</div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label" for="plazas">Plazas</label>
+                                    <input class="form-control" id="plazas" name="plazas" type="number" min="1" max="1000" step="1"
+                                           required th:value="${esNueva ? 1 : vacante.plazas}"
+                                           th:disabled="${!esNueva and vacante.estado != 'borrador'}">
+                                    <div class="invalid-feedback">Ingresa entre 1 y 1000 plazas.</div>
                                 </div>
                             </div>
                         </div>
@@ -140,13 +147,33 @@
                 </form>
                 <div th:if="${!esNueva and vacante.estado != 'cerrada'}" class="vacante-gestion panel-tarjeta">
                     <div>
-                        <h2 th:text="${vacante.estado == 'borrador' ? 'Publicar esta oportunidad' : 'Cerrar esta oportunidad'}"></h2>
-                        <p th:text="${vacante.estado == 'borrador' ? 'Se publicará la última información guardada. Guarda los cambios antes de publicar.' : 'La vacante pasará a Cerrada y conservará su información e historial.'}"></p>
+                        <h2 th:text="${vacante.estado == 'borrador' ? 'Publicar esta oportunidad' : 'Cerrar la recepción de postulaciones'}"></h2>
+                        <p th:text="${vacante.estado == 'borrador' ? 'Se publicará la última información guardada. Guarda los cambios antes de publicar.' : 'La vacante pasará a Cerrada. Podrás continuar con quienes ya postularon.'}"></p>
                     </div>
                     <button class="btn" type="button" th:classappend="${vacante.estado == 'borrador' ? 'btn-primary-custom' : 'btn-soft vacante-cerrar'}"
                             th:attr="data-accion=${vacante.estado == 'borrador' ? 'publicar' : 'cerrar'},data-id-vacante=${vacante.id},data-version=${vacante.version.toString()}"
-                            th:text="${vacante.estado == 'borrador' ? 'Publicar vacante' : 'Cerrar vacante'}"></button>
+                            th:text="${vacante.estado == 'borrador' ? 'Publicar vacante' : 'Dejar de recibir'}"></button>
                 </div>
+                <section class="panel-tarjeta mt-3" aria-labelledby="proceso-titulo"
+                         th:if="${!esNueva and vacante.estado != 'borrador'}">
+                    <h2 id="proceso-titulo">Proceso de selección</h2>
+                    <p th:text="|${vacante.plazasCubiertas} de ${vacante.plazas} plazas cubiertas|"></p>
+                    <p th:if="${vacante.detalleCancelacion != null}" th:text="|Motivo de cancelación. ${vacante.detalleCancelacion}|"></p>
+                    <a class="panel-enlace" th:href="@{/panel/empresa/postulaciones(idVacante=${vacante.id})}">Ver postulaciones</a>
+                    <details class="mt-3" th:if="${vacante.procesoActivo()}">
+                        <summary class="fw-semibold">Cancelar proceso</summary>
+                        <form class="mt-3" method="post"
+                              th:attr="data-contratacion-ruta=|api/vacantes/${vacante.id}/cancelar-proceso|">
+                            <input type="hidden" name="versionVacante" th:value="${vacante.version.toString()}">
+                            <input type="hidden" name="postulacionesAFinalizar" th:value="${vacante.postulacionesActivas}">
+                            <p th:text="|Se finalizarán ${vacante.postulacionesActivas} postulaciones activas y se avisará a sus titulares. Resuelve las ofertas aceptadas antes de cancelar.|"></p>
+                            <label class="form-label" for="motivo-cancelacion">Motivo para el historial de la empresa</label>
+                            <textarea class="form-control mb-3" id="motivo-cancelacion" name="motivo" rows="3" maxlength="500" required></textarea>
+                            <button class="btn btn-soft" type="submit">Confirmar cancelación del proceso</button>
+                        </form>
+                    </details>
+                    <p id="contratacion-estado" class="panel-estado" role="status" aria-live="polite" tabindex="-1" hidden></p>
+                </section>
                 <noscript><p class="panel-aviso">Activa JavaScript para guardar, publicar o cerrar vacantes y cerrar sesión.</p></noscript>
             </div>
         </section>
@@ -157,5 +184,6 @@
     <script th:src="@{/js/sesion.js}"></script>
     <script th:src="@{/js/panel.js}"></script>
     <script th:src="@{/js/vacantes.js}"></script>
+    <script th:src="@{/js/contratacion.js}"></script>
 </body>
 </html>
