@@ -121,7 +121,7 @@ class ControladorVacantesTests {
         UsuarioSesion usuarioActual = empresa(rol);
         when(sesiones.consultarUsuario(22L, "empresa", 69L)).thenReturn(usuarioActual);
         SolicitudVacante datosNuevos = new SolicitudVacante("Desarrollador Java", "Desarrollo de sistemas web.",
-                4L, List.of(8L, 9L), "remota", "Lima", "PE", VENCIMIENTO, null);
+                4L, List.of(8L, 9L), "remota", "Lima", "PE", VENCIMIENTO, null, null);
         when(vacantes.crear(usuarioActual, datosNuevos)).thenReturn(vacante("borrador"));
 
         cliente.perform(post("/api/vacantes").session(sesionDe(EMPRESA))
@@ -137,7 +137,7 @@ class ControladorVacantesTests {
     void publicaInmediatamenteConLaIdentidadEmpresarialValidada() throws Exception {
         autorizarEmpresa();
         SolicitudVacante solicitud = new SolicitudVacante("Desarrollador Java", "Desarrollo de sistemas web.",
-                4L, List.of(8L, 9L), "remota", "Lima", "PE", VENCIMIENTO, null);
+                4L, List.of(8L, 9L), "remota", "Lima", "PE", VENCIMIENTO, null, null);
         when(vacantes.crearYPublicar(EMPRESA, solicitud)).thenReturn(vacante("publicada"));
 
         cliente.perform(post("/api/vacantes/publicar").session(sesionDe(EMPRESA))
@@ -303,12 +303,12 @@ class ControladorVacantesTests {
 
     private static SolicitudVacante datos() {
         return new SolicitudVacante("Desarrollador Java", "Desarrollo de sistemas web.", 4L,
-                List.of(8L, 9L), "remota", "Lima", "PE", VENCIMIENTO, VERSION);
+                List.of(8L, 9L), "remota", "Lima", "PE", VENCIMIENTO, null, VERSION);
     }
 
     private static Vacante vacante(String estado) {
         return new Vacante(7L, "Desarrollador Java", "Desarrollo de sistemas web.", 4L, "Ingeniería de Sistemas",
                 List.of(new Habilidad(8L, "Java"), new Habilidad(9L, "PostgreSQL")), "remota", "Lima", "PE",
-                estado, VERSION, "borrador".equals(estado) ? null : VERSION, VENCIMIENTO, VERSION, false);
+                estado, VERSION, "borrador".equals(estado) ? null : VERSION, VENCIMIENTO, VERSION, false, 1, 0, 0, null, null);
     }
 }

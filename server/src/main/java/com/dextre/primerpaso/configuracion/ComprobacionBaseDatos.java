@@ -68,6 +68,15 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
         if (columnasChat == null || columnasChat != 8) {
             throw new IllegalStateException("Aplica db/migraciones/V001__mensajes_chat.sql antes de iniciar el servidor.");
         }
+        Boolean esquemaContratacion = jdbc.queryForObject("""
+                SELECT to_regclass('ofertas_contratacion') IS NOT NULL AND to_regclass('avisos_contratacion') IS NOT NULL
+                    AND (SELECT count(*) FROM information_schema.columns WHERE table_schema = current_schema()
+                        AND table_name = 'jobs' AND column_name IN ('plazas', 'motivo_fin_proceso', 'detalle_cancelacion',
+                            'fecha_fin_proceso', 'id_responsable_fin_proceso')) = 5
+                """, Boolean.class);
+        if (!Boolean.TRUE.equals(esquemaContratacion)) {
+            throw new IllegalStateException("Aplica db/migraciones/V002__contratacion.sql antes de iniciar el servidor.");
+        }
         REGISTRO.info("Conexión con PostgreSQL y tablas del proyecto comprobadas.");
     }
 }

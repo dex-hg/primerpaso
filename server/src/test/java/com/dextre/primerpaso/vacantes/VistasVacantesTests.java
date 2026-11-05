@@ -205,7 +205,7 @@ class VistasVacantesTests {
         String contenido = "<script>alert('xss')</script>";
         Vacante alterada = new Vacante(base.id(), contenido, contenido, base.idCarrera(), base.nombreCarrera(),
                 base.habilidades(), base.modalidad(), base.ciudad(), base.codigoPais(), base.estado(),
-                base.fechaCreacion(), base.fechaPublicacion(), base.fechaVencimiento(), base.version(), false);
+                base.fechaCreacion(), base.fechaPublicacion(), base.fechaVencimiento(), base.version(), false, 1, 0, 0, null, null);
         when(vacantes.catalogos(EMPRESA)).thenReturn(CATALOGOS);
         when(vacantes.consultar(EMPRESA, 7L)).thenReturn(alterada);
         String html = cliente.perform(get("/panel/empresa/vacantes/7/editar").session(sesionDe(EMPRESA)))
@@ -257,6 +257,6 @@ class VistasVacantesTests {
         return new Vacante(7L, "Desarrollador Java", "Desarrollo de sistemas web.", 4L, "Ingeniería de Sistemas",
                 List.of(new Habilidad(8L, "Java"), new Habilidad(9L, "PostgreSQL")), "remota", "Lima", "PE",
                 estado, VERSION, "borrador".equals(estado) ? null : VERSION,
-                vencida ? VERSION.minusSeconds(1) : VENCIMIENTO, VERSION, vencida);
+                vencida ? VERSION.minusSeconds(1) : VENCIMIENTO, VERSION, vencida, 1, 0, 0, null, null);
     }
 }

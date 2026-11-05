@@ -75,6 +75,9 @@ public class ServicioVacantes {
                 && (vacante.fechaVencimiento() == null || vacante.fechaVencimiento().isAfter(ahora))))) {
             throw new ReglaVacanteException(409, "Solo puedes editar borradores o vacantes publicadas vigentes.");
         }
+        if ("publicada".equals(vacante.estado()) && datos.plazas() != null && datos.plazas() != vacante.plazas()) {
+            throw new ReglaVacanteException(409, "La cantidad de plazas queda fijada al publicar la vacante.");
+        }
         if (vacante.fechaPublicacion() != null && !datos.fechaVencimiento().isAfter(vacante.fechaPublicacion())) {
             throw new ReglaVacanteException(400, "El vencimiento debe ser posterior a la publicación.");
         }
@@ -100,7 +103,7 @@ public class ServicioVacantes {
         List<Long> habilidades = vacante.habilidades().stream().map(habilidad -> habilidad.id()).toList();
         SolicitudVacante solicitud = new SolicitudVacante(vacante.titulo(), vacante.descripcion(),
                 vacante.idCarrera(), habilidades, vacante.modalidad(), vacante.ciudad(),
-                vacante.codigoPais(), vacante.fechaVencimiento(), vacante.version());
+                vacante.codigoPais(), vacante.fechaVencimiento(), vacante.plazas(), vacante.version());
         validarDatos(solicitud, ahora);
         validarCatalogos(solicitud.idCarrera(), habilidades);
         validarDatos(solicitud, reloj.instant());
@@ -209,6 +212,9 @@ public class ServicioVacantes {
         if (datos.fechaVencimiento() == null || !datos.fechaVencimiento().isAfter(ahora)
                 || datos.fechaVencimiento().isAfter(FECHA_MAXIMA)) {
             throw new ReglaVacanteException(400, "La fecha de vencimiento debe ser válida y posterior al momento actual.");
+        }
+        if (datos.plazas() != null && (datos.plazas() < 1 || datos.plazas() > 1000)) {
+            throw new ReglaVacanteException(400, "Ingresa entre 1 y 1000 plazas.");
         }
         List<Long> habilidades = datos.habilidades();
         if (habilidades == null || habilidades.isEmpty() || habilidades.size() > 30

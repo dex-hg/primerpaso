@@ -186,6 +186,11 @@ CREATE TABLE jobs (
     published_at_job TIMESTAMPTZ,
     expires_at_job TIMESTAMPTZ,
     updated_at_job TIMESTAMPTZ NOT NULL DEFAULT now(),
+    plazas SMALLINT NOT NULL DEFAULT 1 CHECK (plazas BETWEEN 1 AND 1000),
+    motivo_fin_proceso VARCHAR(20),
+    detalle_cancelacion VARCHAR(500),
+    fecha_fin_proceso TIMESTAMPTZ,
+    id_responsable_fin_proceso BIGINT REFERENCES users(id_user) ON DELETE RESTRICT,
     CONSTRAINT fk_jobs_creator_membership
         FOREIGN KEY (company_id_job, creator_user_id_job)
         REFERENCES company_members(company_id_company_member, user_id_company_member)
@@ -206,6 +211,15 @@ CREATE TABLE jobs (
         (status_job = 'borrador' AND published_at_job IS NULL)
         OR (status_job IN ('publicada', 'cerrada') AND published_at_job IS NOT NULL
             AND published_at_job >= created_at_job)
+    ),
+    CONSTRAINT ck_jobs_fin_proceso CHECK (
+        (motivo_fin_proceso IS NULL AND detalle_cancelacion IS NULL AND fecha_fin_proceso IS NULL
+            AND id_responsable_fin_proceso IS NULL)
+        OR (motivo_fin_proceso IS NOT NULL AND status_job = 'cerrada' AND fecha_fin_proceso IS NOT NULL
+            AND id_responsable_fin_proceso IS NOT NULL
+            AND ((motivo_fin_proceso = 'vacante_cubierta' AND detalle_cancelacion IS NULL)
+                OR (motivo_fin_proceso = 'proceso_cancelado' AND detalle_cancelacion IS NOT NULL
+                    AND length(btrim(detalle_cancelacion)) > 0)))
     ),
     CONSTRAINT ck_jobs_expiration CHECK (
         expires_at_job IS NULL OR published_at_job IS NULL
@@ -266,8 +280,8 @@ CREATE TABLE applications (
     resume_id_application BIGINT,
     cover_letter_application TEXT,
     status_application VARCHAR(12) NOT NULL DEFAULT 'enviada'
-        CHECK (status_application IN (
-            'enviada', 'en_revision', 'seleccionada', 'descartada', 'retirada'
+        CONSTRAINT ck_applications_estado CHECK (status_application IN (
+            'enviada', 'en_revision', 'seleccionada', 'descartada', 'retirada', 'contratada', 'finalizada'
         )),
     submitted_at_application TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at_application TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -296,6 +310,54 @@ CREATE TABLE mensajes_chat (
 );
 CREATE INDEX idx_mensajes_chat_historial ON mensajes_chat (id_postulacion, id_mensaje DESC);
 CREATE INDEX idx_mensajes_chat_frecuencia ON mensajes_chat (id_postulacion, id_emisor, fecha_envio DESC);
+
+-- Cada envío conserva las condiciones que vio el postulante.
+CREATE TABLE ofertas_contratacion (
+    id_oferta BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_postulacion BIGINT NOT NULL REFERENCES applications(id_application) ON DELETE RESTRICT,
+    id_emisor BIGINT NOT NULL REFERENCES users(id_user) ON DELETE RESTRICT,
+    id_envio UUID NOT NULL,
+    condiciones VARCHAR(4000) NOT NULL CHECK (length(btrim(condiciones)) > 0),
+    fecha_inicio DATE NOT NULL,
+    vence_en TIMESTAMPTZ NOT NULL,
+    estado VARCHAR(12) NOT NULL DEFAULT 'pendiente'
+        CHECK (estado IN ('pendiente', 'aceptada', 'rechazada', 'vencida', 'retirada', 'contratada')),
+    enviada_en TIMESTAMPTZ NOT NULL,
+    respondida_en TIMESTAMPTZ,
+    resuelta_en TIMESTAMPTZ,
+    id_responsable_resolucion BIGINT REFERENCES users(id_user) ON DELETE RESTRICT,
+    CONSTRAINT uq_ofertas_envio UNIQUE (id_postulacion, id_envio),
+    CONSTRAINT ck_ofertas_plazo CHECK (vence_en > enviada_en AND fecha_inicio >= (vence_en AT TIME ZONE 'America/Lima')::date),
+    CONSTRAINT ck_ofertas_respuesta CHECK (
+        (respondida_en IS NULL OR (respondida_en >= enviada_en AND respondida_en < vence_en))
+        AND (estado NOT IN ('aceptada', 'rechazada', 'contratada') OR respondida_en IS NOT NULL)
+        AND (estado NOT IN ('pendiente', 'vencida') OR respondida_en IS NULL)
+    ),
+    CONSTRAINT ck_ofertas_resolucion CHECK (
+        (estado IN ('pendiente', 'aceptada') AND resuelta_en IS NULL AND id_responsable_resolucion IS NULL)
+        OR (estado = 'vencida' AND resuelta_en IS NOT NULL AND resuelta_en = vence_en
+            AND id_responsable_resolucion IS NULL)
+        OR (estado IN ('rechazada', 'retirada', 'contratada') AND resuelta_en IS NOT NULL
+            AND resuelta_en >= COALESCE(respondida_en, enviada_en) AND id_responsable_resolucion IS NOT NULL)
+    )
+);
+CREATE UNIQUE INDEX uq_ofertas_reserva ON ofertas_contratacion (id_postulacion)
+    WHERE estado IN ('pendiente', 'aceptada');
+CREATE UNIQUE INDEX uq_ofertas_contratada ON ofertas_contratacion (id_postulacion)
+    WHERE estado = 'contratada';
+CREATE INDEX idx_ofertas_historial ON ofertas_contratacion (id_postulacion, id_oferta DESC);
+
+CREATE TABLE avisos_contratacion (
+    id_aviso BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_postulacion BIGINT NOT NULL REFERENCES applications(id_application) ON DELETE RESTRICT,
+    destinatario VARCHAR(10) NOT NULL CHECK (destinatario IN ('postulante', 'empresa')),
+    tipo VARCHAR(24) NOT NULL CHECK (tipo IN (
+        'oferta_enviada', 'oferta_aceptada', 'oferta_rechazada', 'oferta_retirada',
+        'contratacion_confirmada', 'vacante_cubierta', 'proceso_cancelado', 'postulacion_retirada'
+    )),
+    fecha_aviso TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
+);
+CREATE INDEX idx_avisos_postulacion ON avisos_contratacion (id_postulacion, destinatario, id_aviso DESC);
 
 COMMIT;
 

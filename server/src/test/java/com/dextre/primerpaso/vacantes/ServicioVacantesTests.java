@@ -304,24 +304,24 @@ class ServicioVacantesTests {
     void rechazaCamposInvalidosYHabilidadesDuplicadasAntesDePersistir() {
         List<SolicitudVacante> solicitudes = new ArrayList<>();
         solicitudes.add(new SolicitudVacante(" ", "Descripción", 30L, List.of(40L), "remota", "Lima", "PE",
-                AHORA.plusSeconds(60), null));
+                AHORA.plusSeconds(60), null, null));
         solicitudes.add(new SolicitudVacante("Título", "x".repeat(12001), 30L, List.of(40L), "remota", "Lima",
-                "PE", AHORA.plusSeconds(60), null));
+                "PE", AHORA.plusSeconds(60), null, null));
         solicitudes.add(new SolicitudVacante("Título", "Descripción", 0L, List.of(40L), "remota", "Lima",
-                "PE", AHORA.plusSeconds(60), null));
+                "PE", AHORA.plusSeconds(60), null, null));
         for (List<Long> habilidades : Arrays.asList(List.<Long>of(), List.of(40L, 40L), List.of(-1L),
                 Arrays.asList(40L, null), LongStream.rangeClosed(1, 31).boxed().toList())) {
             solicitudes.add(new SolicitudVacante("Título", "Descripción", 30L, habilidades, "remota", "Lima",
-                    "PE", AHORA.plusSeconds(60), null));
+                    "PE", AHORA.plusSeconds(60), null, null));
         }
         solicitudes.add(new SolicitudVacante("Título", "Descripción", 30L, List.of(40L), "otra", "Lima", "PE",
-                AHORA.plusSeconds(60), null));
+                AHORA.plusSeconds(60), null, null));
         solicitudes.add(new SolicitudVacante("Título", "Descripción", 30L, List.of(40L), "remota", " ", "PE",
-                AHORA.plusSeconds(60), null));
+                AHORA.plusSeconds(60), null, null));
         solicitudes.add(new SolicitudVacante("Título", "Descripción", 30L, List.of(40L), "remota", "Lima", "PER",
-                AHORA.plusSeconds(60), null));
+                AHORA.plusSeconds(60), null, null));
         solicitudes.add(new SolicitudVacante("Título", "Descripción", 30L, List.of(40L), "remota", "Lima", "PE",
-                AHORA, null));
+                AHORA, null, null));
 
         solicitudes.forEach(datos -> assertEquals(400, assertThrows(ReglaVacanteException.class,
                 () -> servicio.crear(EMPRESA, datos)).estado()));
@@ -400,7 +400,7 @@ class ServicioVacantesTests {
 
     private SolicitudVacante solicitud(Instant version) {
         return new SolicitudVacante(" Practicante de sistemas ", " Descripción de la vacante ", 30L,
-                List.of(40L, 41L), " HIBRIDA ", " Lima ", " pe ", AHORA.plusSeconds(3600), version);
+                List.of(40L, 41L), " HIBRIDA ", " Lima ", " pe ", AHORA.plusSeconds(3600), null, version);
     }
 
     private Vacante vacante(String estado, Instant vencimiento) {
@@ -408,7 +408,7 @@ class ServicioVacantesTests {
                 List.of(new Habilidad(40, "Java"), new Habilidad(41, "SQL")), "hibrida", "Lima", "PE", estado,
                 AHORA.minusSeconds(7200), "borrador".equals(estado) ? null : AHORA.minusSeconds(3600),
                 vencimiento, VERSION, "publicada".equals(estado) && vencimiento != null
-                        && !vencimiento.isAfter(AHORA));
+                        && !vencimiento.isAfter(AHORA), 1, 0, 0, null, null);
     }
 
     private void verificarSinEscrituras() {

@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -26,6 +28,7 @@ public final class DatosVacantes {
             @NotBlank @Size(max = 120) String ciudad,
             @NotBlank @Pattern(regexp = "[A-Z]{2}") String codigoPais,
             @NotNull Instant fechaVencimiento,
+            @Min(1) @Max(1000) Integer plazas,
             Instant version) {
 
         public SolicitudVacante {
@@ -45,7 +48,8 @@ public final class DatosVacantes {
     public record Vacante(long id, String titulo, String descripcion, long idCarrera,
             String nombreCarrera, List<Habilidad> habilidades, String modalidad, String ciudad,
             String codigoPais, String estado, Instant fechaCreacion, Instant fechaPublicacion,
-            Instant fechaVencimiento, Instant version, boolean vencida) {
+            Instant fechaVencimiento, Instant version, boolean vencida, int plazas, long plazasCubiertas,
+            long postulacionesActivas, String motivoFinProceso, String detalleCancelacion) {
 
         public Vacante {
             habilidades = habilidades == null ? List.of() : List.copyOf(habilidades);
@@ -53,6 +57,22 @@ public final class DatosVacantes {
 
         public boolean editable() {
             return "borrador".equals(estado) || ("publicada".equals(estado) && !vencida);
+        }
+
+        public boolean procesoActivo() {
+            return !"borrador".equals(estado) && motivoFinProceso == null;
+        }
+
+        public String nombreEstado() {
+            if (motivoFinProceso != null) {
+                return "vacante_cubierta".equals(motivoFinProceso) ? "Cubierta" : "Proceso cancelado";
+            }
+            if (vencida) return "Vencida";
+            return switch (estado) {
+                case "borrador" -> "Borrador";
+                case "publicada" -> "Publicada";
+                default -> "Cerrada";
+            };
         }
     }
 

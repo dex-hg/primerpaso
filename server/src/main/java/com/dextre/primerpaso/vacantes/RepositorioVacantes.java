@@ -24,7 +24,12 @@ public class RepositorioVacantes {
     private static final String CONSULTA_VACANTES = """
             SELECT j.id_job, j.title_job, j.description_job, j.career_id_job, c.name_career,
                 j.work_mode_job, j.city_job, j.country_code_job, j.status_job,
-                j.created_at_job, j.published_at_job, j.expires_at_job, j.updated_at_job
+                j.created_at_job, j.published_at_job, j.expires_at_job, j.updated_at_job,
+                j.plazas, j.motivo_fin_proceso, j.detalle_cancelacion,
+                (SELECT count(*) FROM applications a
+                    WHERE a.job_id_application = j.id_job AND a.status_application = 'contratada') AS plazas_cubiertas,
+                (SELECT count(*) FROM applications a WHERE a.job_id_application = j.id_job
+                    AND a.status_application IN ('enviada', 'en_revision', 'seleccionada')) AS postulaciones_activas
             FROM jobs j JOIN careers c ON c.id_career = j.career_id_job
             WHERE j.company_id_job = ?
             """;
@@ -77,12 +82,12 @@ public class RepositorioVacantes {
         List<Long> identificadores = plantillaJdbc.query("""
                 INSERT INTO jobs (company_id_job, creator_user_id_job, career_id_job,
                     title_job, description_job, work_mode_job, city_job, country_code_job,
-                    expires_at_job, status_job)
-                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, 'borrador'
+                    expires_at_job, status_job, plazas)
+                SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, 'borrador', COALESCE(?::smallint, 1)
                 WHERE ?::timestamptz > clock_timestamp() RETURNING id_job
                 """, (resultado, fila) -> resultado.getLong(1), idEmpresa, idUsuario, datos.idCarrera(), datos.titulo(),
                 datos.descripcion(), datos.modalidad(), datos.ciudad(), datos.codigoPais(),
-                Timestamp.from(datos.fechaVencimiento()), Timestamp.from(datos.fechaVencimiento()));
+                Timestamp.from(datos.fechaVencimiento()), datos.plazas(), Timestamp.from(datos.fechaVencimiento()));
         if (identificadores.isEmpty()) {
             throw new ReglaVacanteException(409, "La fecha de vencimiento ya pasó. Actualízala antes de guardar.");
         }
@@ -94,6 +99,7 @@ public class RepositorioVacantes {
                 WITH instante AS (SELECT clock_timestamp() AS marca)
                 UPDATE jobs j SET career_id_job = ?, title_job = ?, description_job = ?,
                     work_mode_job = ?, city_job = ?, country_code_job = ?, expires_at_job = ?,
+                    plazas = COALESCE(?::smallint, j.plazas),
                     updated_at_job = GREATEST(instante.marca, j.updated_at_job + interval '1 microsecond')
                 FROM instante WHERE j.id_job = ? AND j.company_id_job = ?
                     AND ?::timestamptz > instante.marca
@@ -101,7 +107,7 @@ public class RepositorioVacantes {
                         AND (j.expires_at_job IS NULL OR j.expires_at_job > instante.marca)))
                 """, datos.idCarrera(), datos.titulo(), datos.descripcion(), datos.modalidad(),
                 datos.ciudad(), datos.codigoPais(), Timestamp.from(datos.fechaVencimiento()),
-                idVacante, idEmpresa, Timestamp.from(datos.fechaVencimiento()));
+                datos.plazas(), idVacante, idEmpresa, Timestamp.from(datos.fechaVencimiento()));
         exigirActualizacion(filas);
     }
 
@@ -198,7 +204,9 @@ public class RepositorioVacantes {
                 resultado.getString("name_career"), List.of(), resultado.getString("work_mode_job"),
                 resultado.getString("city_job"), resultado.getString("country_code_job"), estado,
                 leerInstante(resultado, "created_at_job"), leerInstante(resultado, "published_at_job"),
-                vencimiento, leerInstante(resultado, "updated_at_job"), vencida);
+                vencimiento, leerInstante(resultado, "updated_at_job"), vencida, resultado.getInt("plazas"),
+                resultado.getLong("plazas_cubiertas"), resultado.getLong("postulaciones_activas"),
+                resultado.getString("motivo_fin_proceso"), resultado.getString("detalle_cancelacion"));
     }
 
     private Vacante incluirHabilidades(long idEmpresa, Vacante vacante) {
@@ -212,7 +220,8 @@ public class RepositorioVacantes {
         return new Vacante(vacante.id(), vacante.titulo(), vacante.descripcion(), vacante.idCarrera(),
                 vacante.nombreCarrera(), habilidades, vacante.modalidad(), vacante.ciudad(),
                 vacante.codigoPais(), vacante.estado(), vacante.fechaCreacion(), vacante.fechaPublicacion(),
-                vacante.fechaVencimiento(), vacante.version(), vacante.vencida());
+                vacante.fechaVencimiento(), vacante.version(), vacante.vencida(), vacante.plazas(), vacante.plazasCubiertas(),
+                vacante.postulacionesActivas(), vacante.motivoFinProceso(), vacante.detalleCancelacion());
     }
 
     private Instant leerInstante(ResultSet resultado, String columna) throws SQLException {
