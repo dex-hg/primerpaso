@@ -20,7 +20,7 @@ Para una demostración local con cuentas listas para usar, consultar [Cuentas de
 
 `.env` está excluido de Git. `.env.example` contiene únicamente valores de ejemplo. La aplicación comprueba la conexión y las tablas al arrancar; no crea ni modifica el esquema automáticamente.
 
-En una base existente, aplica `db/migraciones/V001__mensajes_chat.sql` si falta y luego `db/migraciones/V002__contratacion.sql`.
+En una base existente, aplica las migraciones pendientes en orden. Usa `V001__mensajes_chat.sql`, `V002__contratacion.sql` y `V003__lecturas_notificaciones.sql` desde `db/migraciones`.
 
 Las plantillas requieren Spring y no se pueden abrir directamente con Live Server. La configuración CORS de la API conserva los orígenes locales de los puertos 5500, 4173 y 8000 para clientes externos; se pueden cambiar mediante `PRIMERPASO_CORS_ORIGENES`.
 
@@ -53,7 +53,7 @@ El inicio comprueba el hash de la contraseña y el estado activo de la cuenta. U
 3. `GET /api/sesion` devuelve los datos públicos de la cuenta y, cuando corresponde, la empresa y el rol. Revalida los permisos contra PostgreSQL en cada consulta. Una sesión ausente, vencida o revocada devuelve `401`.
 4. `DELETE /api/sesion` requiere la cookie y el token actual, obtenido nuevamente de `/seguridad`. Invalida la sesión, borra la cookie y devuelve `204`.
 
-Después de iniciar sesión, el navegador abre `/panel`. El servidor consulta el tipo de cuenta validado y redirige a `/panel/postulante` o `/panel/empresa`. La página `/cuenta` permite editar los datos y conserva la misma navegación privada: Mi panel, Vacantes, Mi cuenta y Cerrar sesión. La marca lleva al panel y no se ofrece un enlace al landing en esa cabecera. Los avisos de sesión solo aparecen durante comprobaciones o errores. El navegador envía la cookie mediante `credentials: include`; no guarda contraseñas ni sesiones en `localStorage` o `sessionStorage`.
+Después de iniciar sesión, el navegador abre `/panel`. El servidor consulta el tipo de cuenta validado y redirige a `/panel/postulante` o `/panel/empresa`. En `/cuenta` se puede editar el perfil, abrir el historial y cerrar sesión. El menú privado incluye Mi panel, Vacantes, Postulaciones, Mensajes, Notificaciones y Mi cuenta. La marca lleva al panel y no se ofrece un enlace al landing en esa cabecera. Los avisos de sesión solo aparecen durante comprobaciones o errores. El navegador envía la cookie mediante `credentials: include`; no guarda contraseñas ni sesiones en `localStorage` o `sessionStorage`.
 
 ## Paneles y permisos
 
@@ -68,6 +68,8 @@ Los paneles muestran nombres, correo y tipo de cuenta obtenidos de PostgreSQL. E
 | `/panel/empresa/vacantes` y sus formularios | HTTP 403 | Solo vacantes de su empresa |
 | `/api/vacantes` y sus operaciones | HTTP 403 | Solo vacantes de su empresa |
 | `/cuenta` y su alias | Solo datos de su sesión | Solo datos de su sesión |
+| `/cuenta/historial` | Acciones propias | Acciones del miembro en la empresa activa |
+| `/panel/notificaciones` y su contador | Avisos de postulaciones propias | Avisos de su empresa con lectura por miembro |
 | `GET/PUT /api/cuenta` | Datos personales y formación propia | Contacto propio; datos empresariales solo para administradores |
 | `/panel/postulante/postulaciones` y su detalle | Solo solicitudes propias | HTTP 403 |
 | `/panel/empresa/postulaciones` y su detalle | HTTP 403 | Solo solicitudes recibidas por su empresa |
@@ -80,7 +82,7 @@ Los paneles muestran nombres, correo y tipo de cuenta obtenidos de PostgreSQL. E
 | `POST /api/chat/postulaciones/{id}/mensajes` | Responder en una postulación seleccionada o contratada | Iniciar o responder en una postulación seleccionada o contratada |
 | Otra ruta bajo `/panel/` | HTTP 403 | HTTP 403 |
 
-El filtro `FiltroAccesoPanel` protege las páginas privadas y las API de vacantes, cuenta y postulaciones antes de ejecutar el controlador. `AccesoSesion` revalida el usuario y la empresa exacta guardados en la sesión. El tipo de cuenta y el identificador de empresa no se toman de parámetros de la URL. Sin sesión, las páginas redirigen a `/iniciar-sesion` y la API devuelve `401` en JSON. Si la cuenta se suspende o la membresía o empresa se desactiva, invalida la sesión y borra la cookie. Una falla temporal de PostgreSQL devuelve HTTP 503 con un mensaje genérico y permite reintentar sin revocar la sesión. Las respuestas privadas, incluidas las redirecciones y errores, usan `Cache-Control: no-store`.
+El filtro `FiltroAccesoPanel` protege las páginas y API privadas antes de ejecutar el controlador. `AccesoSesion` revalida el usuario y la empresa exacta guardados en la sesión. El tipo de cuenta y el identificador de empresa no se toman de parámetros de la URL. Sin sesión, las páginas redirigen a `/iniciar-sesion` y la API devuelve `401` en JSON. Si la cuenta se suspende o la membresía o empresa se desactiva, invalida la sesión y borra la cookie. Una falla temporal de PostgreSQL devuelve HTTP 503 con un mensaje genérico y permite reintentar sin revocar la sesión. Las respuestas privadas, incluidas las redirecciones y errores, usan `Cache-Control: no-store`.
 
 La comprobación del backend se realiza en cada solicitud privada, de acuerdo con la [guía de autorización de OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html). Ambos roles empresariales pueden consultar, crear, editar, publicar y cerrar vacantes de su empresa. El navegador vuelve a comprobar la sesión al restaurar el panel o regresar a su pestaña y oculta los datos ante errores, expiración o cambio de cuenta, empresa o rol.
 
@@ -163,6 +165,24 @@ Los administradores y reclutadores activos de la empresa pueden guardar **En rev
 | `PUT /api/postulaciones/{id}/estado` | `200`, cambio empresarial; JSON con `estado` y la `version` exacta del detalle |
 
 La API requiere sesión y responde con `Cache-Control: no-store`. Las escrituras exigen `X-CSRF-Token`; los campos ajenos al contrato se rechazan. Los errores usan `400` por datos inválidos, `401` por sesión ausente o revocada, `403` por permisos o CSRF, `404` por recursos ajenos o vacantes no vigentes, `409` por duplicados o versiones anteriores y `503` por fallos temporales. La restricción única de PostgreSQL impide duplicados incluso entre envíos simultáneos. La migración V002 incorpora los estados `contratada` y `finalizada`.
+
+## Notificaciones e historial
+
+**Notificaciones** abre la bandeja privada en `/panel/notificaciones`. Las ofertas, respuestas, retiros y resultados de contratación registrados aparecen del más reciente al más antiguo. El filtro **Sin leer** muestra los pendientes. Abrir una notificación lleva a la postulación y la marca como leída. También se puede marcar una por separado o todas las pendientes.
+
+`GET /api/notificaciones/pendientes` devuelve `cantidad`, `idUsuario` e `idEmpresa` de la sesión. El navegador actualiza el contador al abrir una página privada y al volver a la pestaña. Las lecturas se guardan por cuenta, incluso entre reclutadores de una misma empresa. Las acciones de lectura usan formularios POST con el token CSRF y se pueden repetir de forma segura.
+
+**Mi cuenta → Historial** abre `/cuenta/historial`. Muestra vacante, empresa y hora de Lima para postulaciones, respuestas de oferta y retiros del postulante. Para cuentas empresariales muestra sus propias vacantes creadas, ofertas enviadas, contrataciones confirmadas y procesos cancelados. Consulta las fechas y los responsables ya guardados. Los nombres de vacantes y empresas se muestran tal como figuran en el sistema al consultar.
+
+V003 añade `lecturas_notificaciones` y aprovecha los avisos ya registrados en `avisos_contratacion`. Esos avisos aparecen como pendientes hasta que el titular los marque. El alcance actual es la entrega dentro de PrimerPaso.
+
+Para verificar el recorrido con PostgreSQL y cuentas sintéticas, ejecuta desde `server` después de empaquetar el JAR.
+
+```powershell
+python src/test/python/verificar_actividad.py
+```
+
+El script también acepta `--esquema-anterior` con un archivo SQL previo a V003 que incluya V002. Comprueba privacidad entre empresas y postulantes, token CSRF, conservación de avisos antiguos, paginación, lectura independiente y atribución del historial.
 
 ## Verificación
 

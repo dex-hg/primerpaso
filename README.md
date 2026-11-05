@@ -8,7 +8,8 @@ Plataforma web que conecta a estudiantes, egresados y jóvenes profesionales con
 - Búsqueda de vacantes, envío de cartas de presentación y seguimiento de postulaciones.
 - Creación, publicación y cierre de vacantes; revisión de postulaciones por empresa.
 - Chat iniciado por la empresa, con historial y bandeja de conversaciones.
-- Ofertas, contratación por plazas, cierre de la convocatoria y avisos privados de resultado.
+- Ofertas, contratación por plazas y cierre de la convocatoria.
+- Bandeja privada de notificaciones e historial personal desde Mi cuenta.
 - Vistas adaptables a móviles con temas oscuro, claro y sistema. El tema oscuro es el inicial y la elección se recuerda en el navegador.
 
 ## Tecnologías
@@ -20,7 +21,7 @@ Java 21, Spring Boot, Thymeleaf, PostgreSQL, Bootstrap y JavaScript. El servidor
 Requisitos: JDK 21 o superior y PostgreSQL.
 
 1. Para una base nueva, crear `PrimerPaso` y ejecutar [db/primerpaso.sql](db/primerpaso.sql). No ejecutar este script sobre una base existente.
-   Para una base existente, aplicar [V001 de chat](db/migraciones/V001__mensajes_chat.sql) si falta y luego [V002 de contratación](db/migraciones/V002__contratacion.sql) antes de iniciar el servidor.
+   Para una base existente, aplica las migraciones pendientes. El orden es [V001 de chat](db/migraciones/V001__mensajes_chat.sql), [V002 de contratación](db/migraciones/V002__contratacion.sql) y [V003 de notificaciones](db/migraciones/V003__lecturas_notificaciones.sql).
 2. Copiar [server/.env.example](server/.env.example) como `server/.env` y completar la conexión. Este archivo está excluido de Git.
 3. Desde la raíz del proyecto, ejecutar:
 
@@ -41,7 +42,7 @@ node --test src/test/js/*.test.cjs
 ```
 
 Consulta la [documentación técnica y contribuciones](server/README.md) y las [cuentas de demostración](db/README-demostracion.md).
-Las reglas, la API y las pruebas del flujo están en [Contratación](server/CONTRATACION.md).
+La [bandeja y el historial](server/README.md#notificaciones-e-historial) se consultan desde la navegación privada.
 
 Las cifras y oportunidades del inicio son demostrativas. La carga de CV, el acceso social, la recuperación de contraseña y el envío de contacto y suscripciones siguen pendientes.
 
