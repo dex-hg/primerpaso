@@ -7,7 +7,8 @@ Plataforma web que conecta a estudiantes, egresados y jóvenes profesionales con
 - Registro, inicio de sesión y edición de cuenta con permisos por tipo de usuario.
 - Búsqueda de vacantes, envío de cartas de presentación y seguimiento de postulaciones.
 - Creación, publicación y cierre de vacantes; revisión de postulaciones por empresa.
-- Chat por postulación seleccionada, iniciado por la empresa, con historial y bandeja de conversaciones.
+- Chat iniciado por la empresa, con historial y bandeja de conversaciones.
+- Ofertas, contratación por plazas, cierre de la convocatoria y avisos privados de resultado.
 - Vistas adaptables a móviles con temas oscuro, claro y sistema. El tema oscuro es el inicial y la elección se recuerda en el navegador.
 
 ## Tecnologías
@@ -19,7 +20,7 @@ Java 21, Spring Boot, Thymeleaf, PostgreSQL, Bootstrap y JavaScript. El servidor
 Requisitos: JDK 21 o superior y PostgreSQL.
 
 1. Para una base nueva, crear `PrimerPaso` y ejecutar [db/primerpaso.sql](db/primerpaso.sql). No ejecutar este script sobre una base existente.
-   Para una base existente, aplicar [la migración del chat](db/migraciones/V001__mensajes_chat.sql) antes de iniciar esta versión.
+   Para una base existente, aplicar [V001 de chat](db/migraciones/V001__mensajes_chat.sql) si falta y luego [V002 de contratación](db/migraciones/V002__contratacion.sql) antes de iniciar el servidor.
 2. Copiar [server/.env.example](server/.env.example) como `server/.env` y completar la conexión. Este archivo está excluido de Git.
 3. Desde la raíz del proyecto, ejecutar:
 
@@ -40,7 +41,7 @@ node --test src/test/js/*.test.cjs
 ```
 
 Consulta la [documentación técnica y contribuciones](server/README.md) y las [cuentas de demostración](db/README-demostracion.md).
-Las reglas, la API y la verificación del módulo de conversación están en [Chat](server/CHAT.md). Las notificaciones quedan pendientes.
+Las reglas, la API y las pruebas del flujo están en [Contratación](server/CONTRATACION.md).
 
 Las cifras y oportunidades del inicio son demostrativas. La carga de CV, el acceso social, la recuperación de contraseña y el envío de contacto y suscripciones siguen pendientes.
 

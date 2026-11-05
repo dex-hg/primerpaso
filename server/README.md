@@ -20,7 +20,7 @@ Para una demostración local con cuentas listas para usar, consultar [Cuentas de
 
 `.env` está excluido de Git. `.env.example` contiene únicamente valores de ejemplo. La aplicación comprueba la conexión y las tablas al arrancar; no crea ni modifica el esquema automáticamente.
 
-Esta versión incorpora chat por postulación. En una base existente, ejecutar `db/migraciones/V001__mensajes_chat.sql` antes de arrancar; en una base nueva, `db/primerpaso.sql` ya incluye la tabla. La migración agrega `mensajes_chat` y sus índices sin cambiar los registros existentes. Consultar [reglas, API y pruebas del chat](CHAT.md).
+En una base existente, aplica `db/migraciones/V001__mensajes_chat.sql` si falta y luego `db/migraciones/V002__contratacion.sql`.
 
 Las plantillas requieren Spring y no se pueden abrir directamente con Live Server. La configuración CORS de la API conserva los orígenes locales de los puertos 5500, 4173 y 8000 para clientes externos; se pueden cambiar mediante `PRIMERPASO_CORS_ORIGENES`.
 
@@ -75,9 +75,9 @@ Los paneles muestran nombres, correo y tipo de cuenta obtenidos de PostgreSQL. E
 | `POST /api/postulaciones` | Enviar carta a una vacante vigente | HTTP 403 |
 | `PUT /api/postulaciones/{id}/estado` | HTTP 403 | Evaluar solicitudes de su empresa |
 | `/panel/postulante/mensajes` y `/panel/empresa/mensajes` | Solo bandeja de postulante | Solo bandeja de su empresa |
-| `/panel/{tipo}/postulaciones/{id}/chat` | Historial propio; responde al primer mensaje de la empresa | Historial de su empresa; inicia al seleccionar |
+| `/panel/{tipo}/postulaciones/{id}/chat` | Historial propio; responde al primer mensaje de la empresa | Historial de su empresa; inicia en una postulación seleccionada o contratada |
 | `GET /api/chat` y `/api/chat/postulaciones/{id}` | Solo conversaciones propias | Solo conversaciones de su empresa |
-| `POST /api/chat/postulaciones/{id}/mensajes` | Responder en una postulación seleccionada | Iniciar o responder en una postulación seleccionada |
+| `POST /api/chat/postulaciones/{id}/mensajes` | Responder en una postulación seleccionada o contratada | Iniciar o responder en una postulación seleccionada o contratada |
 | Otra ruta bajo `/panel/` | HTTP 403 | HTTP 403 |
 
 El filtro `FiltroAccesoPanel` protege las páginas privadas y las API de vacantes, cuenta y postulaciones antes de ejecutar el controlador. `AccesoSesion` revalida el usuario y la empresa exacta guardados en la sesión. El tipo de cuenta y el identificador de empresa no se toman de parámetros de la URL. Sin sesión, las páginas redirigen a `/iniciar-sesion` y la API devuelve `401` en JSON. Si la cuenta se suspende o la membresía o empresa se desactiva, invalida la sesión y borra la cookie. Una falla temporal de PostgreSQL devuelve HTTP 503 con un mensaje genérico y permite reintentar sin revocar la sesión. Las respuestas privadas, incluidas las redirecciones y errores, usan `Cache-Control: no-store`.
@@ -106,9 +106,9 @@ El servidor bloquea y revalida las filas antes de guardar y compara la versión 
 
 Desde el panel empresarial, `/panel/empresa/vacantes` lista las oportunidades propias; `/panel/empresa/vacantes/nueva` ofrece **Publicar vacante** como acción principal y **Guardar borrador** como alternativa. `/panel/empresa/vacantes/{id}/editar` muestra la edición o consulta. Ambas formas de creación exigen título, descripción, una carrera activa, entre 1 y 30 habilidades activas sin duplicados, modalidad (`presencial`, `remota` o `hibrida`), ciudad, código de país de dos letras y vencimiento futuro. Los límites son 180 caracteres para el título, 12 000 para la descripción y 120 para la ciudad.
 
-Se puede editar un borrador o una vacante publicada vigente. Los borradores guardados pueden publicarse cuando están completos y vigentes; la publicación directa aplica las mismas validaciones. Una publicada puede cerrarse, incluso si ya venció; una cerrada conserva sus datos y no admite cambios. Las publicadas vencidas permiten consulta y cierre, pero no edición. El vencimiento se calcula a partir de `expires_at_job`: no se añade un estado ni se modifica automáticamente la tabla. La interfaz muestra y recibe la fecha en hora de Lima (UTC−5); la API intercambia instantes ISO 8601 con zona horaria.
+Se puede editar un borrador o una vacante publicada vigente. Los borradores guardados pueden publicarse cuando están completos y vigentes; la publicación directa aplica las mismas validaciones. La empresa puede cerrar la recepción de una vacante publicada, incluso si ya venció. Puede seguir evaluando las solicitudes recibidas hasta que el proceso termine por cobertura de plazas o cancelación. El vencimiento se calcula a partir de `expires_at_job`: no se añade un estado ni se modifica automáticamente la tabla. La interfaz muestra y recibe la fecha en hora de Lima (UTC−5); la API intercambia instantes ISO 8601 con zona horaria.
 
-El módulo reutiliza `jobs` y `job_skills`, sus claves, restricciones y marcas de tiempo existentes. Consulta `careers`, `skills`, `users`, `companies` y `company_members` para validar catálogos y permisos. No requiere una migración ni modifica el SQL del esquema. La vacante y sus habilidades se guardan en una transacción; cerrar una vacante conserva sus datos y relaciones. El servidor determina la empresa y el creador desde la sesión y comprueba la pertenencia de cada vacante, además de revalidar la membresía dentro de la operación.
+El módulo reutiliza `jobs` y `job_skills`, sus claves, restricciones y marcas de tiempo existentes. Consulta `careers`, `skills`, `users`, `companies` y `company_members` para validar catálogos y permisos. La migración V002 añade las plazas y el resultado del proceso. La vacante y sus habilidades se guardan en una transacción. La capacidad se puede editar en borradores y queda fijada al publicar. El servidor determina la empresa y el creador desde la sesión y comprueba la pertenencia de cada vacante, además de revalidar la membresía dentro de la operación.
 
 | Método y ruta | Resultado |
 | --- | --- |
@@ -118,7 +118,8 @@ El módulo reutiliza `jobs` y `job_skills`, sus claves, restricciones y marcas d
 | `POST /api/vacantes/publicar` | `201`, nueva vacante publicada y cabecera `Location`; creación, habilidades y publicación en una transacción |
 | `PUT /api/vacantes/{id}` | `200`, vacante actualizada |
 | `POST /api/vacantes/{id}/publicar` | `200`, vacante publicada |
-| `POST /api/vacantes/{id}/cerrar` | `200`, vacante cerrada |
+| `POST /api/vacantes/{id}/cerrar` | `200`, recepción cerrada |
+| `POST /api/vacantes/{id}/cancelar-proceso` | `204`, proceso finalizado con motivo de cancelación |
 
 El listado usa páginas de 12 vacantes, numeradas desde cero, y filtros `todos`, `borrador`, `publicada`, `cerrada` y `vencida`. `publicada` incluye únicamente las vigentes y `vencida`, las publicadas cuyo vencimiento ya pasó. Las vacantes se ordenan por creación más reciente.
 
@@ -133,6 +134,7 @@ Las operaciones de escritura reciben `application/json` y requieren la cookie de
   "modalidad": "hibrida",
   "ciudad": "Lima",
   "codigoPais": "PE",
+  "plazas": 2,
   "fechaVencimiento": "2027-03-31T04:59:00Z"
 }
 ```
@@ -151,7 +153,7 @@ Desde el detalle de una vacante vigente, el postulante puede enviar una carta de
 
 El detalle muestra la carta, fecha y hora de Lima, estado, nombre, correo, teléfono opcional, institución, carrera, condición académica y habilidades actuales del perfil. La carta y su fecha de envío se conservan; los datos del perfil se consultan en su versión actual, identificada así en pantalla. Las solicitudes siguen disponibles para sus participantes después de cerrar o vencer la vacante. Abrir un detalle no cambia su estado.
 
-Los administradores y reclutadores activos de la empresa pueden guardar **En revisión**, **Seleccionada** o **Descartada**. El postulante ve ese estado en su historial. Se permite corregir una evaluación, con control de versión para impedir sobrescrituras concurrentes. El estado `retirada` del esquema se respeta como solo lectura; retirar solicitudes aún no es una acción disponible. Adjuntar CV y enviar avisos por correo quedan pendientes.
+Los administradores y reclutadores activos de la empresa pueden guardar **En revisión**, **Seleccionada** o **Descartada**. El postulante ve ese estado en su historial. Se permite corregir una evaluación, con control de versión para impedir sobrescrituras concurrentes. El postulante puede retirar una solicitud activa. Las ofertas reservadas requieren resolución antes de cambiar la evaluación. Los resultados de contratación y cierre son consultables en el historial.
 
 | Método y ruta | Resultado |
 | --- | --- |
@@ -160,9 +162,7 @@ Los administradores y reclutadores activos de la empresa pueden guardar **En rev
 | `GET /api/postulaciones/{id}` | `200`, detalle autorizado de la solicitud |
 | `PUT /api/postulaciones/{id}/estado` | `200`, cambio empresarial; JSON con `estado` y la `version` exacta del detalle |
 
-La API requiere sesión y responde con `Cache-Control: no-store`. Las escrituras exigen `X-CSRF-Token`; los campos ajenos al contrato se rechazan. Los errores usan `400` por datos inválidos, `401` por sesión ausente o revocada, `403` por permisos o CSRF, `404` por recursos ajenos o vacantes no vigentes, `409` por duplicados o versiones anteriores y `503` por fallos temporales. La restricción única de PostgreSQL impide duplicados incluso entre envíos simultáneos. Se reutiliza la tabla `applications` sin migraciones.
-
-La verificación de este incremento y los archivos para cada commit sugerido están en [Postulaciones](POSTULACIONES.md).
+La API requiere sesión y responde con `Cache-Control: no-store`. Las escrituras exigen `X-CSRF-Token`; los campos ajenos al contrato se rechazan. Los errores usan `400` por datos inválidos, `401` por sesión ausente o revocada, `403` por permisos o CSRF, `404` por recursos ajenos o vacantes no vigentes, `409` por duplicados o versiones anteriores y `503` por fallos temporales. La restricción única de PostgreSQL impide duplicados incluso entre envíos simultáneos. La migración V002 incorpora los estados `contratada` y `finalizada`.
 
 ## Verificación
 
@@ -182,7 +182,7 @@ node --test src/test/js/*.test.cjs
 
 Estas pruebas usan los scripts reales y comprueban reintentos, cambios de identidad, restauración del navegador, cierre de sesión con CSRF, envío y validación de vacantes, cambios de estado y conversión de la fecha de Lima. No sustituyen la verificación de integración con PostgreSQL.
 
-Las pruebas de cuenta cubren permisos, CSRF, validación académica, correos duplicados y versiones concurrentes. Las de oportunidades verifican filtros, paginación, escape de HTML, estados vacíos y detalle no disponible. La publicación directa conserva las pruebas del borrador opcional y comprueba que un fallo al publicar revierte la creación completa. La verificación real y la agrupación sugerida de commits se documentan en [Mejoras de paneles](docs/MEJORAS-PANELES.md).
+Las pruebas de cuenta cubren permisos, CSRF, validación académica, correos duplicados y versiones concurrentes. Las de oportunidades verifican filtros, paginación, escape de HTML, estados vacíos y detalle no disponible.
 
 La configuración externa sigue la [documentación de Spring Boot](https://docs.spring.io/spring-boot/reference/features/external-config.html). La transacción de registro aplica el rollback de excepciones de ejecución definido por [Spring Framework](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/annotation/Transactional.html).
 La protección CSRF emplea un token asociado a la sesión, siguiendo el [patrón documentado por Spring Security](https://docs.spring.io/spring-security/reference/features/exploits/csrf.html#csrf-explained-protection).
