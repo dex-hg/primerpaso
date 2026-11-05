@@ -16,7 +16,7 @@
 </head>
 <body class="panel-page" th:attr="data-ruta-base=@{/}">
     <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
-    <div th:replace="~{fragments/header :: panelHeader('cuenta', true)}"></div>
+    <div th:replace="~{fragments/header :: panelHeader('cuenta')}"></div>
     <main class="panel-main container" id="main-content">
         <section id="panel" th:attr="data-tipo-cuenta=${usuario.tipoCuenta},data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}" aria-labelledby="pagina-titulo">
             <div class="panel-sesion" aria-label="Estado de la sesión">
@@ -28,6 +28,9 @@
                     <div><span class="panel-etiqueta"><i class="bi bi-person-gear" aria-hidden="true"></i> Tu información</span>
                         <h1 id="pagina-titulo">Mi cuenta</h1><p>Mantén tus datos al día y elige cómo presentarte en PrimerPaso.</p></div>
                     <span class="panel-simbolo" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+                </div>
+                <div class="mb-4">
+                    <nav th:replace="~{fragments/cuenta :: navegacion('perfil')}"></nav>
                 </div>
                 <div class="cuenta-distribucion">
                     <aside class="panel-tarjeta cuenta-resumen" aria-label="Resumen de tu cuenta">

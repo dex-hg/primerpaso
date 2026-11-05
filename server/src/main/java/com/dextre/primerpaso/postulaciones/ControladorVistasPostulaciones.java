@@ -56,7 +56,6 @@ public class ControladorVistasPostulaciones {
         modelo.addAttribute("idVacante", idVacante);
         modelo.addAttribute("estados", ESTADOS);
         modelo.addAttribute("nombresEstados", NOMBRES_ESTADOS);
-        modelo.addAttribute("avisosContratacion", contratacion.avisos(usuario, idVacante));
         return "postulaciones/lista";
     }
 

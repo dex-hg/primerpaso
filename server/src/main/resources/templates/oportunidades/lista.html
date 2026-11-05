@@ -16,7 +16,7 @@
 </head>
 <body class="panel-page" th:attr="data-ruta-base=@{/}">
     <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
-    <div th:replace="~{fragments/header :: panelHeader('oportunidades', true)}"></div>
+    <div th:replace="~{fragments/header :: panelHeader('oportunidades')}"></div>
     <main class="panel-main container" id="main-content">
         <section id="panel" data-tipo-cuenta="postulante" th:attr="data-id-usuario=${usuario.idUsuario}" aria-labelledby="pagina-titulo">
             <div class="panel-sesion" aria-label="Estado de la sesión">
@@ -54,7 +54,6 @@
                     <a class="btn btn-soft" th:if="${paginaVacantes.pagina + 1 < paginaVacantes.totalPaginas}" th:href="@{/panel/postulante/vacantes(pagina=${paginaVacantes.pagina + 1},busqueda=${filtros.busqueda},modalidad=${filtros.modalidad},idCarrera=${filtros.idCarrera},ciudad=${filtros.ciudad},idHabilidad=${filtros.idHabilidad})}">Siguiente</a>
                 </nav>
             </div>
-            <noscript><p class="panel-aviso">Activa JavaScript para editar tu cuenta y cerrar sesión.</p></noscript>
         </section>
     </main>
     <div th:replace="~{fragments/footer :: authFooter(@{/panel}, 'Volver a mi panel')}"></div>

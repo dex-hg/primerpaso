@@ -8,15 +8,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const estado = document.getElementById("panel-estado");
     const reintentar = document.getElementById("panel-reintentar");
     const cerrar = document.getElementById("cerrar-sesion");
+    const contador = document.getElementById("contador-notificaciones");
     let enProceso = false;
+    let consultaPendientes = null;
 
-    if (!sesion || !contenido || !estado || !reintentar || !cerrar) {
+    if (!sesion || !contenido || !estado || !reintentar) {
         if (contenido) contenido.hidden = true;
         if (estado) estado.textContent = "No se pudo cargar tu panel. Recarga la página para continuar.";
         return;
     }
 
-    const ocultarDatos = () => { contenido.hidden = true; };
+    const ocultarDatos = () => {
+        contenido.hidden = true;
+        consultaPendientes?.abort();
+        if (contador) contador.hidden = true;
+    };
+
+    const cargarPendientes = async () => {
+        if (!contador) return;
+        const controlador = new AbortController();
+        consultaPendientes = controlador;
+        const temporizador = window.setTimeout(() => controlador.abort(), 5000);
+        try {
+            const respuesta = await fetch(sesion.obtenerRuta("api/notificaciones/pendientes"), {
+                headers: { Accept: "application/json" }, credentials: "include", cache: "no-store",
+                signal: controlador.signal
+            });
+            if (!respuesta.ok) return;
+            const { cantidad, idUsuario, idEmpresa } = await respuesta.json();
+            if (controlador.signal.aborted || contenido.hidden || String(idUsuario) !== panel.dataset.idUsuario
+                || String(idEmpresa ?? "") !== (panel.dataset.idEmpresa || "")) return;
+            if (!Number.isSafeInteger(cantidad) || cantidad <= 0) return;
+            contador.textContent = cantidad > 99 ? "99+" : String(cantidad);
+            contador.setAttribute("aria-label", cantidad === 1 ? "1 notificación sin leer" : cantidad + " notificaciones sin leer");
+            contador.hidden = false;
+        } catch {
+            // La bandeja puede consultarse aunque el contador no esté disponible.
+        } finally {
+            window.clearTimeout(temporizador);
+            if (consultaPendientes === controlador) consultaPendientes = null;
+        }
+    };
     const volverAlAcceso = () => {
         ocultarDatos();
         window.location.replace(sesion.obtenerRuta("iniciar-sesion"));
@@ -24,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const actualizarEspera = (ocupado) => {
         enProceso = ocupado;
         panel.setAttribute("aria-busy", String(ocupado));
-        cerrar.disabled = ocupado;
+        if (cerrar) cerrar.disabled = ocupado;
         reintentar.disabled = ocupado;
     };
     const mostrarError = (mensaje) => {
@@ -61,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             contenido.hidden = false;
             sesion.mostrarEstado(estado, "");
+            void cargarPendientes();
         } catch (error) {
             mostrarError(sesion.mensajeConexion(error));
         } finally {
@@ -68,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    cerrar.addEventListener("click", async () => {
+    cerrar?.addEventListener("click", async () => {
         if (enProceso) return;
         ocultarDatos();
         actualizarEspera(true);

@@ -3,7 +3,6 @@ package com.dextre.primerpaso.contratacion;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.dextre.primerpaso.contratacion.DatosContratacion.Aviso;
 import com.dextre.primerpaso.contratacion.DatosContratacion.Ficha;
 import com.dextre.primerpaso.contratacion.DatosContratacion.Oferta;
 import com.dextre.primerpaso.contratacion.DatosContratacion.Postulacion;
@@ -59,12 +57,6 @@ public class ServicioContratacion {
         return new Ficha(ofertas, progreso, evaluable,
                 empresa && gestionable && !reservada && progreso.quedanPlazas(), gestionable,
                 empresa && enCurso && seleccionada && reservada, !empresa && enCurso && postulacion.activa());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Aviso> avisos(UsuarioSesion usuario, Long idVacante) {
-        comprobarCuenta(usuario, esEmpresa(usuario), false);
-        return repositorio.avisos(usuario, idVacante);
     }
 
     @Transactional

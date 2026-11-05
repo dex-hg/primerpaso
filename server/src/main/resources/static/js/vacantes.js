@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
         enProceso = true;
         limpiarErrores();
         mostrarEstado(mensaje);
-        const controles = [...panel.querySelectorAll("input, select, textarea, button"), document.getElementById("cerrar-sesion")].filter(Boolean);
+        const controles = [...panel.querySelectorAll("input, select, textarea, button")];
         const deshabilitados = controles.map((control) => control.disabled);
         controles.forEach((control) => { control.disabled = true; });
         panel.setAttribute("aria-busy", "true");

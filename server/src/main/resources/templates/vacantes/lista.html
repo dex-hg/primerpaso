@@ -16,7 +16,7 @@
 </head>
 <body class="panel-page" th:attr="data-ruta-base=@{/}">
     <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
-    <div th:replace="~{fragments/header :: panelHeader('vacantes', true)}"></div>
+    <div th:replace="~{fragments/header :: panelHeader('vacantes')}"></div>
     <main class="panel-main container" id="main-content">
         <section id="panel" data-tipo-cuenta="empresa" aria-labelledby="panel-titulo"
                  th:attr="data-id-usuario=${usuario.idUsuario},data-id-empresa=${usuario.idEmpresa},data-rol-empresa=${usuario.rolEmpresa}">
@@ -102,7 +102,7 @@
                     <a class="btn btn-soft" th:if="${paginaVacantes.pagina + 1 < paginaVacantes.totalPaginas}"
                        th:href="@{/panel/empresa/vacantes(pagina=${paginaVacantes.pagina + 1},estado=${estadoFiltro})}">Siguiente</a>
                 </nav>
-                <noscript><p class="panel-aviso">Activa JavaScript para publicar, cerrar vacantes y cerrar sesión.</p></noscript>
+                <noscript><p class="panel-aviso">Activa JavaScript para publicar, cerrar vacantes.</p></noscript>
             </div>
         </section>
     </main>

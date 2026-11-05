@@ -28,7 +28,7 @@
     </div>
 </header>
 
-<header class="site-header panel-header" th:fragment="panelHeader(seccionActiva, mostrarCierre)">
+<header class="site-header panel-header" th:fragment="panelHeader(seccionActiva)">
     <nav class="navbar navbar-expand-xl" aria-label="Navegación de tu cuenta">
         <div class="container">
             <a class="navbar-brand brand-link" th:href="@{/panel}" aria-label="PrimerPaso, ir a mi panel">
@@ -73,14 +73,20 @@
                            th:attr="aria-current=${seccionActiva == 'mensajes'} ? 'page' : null">Mensajes</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center gap-2" th:href="@{/panel/notificaciones}"
+                           th:classappend="${seccionActiva == 'notificaciones'} ? 'active'"
+                           th:attr="aria-current=${seccionActiva == 'notificaciones'} ? 'page' : null">
+                            <i class="bi bi-bell" aria-hidden="true"></i>
+                            <span>Notificaciones</span>
+                            <span id="contador-notificaciones" class="badge rounded-pill text-bg-primary" hidden></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" th:href="@{/cuenta}"
                            th:classappend="${seccionActiva == 'cuenta'} ? 'active'"
                            th:attr="aria-current=${seccionActiva == 'cuenta'} ? 'page' : null">Mi cuenta</a>
                     </li>
                 </ul>
-                <button th:if="${mostrarCierre}" class="btn btn-soft ms-md-3" id="cerrar-sesion" type="button">
-                    <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Cerrar sesión
-                </button>
             </div>
         </div>
     </nav>

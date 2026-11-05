@@ -15,7 +15,7 @@
 </head>
 <body class="panel-page" th:attr="data-ruta-base=@{/}">
     <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
-    <div th:replace="~{fragments/header :: panelHeader('panel', true)}"></div>
+    <div th:replace="~{fragments/header :: panelHeader('panel')}"></div>
 
     <main class="panel-main container" id="main-content">
         <section id="panel" data-tipo-cuenta="postulante" aria-labelledby="panel-titulo"
@@ -97,7 +97,6 @@
                     </div>
                 </section>
             </div>
-            <noscript><p class="panel-aviso">Activa JavaScript para cerrar tu sesión desde este panel.</p></noscript>
         </section>
     </main>
 

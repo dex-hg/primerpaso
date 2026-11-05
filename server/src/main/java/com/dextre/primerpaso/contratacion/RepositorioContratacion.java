@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.dextre.primerpaso.contratacion.DatosContratacion.Aviso;
 import com.dextre.primerpaso.contratacion.DatosContratacion.Oferta;
 import com.dextre.primerpaso.contratacion.DatosContratacion.Postulacion;
 import com.dextre.primerpaso.contratacion.DatosContratacion.Proceso;
@@ -206,22 +205,6 @@ public class RepositorioContratacion {
     void avisar(long idPostulacion, String destinatario, String tipo) {
         jdbc.update("INSERT INTO avisos_contratacion (id_postulacion, destinatario, tipo) VALUES (?, ?, ?)",
                 idPostulacion, destinatario, tipo);
-    }
-
-    List<Aviso> avisos(UsuarioSesion usuario, Long idVacante) {
-        boolean empresa = "empresa".equals(usuario.tipoCuenta());
-        String consulta = """
-                SELECT a.id_application, j.title_job, n.tipo, n.fecha_aviso
-                FROM avisos_contratacion n JOIN applications a ON a.id_application = n.id_postulacion
-                JOIN jobs j ON j.id_job = a.job_id_application
-                WHERE n.destinatario = ? AND
-                """ + (empresa ? "j.company_id_job = ?" : "a.candidate_id_application = ?") + """
-                 AND (?::bigint IS NULL OR j.id_job = ?)
-                ORDER BY n.id_aviso DESC LIMIT 12
-                """;
-        return jdbc.query(consulta, (resultado, fila) -> new Aviso(resultado.getLong(1), resultado.getString(2),
-                resultado.getString(3), resultado.getTimestamp(4).toInstant()), usuario.tipoCuenta(),
-                empresa ? usuario.idEmpresa() : usuario.idUsuario(), idVacante, idVacante);
     }
 
     private Proceso mapearProceso(ResultSet resultado) throws SQLException {

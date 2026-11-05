@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <nav class="d-flex align-items-center flex-wrap gap-2" aria-label="Opciones de mi cuenta"
+         th:fragment="navegacion(seccion)">
+        <a class="btn btn-soft" th:href="@{/cuenta}"
+           th:attr="aria-current=${seccion == 'perfil' ? 'page' : null}">Perfil</a>
+        <a class="btn btn-soft" th:href="@{/cuenta/historial}"
+           th:attr="aria-current=${seccion == 'historial' ? 'page' : null}">Historial</a>
+        <button class="btn btn-soft ms-sm-auto" id="cerrar-sesion" type="button">
+            <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i> Cerrar sesión
+        </button>
+    </nav>
+</body>
+</html>

@@ -108,19 +108,4 @@ public final class DatosContratacion {
         }
     }
 
-    public record Aviso(long idPostulacion, String tituloVacante, String tipo, Instant fecha) {
-        public String mensaje() {
-            return switch (tipo) {
-                case "oferta_enviada" -> "Tienes una oferta para revisar.";
-                case "oferta_aceptada" -> "El postulante aceptó la oferta.";
-                case "oferta_rechazada" -> "El postulante rechazó la oferta.";
-                case "oferta_retirada" -> "La empresa retiró la oferta.";
-                case "contratacion_confirmada" -> "La empresa confirmó tu contratación.";
-                case "vacante_cubierta" -> "La empresa cubrió las plazas de esta convocatoria. Gracias por postular.";
-                case "proceso_cancelado" -> "La empresa canceló el proceso de selección.";
-                case "postulacion_retirada" -> "El postulante retiró su solicitud.";
-                default -> throw new IllegalStateException("Tipo de aviso desconocido.");
-            };
-        }
-    }
 }
