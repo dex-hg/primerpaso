@@ -1,6 +1,7 @@
 package com.dextre.primerpaso.postulaciones;
 
 import java.time.ZoneId;
+import java.util.UUID;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.dextre.primerpaso.contratacion.ServicioContratacion;
 import com.dextre.primerpaso.oportunidades.ServicioOportunidades;
 import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 
@@ -19,14 +21,20 @@ public class ControladorVistasPostulaciones {
 
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
             .withZone(ZoneId.of("America/Lima"));
-    private static final List<String> ESTADOS = List.of("enviada", "en_revision", "seleccionada", "descartada", "retirada");
-    private static final List<String> NOMBRES_ESTADOS = List.of("Enviada", "En revisión", "Seleccionada", "Descartada", "Retirada");
+    private static final DateTimeFormatter FECHA_INICIO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final List<String> ESTADOS = List.of("enviada", "en_revision", "seleccionada",
+            "descartada", "retirada", "contratada", "finalizada");
+    private static final List<String> NOMBRES_ESTADOS = List.of("Enviada", "En revisión", "Seleccionada",
+            "Descartada", "Retirada", "Contratada", "Finalizada");
     private final ServicioPostulaciones servicio;
     private final ServicioOportunidades oportunidades;
+    private final ServicioContratacion contratacion;
 
-    public ControladorVistasPostulaciones(ServicioPostulaciones servicio, ServicioOportunidades oportunidades) {
+    public ControladorVistasPostulaciones(ServicioPostulaciones servicio, ServicioOportunidades oportunidades,
+            ServicioContratacion contratacion) {
         this.servicio = servicio;
         this.oportunidades = oportunidades;
+        this.contratacion = contratacion;
     }
 
     @GetMapping("/panel/postulante/vacantes/{id}/postular")
@@ -48,6 +56,7 @@ public class ControladorVistasPostulaciones {
         modelo.addAttribute("idVacante", idVacante);
         modelo.addAttribute("estados", ESTADOS);
         modelo.addAttribute("nombresEstados", NOMBRES_ESTADOS);
+        modelo.addAttribute("avisosContratacion", contratacion.avisos(usuario, idVacante));
         return "postulaciones/lista";
     }
 
@@ -55,6 +64,10 @@ public class ControladorVistasPostulaciones {
     public String consultar(@RequestAttribute("usuarioSesion") UsuarioSesion usuario, @PathVariable long id, Model modelo) {
         prepararModelo(usuario, modelo);
         modelo.addAttribute("detalle", servicio.consultar(usuario, id));
+        var ficha = contratacion.consultar(usuario, id);
+        modelo.addAttribute("contratacion", ficha);
+        if (ficha.puedeOfertar()) modelo.addAttribute("idEnvioOferta", UUID.randomUUID());
+        modelo.addAttribute("formatoFechaInicio", FECHA_INICIO);
         return "postulaciones/detalle";
     }
 

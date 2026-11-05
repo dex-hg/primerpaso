@@ -28,7 +28,8 @@ public class RepositorioPostulaciones {
     private static final String COLUMNAS = """
             SELECT a.id_application, j.id_job, j.title_job, e.trade_name_company,
                 c.first_name_candidate, c.last_name_candidate, a.status_application,
-                a.submitted_at_application, a.updated_at_application
+                a.submitted_at_application, a.updated_at_application,
+                CASE WHEN a.status_application = 'finalizada' THEN j.motivo_fin_proceso END AS motivo_finalizacion
             """;
     private final JdbcTemplate plantillaJdbc;
 
@@ -101,10 +102,19 @@ public class RepositorioPostulaciones {
         List<Object> parametros = new ArrayList<>();
         String filtro = condiciones(usuario, "todos", null, parametros);
         parametros.add(idPostulacion);
+        if (bloquear && plantillaJdbc.query("""
+                SELECT j.id_job FROM applications a JOIN jobs j ON j.id_job = a.job_id_application
+                """ + filtro + " AND a.id_application = ? FOR UPDATE OF j",
+                (resultado, fila) -> resultado.getLong(1), parametros.toArray()).isEmpty()) {
+            return Optional.empty();
+        }
         String consulta = COLUMNAS + """
                 , a.cover_letter_application, u.email_user, c.phone_candidate, c.city_candidate,
                 c.institution_candidate, r.name_career, c.academic_status_candidate,
-                c.current_term_candidate, c.graduation_year_candidate, c.id_candidate
+                c.current_term_candidate, c.graduation_year_candidate, c.id_candidate,
+                EXISTS (SELECT 1 FROM ofertas_contratacion o WHERE o.id_postulacion = a.id_application
+                    AND (o.estado = 'aceptada' OR (o.estado = 'pendiente' AND o.vence_en > statement_timestamp())))
+                    AS oferta_activa, j.motivo_fin_proceso IS NOT NULL AS proceso_finalizado
                 """ + ORIGEN + filtro + " AND a.id_application = ?" + (bloquear ? " FOR UPDATE OF a" : "");
         return plantillaJdbc.query(consulta, (resultado, fila) -> {
             List<String> habilidades = plantillaJdbc.query("""
@@ -116,7 +126,8 @@ public class RepositorioPostulaciones {
                     resultado.getString("name_career"), resultado.getString("academic_status_candidate"),
                     resultado.getObject("current_term_candidate", Integer.class),
                     resultado.getObject("graduation_year_candidate", Integer.class), habilidades);
-            return new Detalle(mapearResumen(resultado), resultado.getString("cover_letter_application"), perfil);
+            return new Detalle(mapearResumen(resultado), resultado.getString("cover_letter_application"), perfil,
+                    resultado.getBoolean("oferta_activa"), resultado.getBoolean("proceso_finalizado"));
         }, parametros.toArray()).stream().findFirst();
     }
 
@@ -152,6 +163,6 @@ public class RepositorioPostulaciones {
                 resultado.getString("title_job"), resultado.getString("trade_name_company"),
                 resultado.getString("first_name_candidate"), resultado.getString("last_name_candidate"),
                 resultado.getString("status_application"), resultado.getTimestamp("submitted_at_application").toInstant(),
-                resultado.getTimestamp("updated_at_application").toInstant());
+                resultado.getTimestamp("updated_at_application").toInstant(), resultado.getString("motivo_finalizacion"));
     }
 }

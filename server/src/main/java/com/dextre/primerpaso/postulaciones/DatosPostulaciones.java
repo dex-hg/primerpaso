@@ -31,7 +31,7 @@ public final class DatosPostulaciones {
     }
 
     public record Resumen(long id, long idVacante, String tituloVacante, String nombreEmpresa,
-            String nombres, String apellidos, String estado, Instant fechaEnvio, Instant version) {
+            String nombres, String apellidos, String estado, Instant fechaEnvio, Instant version, String motivoFinalizacion) {
         public String nombreEstado() {
             return switch (estado) {
                 case "enviada" -> "Enviada";
@@ -39,6 +39,12 @@ public final class DatosPostulaciones {
                 case "seleccionada" -> "Seleccionada";
                 case "descartada" -> "Descartada";
                 case "retirada" -> "Retirada";
+                case "contratada" -> "Contratada";
+                case "finalizada" -> switch (motivoFinalizacion == null ? "" : motivoFinalizacion) {
+                    case "vacante_cubierta" -> "Finalizada · Vacante cubierta";
+                    case "proceso_cancelado" -> "Finalizada · Proceso cancelado";
+                    default -> "Finalizada";
+                };
                 default -> "Por confirmar";
             };
         }
@@ -52,7 +58,8 @@ public final class DatosPostulaciones {
         }
     }
 
-    public record Detalle(Resumen postulacion, String cartaPresentacion, Perfil perfil) {
+    public record Detalle(Resumen postulacion, String cartaPresentacion, Perfil perfil,
+            boolean ofertaActiva, boolean procesoFinalizado) {
     }
 
     public record PaginaPostulaciones(List<Resumen> postulaciones, int pagina, int totalPaginas,

@@ -88,12 +88,17 @@ public class ServicioChat {
 
     private String explicarDisponibilidad(UsuarioSesion usuario, Contexto contexto, boolean iniciada) {
         if (!contexto.participantesActivos()) return "La conversación está en modo de lectura porque una cuenta o empresa está inactiva.";
-        if (!"seleccionada".equals(contexto.estadoPostulacion())) {
+        if ("finalizada".equals(contexto.estadoPostulacion())) {
+            return "Conversación en modo de lectura. El proceso de selección finalizó.";
+        }
+        boolean contratada = "contratada".equals(contexto.estadoPostulacion());
+        if (!contratada && !"seleccionada".equals(contexto.estadoPostulacion())) {
             return iniciada ? "Conversación en modo de lectura. La postulación ya no está seleccionada."
                     : "El chat se habilita cuando la empresa selecciona esta postulación para continuar el proceso.";
         }
         if (!iniciada && "postulante".equals(usuario.tipoCuenta())) {
-            return "Tu postulación está seleccionada. Podrás responder cuando el reclutador envíe el primer mensaje.";
+            return contratada ? "La empresa confirmó tu contratación. Podrás responder cuando inicie la conversación."
+                    : "Tu postulación está seleccionada. Podrás responder cuando el reclutador envíe el primer mensaje.";
         }
         return "";
     }

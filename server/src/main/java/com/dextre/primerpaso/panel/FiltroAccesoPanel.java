@@ -33,13 +33,13 @@ public class FiltroAccesoPanel extends OncePerRequestFilter {
     private static final Pattern RUTAS_VACANTES = Pattern.compile(
             "/panel/empresa/vacantes(?:/nueva|/[1-9][0-9]*/editar)?");
     private static final Pattern API_VACANTES = Pattern.compile(
-            "/api/vacantes(?:/publicar|/[1-9][0-9]*(?:/(?:publicar|cerrar))?)?");
+            "/api/vacantes(?:/publicar|/[1-9][0-9]*(?:/(?:publicar|cerrar|cancelar-proceso))?)?");
     private static final Pattern RUTAS_OPORTUNIDADES = Pattern.compile(
             "/panel/postulante/vacantes(?:/[1-9][0-9]*(?:/postular)?)?");
     private static final Pattern RUTAS_POSTULACIONES = Pattern.compile(
             "/panel/(postulante|empresa)/postulaciones(?:/[1-9][0-9]*)?");
     private static final Pattern API_POSTULACIONES = Pattern.compile(
-            "/api/postulaciones(?:/[1-9][0-9]*(?:/estado)?)?");
+            "/api/postulaciones(?:/[1-9][0-9]*(?:/estado|/retirar|/ofertas(?:/[1-9][0-9]*/(?:respuesta|retirar|confirmar))?)?)?");
     private static final Pattern RUTAS_CHAT = Pattern.compile(
             "/panel/(postulante|empresa)/(?:mensajes|postulaciones/[1-9][0-9]*/chat)");
     private static final Pattern API_CHAT = Pattern.compile(

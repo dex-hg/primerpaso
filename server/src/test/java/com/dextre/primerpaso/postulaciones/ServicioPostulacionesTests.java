@@ -183,9 +183,9 @@ class ServicioPostulacionesTests {
     }
 
     private Detalle detalle(String estado) {
-        return new Detalle(new Resumen(15, 12, "Practicante", "Empresa", "Ana", "Pérez", estado, VERSION, VERSION),
+        return new Detalle(new Resumen(15, 12, "Practicante", "Empresa", "Ana", "Pérez", estado, VERSION, VERSION, null),
                 "Hola\nMe interesa esta vacante.", new Perfil("ana@example.test", null, null, "Institución", "Sistemas",
-                        "estudiante", 6, null, List.of("Java")));
+                        "estudiante", 6, null, List.of("Java")), false, false);
     }
 
     private void exigirError(Runnable accion, int estado) {

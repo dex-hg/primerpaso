@@ -19,7 +19,8 @@ import com.dextre.primerpaso.vacantes.RepositorioVacantes;
 public class ServicioPostulaciones {
 
     private static final int TAMANIO_PAGINA = 12;
-    private static final Set<String> ESTADOS = Set.of("todos", "enviada", "en_revision", "seleccionada", "descartada", "retirada");
+    private static final Set<String> ESTADOS = Set.of("todos", "enviada", "en_revision", "seleccionada",
+            "descartada", "retirada", "contratada", "finalizada");
     private static final Set<String> ESTADOS_EMPRESA = Set.of("en_revision", "seleccionada", "descartada");
     private final RepositorioPostulaciones repositorio;
     private final RepositorioVacantes vacantes;
@@ -98,7 +99,13 @@ public class ServicioPostulaciones {
         if ("retirada".equals(detalle.postulacion().estado())) {
             throw regla(HttpStatus.CONFLICT, "Una postulación retirada no admite cambios de estado.");
         }
+        if (detalle.procesoFinalizado() || Set.of("contratada", "finalizada").contains(detalle.postulacion().estado())) {
+            throw regla(HttpStatus.CONFLICT, "La postulación ya tiene un resultado final.");
+        }
         if (datos.estado().equals(detalle.postulacion().estado())) return detalle;
+        if (detalle.ofertaActiva()) {
+            throw regla(HttpStatus.CONFLICT, "Resuelve la oferta pendiente o aceptada antes de cambiar la evaluación.");
+        }
         repositorio.actualizarEstado(usuario.idEmpresa(), idPostulacion, datos.estado(), datos.version());
         return obtenerDetalle(usuario, idPostulacion, false);
     }

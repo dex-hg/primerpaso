@@ -37,6 +37,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.dextre.primerpaso.oportunidades.DatosOportunidades.Oportunidad;
+import com.dextre.primerpaso.contratacion.DatosContratacion.Ficha;
+import com.dextre.primerpaso.contratacion.DatosContratacion.Progreso;
+import com.dextre.primerpaso.contratacion.ServicioContratacion;
 import com.dextre.primerpaso.oportunidades.ServicioOportunidades;
 import com.dextre.primerpaso.panel.FiltroAccesoPanel;
 import com.dextre.primerpaso.postulaciones.DatosPostulaciones.Detalle;
@@ -65,6 +68,7 @@ class ControladorPostulacionesTests {
     @MockitoBean private ServicioSesion sesiones;
     @MockitoBean private ServicioPostulaciones postulaciones;
     @MockitoBean private ServicioOportunidades oportunidades;
+    @MockitoBean private ServicioContratacion contratacion;
     private MockMvc cliente;
 
     @BeforeEach
@@ -169,6 +173,8 @@ class ControladorPostulacionesTests {
         assertThat(lista).contains("Practicante &lt;web&gt;", "idVacante=12", "estado=enviada", "pagina=1",
                 "28/10/2026 10:00", "13 postulaciones");
         when(postulaciones.consultar(EMPRESA, 15)).thenReturn(detalle());
+        when(contratacion.consultar(EMPRESA, 15)).thenReturn(new Ficha(List.of(),
+                new Progreso(1, 0, 0, 1, VERSION), true, false, false, false, false));
         String html = cliente.perform(get("/panel/empresa/postulaciones/15").session(sesion(EMPRESA)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertThat(html).contains("&lt;script&gt;alert", "Datos actuales del perfil", "Guardar estado", VERSION.toString())
@@ -179,6 +185,8 @@ class ControladorPostulacionesTests {
     @Test
     void renderizaVistaDePostulanteSinControlesEmpresarialesYEstadoVacio() throws Exception {
         when(postulaciones.consultar(POSTULANTE, 15)).thenReturn(detalle());
+        when(contratacion.consultar(POSTULANTE, 15)).thenReturn(new Ficha(List.of(),
+                null, false, false, false, false, true));
         String html = cliente.perform(get("/panel/postulante/postulaciones/15").session(sesion(POSTULANTE)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         assertThat(html).contains("Carta de presentación", "Mis postulaciones").doesNotContain("Guardar estado");
@@ -212,9 +220,9 @@ class ControladorPostulacionesTests {
     }
 
     private Detalle detalle() {
-        return new Detalle(new Resumen(15, 12, "Practicante <web>", "Empresa", "Ana", "Pérez", "enviada", VERSION, VERSION),
+        return new Detalle(new Resumen(15, 12, "Practicante <web>", "Empresa", "Ana", "Pérez", "enviada", VERSION, VERSION, null),
                 "<script>alert('prueba')</script>\nSegunda línea", new Perfil("ana@example.test", null, null,
-                "Institución", "Sistemas", "estudiante", 6, null, List.of("Java")));
+                "Institución", "Sistemas", "estudiante", 6, null, List.of("Java")), false, false);
     }
 
     private String estadoJson() {
