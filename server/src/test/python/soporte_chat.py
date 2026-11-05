@@ -70,13 +70,15 @@ def cliente():
     return build_opener(HTTPCookieProcessor(http.cookiejar.CookieJar()), SinRedireccion())
 
 
-def solicitar(navegador, ruta, metodo='GET', datos=None, token=None):
+def solicitar(navegador, ruta, metodo='GET', datos=None, token=None, *, base=BASE):
+    if urlparse(base).hostname not in ('localhost', '127.0.0.1', '::1'):
+        raise RuntimeError('El servidor de verificación debe estar en localhost.')
     cabeceras = {'Accept': 'application/json'}
     if datos is not None:
         cabeceras['Content-Type'] = 'application/json'
     if token:
         cabeceras['X-CSRF-Token'] = token
-    solicitud = Request(BASE + ruta, method=metodo, headers=cabeceras,
+    solicitud = Request(base + ruta, method=metodo, headers=cabeceras,
         data=json.dumps(datos).encode('utf-8') if datos is not None else None)
     try:
         respuesta = navegador.open(solicitud, timeout=20)
