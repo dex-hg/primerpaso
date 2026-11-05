@@ -19,7 +19,7 @@ const empresa = {
 };
 
 const crearRespuesta = (estado, contenido = null) => ({
-    status: estado,
+    status: estado, ok: estado >= 200 && estado < 300,
     json: async () => contenido
 });
 
@@ -62,9 +62,13 @@ const prepararPanel = (respuestas, opciones = {}) => {
         panel: crearElemento(datos),
         "panel-contenido": crearElemento(),
         "panel-estado": crearElemento(),
-        "panel-reintentar": crearElemento(),
-        "cerrar-sesion": crearElemento()
+        "panel-reintentar": crearElemento()
     };
+    if (!opciones.sinCierre) elementos["cerrar-sesion"] = crearElemento();
+    if (opciones.contador) {
+        elementos["contador-notificaciones"] = crearElemento();
+        elementos["contador-notificaciones"].hidden = true;
+    }
     elementos["panel-reintentar"].hidden = true;
     const documento = {
         ...crearEventos(), visibilityState: "visible",
@@ -116,6 +120,35 @@ prueba("la identidad SSR permanece oculta hasta revalidar una sesión vigente", 
     comprobar.deepEqual(entorno.destinos, []);
     comprobar.equal(entorno.solicitudes[0].credentials, "include");
     comprobar.equal(entorno.solicitudes[0].cache, "no-store");
+});
+
+prueba("una página sin cierre de sesión muestra su contenido y actualiza el contador al volver", async () => {
+    const resumen = { idUsuario: postulante.idUsuario, idEmpresa: null };
+    const entorno = prepararPanel([
+        crearRespuesta(200, postulante), crearRespuesta(200, { ...resumen, cantidad: 1 }),
+        crearRespuesta(200, postulante), crearRespuesta(200, { ...resumen, cantidad: 3 })
+    ], { sinCierre: true, contador: true, rutaBase: "/primerpaso/" });
+    const contador = entorno.elementos["contador-notificaciones"];
+    await entorno.iniciar();
+    comprobar.equal(entorno.elementos["panel-contenido"].hidden, false);
+    comprobar.equal(contador.hidden, false);
+    comprobar.equal(contador.textContent, "1");
+    comprobar.equal(entorno.solicitudes[1].url, "/primerpaso/api/notificaciones/pendientes");
+    entorno.documento.visibilityState = "hidden";
+    await entorno.documento.emitir("visibilitychange");
+    comprobar.equal(contador.hidden, true);
+    entorno.documento.visibilityState = "visible";
+    await entorno.documento.emitir("visibilitychange");
+    comprobar.equal(contador.textContent, "3");
+});
+
+prueba("el contador descarta el resumen de otra cuenta", async () => {
+    const entorno = prepararPanel([
+        crearRespuesta(200, postulante), crearRespuesta(200, { idUsuario: 19, idEmpresa: null, cantidad: 5 })
+    ], { sinCierre: true, contador: true });
+    await entorno.iniciar();
+    comprobar.equal(entorno.elementos["contador-notificaciones"].hidden, true);
+    comprobar.equal(entorno.elementos["panel-contenido"].hidden, false);
 });
 
 prueba("una sesión expirada oculta la identidad y vuelve al acceso", async () => {

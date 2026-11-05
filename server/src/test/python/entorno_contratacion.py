@@ -14,7 +14,8 @@ from urllib.request import urlopen
 
 SERVIDOR = Path(__file__).resolve().parents[3]
 ESQUEMA = SERVIDOR.parent / 'db' / 'primerpaso.sql'
-MIGRACION = ESQUEMA.parent / 'migraciones' / 'V002__contratacion.sql'
+MIGRACIONES = tuple(ESQUEMA.parent / 'migraciones' / nombre for nombre in (
+    'V002__contratacion.sql', 'V003__lecturas_notificaciones.sql'))
 JAR = SERVIDOR / 'target' / 'primerpaso-0.0.1-SNAPSHOT.jar'
 
 
@@ -77,9 +78,10 @@ class EntornoContratacion:
         else:
             self.sql(ESQUEMA.read_text(encoding='utf-8-sig'))
         preparar_datos(self)
-        migracion = MIGRACION.read_text(encoding='utf-8')
-        self.sql(migracion)
-        self.sql(migracion)
+        for archivo in MIGRACIONES:
+            migracion = archivo.read_text(encoding='utf-8')
+            self.sql(migracion)
+            self.sql(migracion)
 
     @contextmanager
     def servidor(self):

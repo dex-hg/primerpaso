@@ -215,7 +215,7 @@ def verificar_contratacion(entorno, sesiones):
     finalizada = sesiones[restante].llamar(rutas[restante])['postulacion']
     assert (finalizada['estado'], finalizada['motivoFinalizacion']) == ('finalizada', 'vacante_cubierta')
     evaluar(empresa, rutas[restante], 'seleccionada', 409)
-    assert 'cubrió las plazas' in sesiones[restante].llamar('/panel/postulante/postulaciones')
+    assert 'cubrió las plazas' in sesiones[restante].llamar('/panel/notificaciones')
     assert sesiones[restante].llamar('/api/chat' + rutas[restante].removeprefix('/api'))['puedeEnviar'] is False
     enviar_chat(sesiones[restante], rutas[restante], 409)
     assert entorno.sql(f"""SELECT count(*) FROM avisos_contratacion
@@ -244,7 +244,7 @@ def verificar_cancelacion(entorno, sesiones):
         empresa.llamar(ruta_vacante + '/cancelar-proceso', 204, 'POST', cancelacion)
     ficha = postulante.llamar(ruta + '/ofertas')
     assert ficha['ofertas'][0]['id'] == nueva['id'] and ficha['ofertas'][0]['estado'] == 'retirada'
-    html = postulante.llamar('/panel/postulante/postulaciones')
+    html = postulante.llamar('/panel/notificaciones')
     assert 'canceló el proceso' in html and cancelacion['motivo'] not in html
     assert postulante.llamar(ruta)['postulacion']['motivoFinalizacion'] == 'proceso_cancelado'
     assert entorno.sql(f"""SELECT count(*) FROM applications WHERE job_id_application = {int(id_vacante)}
@@ -277,7 +277,7 @@ def verificar_retiro_concurrente(entorno, sesiones):
 
 def principal():
     argumentos = argparse.ArgumentParser()
-    argumentos.add_argument('--esquema-anterior', type=Path, help='SQL base previo a V002 para verificar la migración.')
+    argumentos.add_argument('--esquema-anterior', type=Path, help='SQL base anterior para verificar las migraciones.')
     opciones = argumentos.parse_args()
     with entorno_contratacion() as entorno:
         entorno.preparar_esquema(opciones.esquema_anterior, preparar_datos)
