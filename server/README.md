@@ -20,7 +20,9 @@ Para una demostración local con cuentas listas para usar, consultar [Cuentas de
 
 `.env` está excluido de Git. `.env.example` contiene únicamente valores de ejemplo. La aplicación comprueba la conexión y las tablas al arrancar; no crea ni modifica el esquema automáticamente.
 
-En una base existente, aplica las migraciones pendientes en orden. Usa `V001__mensajes_chat.sql`, `V002__contratacion.sql` y `V003__lecturas_notificaciones.sql` desde `db/migraciones`.
+En una base existente, aplica las migraciones pendientes en orden hasta [V004 de seguridad](../db/migraciones/V004__limites_inicio_sesion.sql). Para Supabase, sigue los [pasos de actualización del esquema privado](../db/supabase/README.md#actualizar-una-instalación-existente).
+
+Para publicar el JAR y sus vistas en un Web Service, sigue la [guía de Render](DESPLIEGUE-RENDER.md).
 
 Las plantillas requieren Spring y no se pueden abrir directamente con Live Server. La configuración CORS de la API conserva los orígenes locales de los puertos 5500, 4173 y 8000 para clientes externos; se pueden cambiar mediante `PRIMERPASO_CORS_ORIGENES`.
 
@@ -38,7 +40,7 @@ Las categorías, cifras y oportunidades del inicio siguen siendo datos de demost
 
 `POST /api/registro/empresas` recibe los datos de la empresa y del reclutador, país, identificación fiscal, sector, ciudad, sitio web opcional e intereses. Para Perú se exige un RUC de 11 dígitos. La cuenta del reclutador recibe la membresía de administrador de la empresa registrada.
 
-La cuenta y su perfil, membresía y preferencias se guardan en una transacción. Los correos se normalizan a minúsculas; las contraseñas conservan sus caracteres y se almacenan con PBKDF2-HMAC-SHA-256, sal aleatoria de 16 bytes y 600 000 iteraciones. La API devuelve `201` al crear, `400` para datos inválidos, `409` para correo o identificación fiscal duplicados y `503` cuando el servicio no puede completar la operación.
+La cuenta y su perfil, membresía y preferencias se guardan en una transacción. Los correos se normalizan a minúsculas. Las contraseñas nuevas deben tener entre 15 y 128 caracteres; se almacenan con PBKDF2-HMAC-SHA-256, sal aleatoria de 16 bytes y 600 000 iteraciones. Las cuentas existentes mantienen su contraseña. La API devuelve `201` al crear, `400` para datos inválidos, `403` si ese tipo de registro está cerrado, `409` para duplicados y `503` cuando el servicio no puede completar la operación.
 
 Las carreras escritas en el formulario y las opciones seleccionadas se resuelven en sus catálogos sin duplicar nombres. Un catálogo inactivo impide el registro y revierte la transacción. `terms_version_user` usa `registro-v1` para identificar esta versión del formulario; el contenido legal de los enlaces de términos sigue pendiente.
 
@@ -47,6 +49,8 @@ Después del registro se puede acceder desde `/iniciar-sesion`, eligiendo el tip
 ## Inicio y cierre de sesión
 
 El inicio comprueba el hash de la contraseña y el estado activo de la cuenta. Un postulante debe tener su perfil; una empresa requiere una membresía activa en una empresa activa. Las credenciales incorrectas, el tipo equivocado y las cuentas no habilitadas devuelven el mismo mensaje con estado `401`.
+
+El acceso se limita a cinco fallos por correo en una ventana de 15 minutos y 25 solicitudes por origen en 15 minutos. El registro comparte un cupo de seis solicitudes por origen entre ambos tipos de cuenta. El endpoint del token CSRF limita la creación de sesiones anónimas. Al superar un cupo, la API devuelve `429` con `Retry-After` en segundos. Los límites por correo quedan en PostgreSQL; define una clave estable para conservarlos entre reinicios.
 
 1. `GET /api/sesion/seguridad` obtiene `tokenCsrf` y una cookie de sesión previa al acceso.
 2. `POST /api/sesion` recibe `correo`, `contrasena` y `tipoCuenta` (`postulante` o `empresa`) en JSON. Requiere esa cookie y la cabecera `X-CSRF-Token`. Al autenticar devuelve `200`, cambia el identificador de sesión y renueva el token.
@@ -86,7 +90,7 @@ El filtro `FiltroAccesoPanel` protege las páginas y API privadas antes de ejecu
 
 La comprobación del backend se realiza en cada solicitud privada, de acuerdo con la [guía de autorización de OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html). Ambos roles empresariales pueden consultar, crear, editar, publicar y cerrar vacantes de su empresa. El navegador vuelve a comprobar la sesión al restaurar el panel o regresar a su pestaña y oculta los datos ante errores, expiración o cambio de cuenta, empresa o rol.
 
-La cookie `PRIMERPASO_SESION` usa `HttpOnly`, `SameSite=Strict` y ruta `/`. La sesión vence después de 30 minutos de inactividad y se conserva en memoria del servidor, de modo que reiniciar Spring cierra las sesiones. Todas las respuestas de sesión usan `Cache-Control: no-store`. Las solicitudes que modifican la sesión sin el token válido devuelven `403`; los datos inválidos, `400`; los fallos del servicio, `503`, sin exponer detalles internos.
+La cookie `PRIMERPASO_SESION` usa `HttpOnly`, `SameSite=Strict` y ruta `/`. La sesión anónima del token CSRF vence tras cinco minutos de inactividad y la autenticada tras 30 minutos. Las sesiones se guardan en memoria, de modo que reiniciar Spring las cierra. Las respuestas de sesión usan `Cache-Control: no-store`. Los fallos del servicio devuelven `503` sin detalles internos.
 
 En localhost se usa `PRIMERPASO_COOKIE_SEGURA=false`. Al servir mediante HTTPS, configurar `PRIMERPASO_COOKIE_SEGURA=true`. Para probar con un servidor estático, usar el mismo nombre de host en cliente y API: `localhost` en ambos o `127.0.0.1` en ambos.
 
