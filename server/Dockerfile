@@ -10,6 +10,7 @@ FROM eclipse-temurin:21.0.13_9-jre-noble
 WORKDIR /opt/primerpaso
 ENV SPRING_PROFILES_ACTIVE=supabase,render
 COPY --from=compilacion /primerpaso.jar ./primerpaso.jar
-USER 10001:10001
+# Render permite leer los archivos de /etc/secrets al grupo 1000.
+USER 10001:1000
 EXPOSE 10000
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=55.0", "-XX:+ExitOnOutOfMemoryError", "-jar", "/opt/primerpaso/primerpaso.jar"]
