@@ -2,6 +2,10 @@ HELP.md
 .env
 .env.*
 !.env.example
+*.dump
+*.backup
+pgpass.conf
+.pgpass
 target/
 __pycache__/
 .mvn/wrapper/maven-wrapper.jar
