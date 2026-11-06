@@ -15,7 +15,7 @@ from urllib.request import urlopen
 SERVIDOR = Path(__file__).resolve().parents[3]
 ESQUEMA = SERVIDOR.parent / 'db' / 'primerpaso.sql'
 MIGRACIONES = tuple(ESQUEMA.parent / 'migraciones' / nombre for nombre in (
-    'V002__contratacion.sql', 'V003__lecturas_notificaciones.sql'))
+    'V002__contratacion.sql', 'V003__lecturas_notificaciones.sql', 'V004__limites_inicio_sesion.sql'))
 JAR = SERVIDOR / 'target' / 'primerpaso-0.0.1-SNAPSHOT.jar'
 
 
@@ -84,12 +84,13 @@ class EntornoContratacion:
             self.sql(migracion)
 
     @contextmanager
-    def servidor(self):
+    def servidor(self, *, variables_extra=None):
         directorio_java = os.environ.get('JAVA_HOME')
         java = str(Path(directorio_java) / 'bin' / 'java') if directorio_java else 'java'
         variables = dict(os.environ,
                          PRIMERPASO_BD_URL=f'jdbc:postgresql://127.0.0.1:{self.puerto}/qa_contratacion',
                          PRIMERPASO_BD_USUARIO=self.usuario, PRIMERPASO_BD_CLAVE=self.clave)
+        variables.update(variables_extra or {})
         with self.registro_web.open('wb') as registro:
             proceso = subprocess.Popen(
                 [java, '-jar', str(JAR), f'--server.port={self.puerto_web}', '--server.address=127.0.0.1'],
@@ -98,7 +99,7 @@ class EntornoContratacion:
                 limite = monotonic() + 40
                 while monotonic() < limite and proceso.poll() is None:
                     try:
-                        with urlopen(self.url + '/iniciar-sesion', timeout=2) as respuesta:
+                        with urlopen(self.url + '/salud', timeout=2) as respuesta:
                             if respuesta.status == 200:
                                 break
                     except (URLError, OSError):
