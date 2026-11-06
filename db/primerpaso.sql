@@ -366,6 +366,13 @@ CREATE TABLE lecturas_notificaciones (
     PRIMARY KEY (id_aviso, id_usuario)
 );
 
+CREATE TABLE limites_inicio_sesion (
+    clave BYTEA PRIMARY KEY CHECK (octet_length(clave) = 32),
+    intentos SMALLINT NOT NULL CHECK (intentos >= 0),
+    vence_en TIMESTAMPTZ NOT NULL
+);
+CREATE INDEX idx_limites_inicio_sesion_vence ON limites_inicio_sesion (vence_en);
+
 COMMIT;
 
 -- Reglas del backend: crear cuenta y perfil/membresía en una transacción;

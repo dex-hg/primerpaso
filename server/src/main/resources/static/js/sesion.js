@@ -19,6 +19,9 @@
     const leerRespuesta = async (respuesta) => {
         let contenido = null;
         try { contenido = await respuesta.json(); } catch { /* Una respuesta vacía no contiene JSON. */ }
+        if (respuesta.status === 429) {
+            return { estado: respuesta.status, contenido, espera: Number(respuesta.headers.get("Retry-After")) };
+        }
         return { estado: respuesta.status, contenido };
     };
 
@@ -59,10 +62,16 @@
         elemento.classList.toggle("is-error", esError);
     };
 
-    const mensajeError = (estado) => {
+    const mensajeError = (estado, espera) => {
         if (estado === 400) return "Revisa el correo, la contraseña y el tipo de cuenta ingresados.";
         if (estado === 401) return mensajeCredenciales;
         if (estado === 403) return "La solicitud de sesión no es válida. Recarga la página e inténtalo nuevamente.";
+        if (estado === 429) {
+            if (!Number.isSafeInteger(espera) || espera <= 0) return "Demasiados intentos. Espera antes de volver a intentarlo.";
+            const cantidad = espera < 60 ? espera : Math.ceil(espera / 60);
+            const unidad = espera < 60 ? "segundo" : "minuto";
+            return `Demasiados intentos. Vuelve a intentarlo en ${cantidad} ${unidad}${cantidad === 1 ? "" : "s"}.`;
+        }
         if (estado === 503) return "El servicio de inicio de sesión no está disponible. Inténtalo más tarde.";
         return "No se pudo comprobar tu sesión. Inténtalo nuevamente.";
     };
@@ -149,7 +158,7 @@
                     window.location.replace(obtenerRuta("panel"));
                     return;
                 }
-                mostrarEstado(estado, mensajeError(resultado.estado), true);
+                mostrarEstado(estado, mensajeError(resultado.estado, resultado.espera), true);
             } catch (error) {
                 mostrarEstado(estado, mensajeConexion(error), true);
             } finally {

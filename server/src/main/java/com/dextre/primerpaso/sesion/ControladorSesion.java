@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dextre.primerpaso.seguridad.LimiteInicioSesion;
 import com.dextre.primerpaso.sesion.DatosSesion.SolicitudInicioSesion;
 import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 
@@ -28,16 +29,21 @@ public class ControladorSesion {
     private final SecureRandom aleatorio = new SecureRandom();
     private final ServicioSesion servicio;
     private final AccesoSesion acceso;
+    private final LimiteInicioSesion limite;
 
-    public ControladorSesion(ServicioSesion servicio, AccesoSesion acceso) {
+    public ControladorSesion(ServicioSesion servicio, AccesoSesion acceso, LimiteInicioSesion limite) {
         this.servicio = servicio;
         this.acceso = acceso;
+        this.limite = limite;
     }
 
     @GetMapping("/seguridad")
     public ResponseEntity<SeguridadSesion> obtenerSeguridad(HttpServletRequest solicitud) {
-        HttpSession sesion = solicitud.getSession(true);
-        sesion.setMaxInactiveInterval(1800);
+        HttpSession sesion = solicitud.getSession(false);
+        if (sesion == null) {
+            sesion = solicitud.getSession(true);
+            sesion.setMaxInactiveInterval(300);
+        }
         return ResponseEntity.ok().cacheControl(CacheControl.noStore())
                 .body(new SeguridadSesion(obtenerToken(sesion)));
     }
@@ -48,7 +54,9 @@ public class ControladorSesion {
             HttpServletRequest solicitud) {
         HttpSession sesionAnterior = solicitud.getSession(false);
         acceso.comprobarToken(sesionAnterior, token);
+        var reserva = limite.reservar(datos.correo());
         UsuarioSesion usuario = servicio.iniciarSesion(datos);
+        limite.liberar(reserva);
         sesionAnterior.invalidate();
         HttpSession sesion = solicitud.getSession(true);
         sesion.setMaxInactiveInterval(1800);

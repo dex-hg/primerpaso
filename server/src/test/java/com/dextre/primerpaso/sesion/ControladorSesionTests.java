@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import com.dextre.primerpaso.seguridad.LimiteInicioSesion;
 import com.dextre.primerpaso.sesion.DatosSesion.SolicitudInicioSesion;
 import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 import com.jayway.jsonpath.JsonPath;
@@ -50,7 +51,8 @@ class ControladorSesionTests {
         servicio = mock(ServicioSesion.class);
         LocalValidatorFactoryBean validador = new LocalValidatorFactoryBean();
         validador.afterPropertiesSet();
-        cliente = MockMvcBuilders.standaloneSetup(new ControladorSesion(servicio, new AccesoSesion(servicio, false)))
+        cliente = MockMvcBuilders.standaloneSetup(new ControladorSesion(servicio, new AccesoSesion(servicio, false),
+                mock(LimiteInicioSesion.class)))
                 .setControllerAdvice(new ManejadorErroresSesion()).setValidator(validador).build();
     }
 
