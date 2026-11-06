@@ -1,0 +1,10 @@
+# Envía solo los insumos de Maven; excluye .env, certificados locales y artefactos.
+**
+!Dockerfile
+!pom.xml
+!mvnw
+!.mvn/
+!.mvn/wrapper/
+!.mvn/wrapper/maven-wrapper.properties
+!src/
+!src/**
