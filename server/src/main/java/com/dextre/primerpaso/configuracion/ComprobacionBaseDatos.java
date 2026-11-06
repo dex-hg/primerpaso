@@ -34,18 +34,18 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments argumentos) {
         if (clave == null || clave.isBlank()) {
-            throw new IllegalStateException("Configura PRIMERPASO_BD_CLAVE en server/.env.");
+            throw new IllegalStateException("Configura la contraseña de PostgreSQL para el perfil activo.");
         }
         try (Connection conexion = fuenteDatos.getConnection()) {
             if (!conexion.isValid(5)) {
                 throw new IllegalStateException("PostgreSQL no responde a la comprobación de conexión.");
             }
         } catch (SQLException excepcion) {
-            throw new IllegalStateException("No se pudo conectar a PostgreSQL. Revisa server/.env.");
+            throw new IllegalStateException("No se pudo conectar a PostgreSQL. Revisa la conexión del perfil activo.");
         }
         for (String tabla : List.of("users", "candidates", "careers", "skills", "work_areas",
                 "companies", "company_members", "candidate_skills", "candidate_work_areas", "company_work_areas",
-                "jobs", "job_skills")) {
+                "jobs", "job_skills", "applications")) {
             Boolean existe = jdbc.queryForObject("SELECT to_regclass(?) IS NOT NULL", Boolean.class, tabla);
             if (!Boolean.TRUE.equals(existe)) {
                 throw new IllegalStateException("Faltan tablas del esquema. Revisa db/primerpaso.sql.");
@@ -57,7 +57,7 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
                 AND column_name IN ('first_name_company_member', 'last_name_company_member', 'phone_company_member')
                 """, Integer.class);
         if (columnas == null || columnas != 3) {
-            throw new IllegalStateException("Aplica db/registro_reclutador.sql antes de iniciar el servidor.");
+            throw new IllegalStateException("Faltan las columnas de contacto de company_members. Revisa db/primerpaso.sql.");
         }
         Integer columnasChat = jdbc.queryForObject("""
                 SELECT count(*) FROM information_schema.columns
@@ -82,6 +82,16 @@ public class ComprobacionBaseDatos implements ApplicationRunner {
                 """, Boolean.class);
         if (!Boolean.TRUE.equals(esquemaNotificaciones)) {
             throw new IllegalStateException("Aplica db/migraciones/V003__lecturas_notificaciones.sql antes de iniciar el servidor.");
+        }
+        Boolean esquemaLimites = jdbc.queryForObject("""
+                SELECT to_regclass('limites_inicio_sesion') IS NOT NULL
+                    AND has_table_privilege(to_regclass('limites_inicio_sesion'), 'SELECT')
+                    AND has_table_privilege(to_regclass('limites_inicio_sesion'), 'INSERT')
+                    AND has_table_privilege(to_regclass('limites_inicio_sesion'), 'UPDATE')
+                    AND has_table_privilege(to_regclass('limites_inicio_sesion'), 'DELETE')
+                """, Boolean.class);
+        if (!Boolean.TRUE.equals(esquemaLimites)) {
+            throw new IllegalStateException("Aplica V004 de seguridad y verifica los permisos del rol de PrimerPaso.");
         }
         REGISTRO.info("Conexión con PostgreSQL y tablas del proyecto comprobadas.");
     }

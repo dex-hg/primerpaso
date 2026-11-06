@@ -21,6 +21,9 @@ public class ConfiguracionWeb implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registro) {
+        if (origenes.length == 0) {
+            return;
+        }
         registro.addMapping("/api/registro/**").allowedOrigins(origenes)
                 .allowedMethods("POST", "OPTIONS").allowedHeaders("Content-Type")
                 .maxAge(3600);
