@@ -65,8 +65,8 @@
             }
         });
         formulario.querySelectorAll('input[type="password"]:not([data-confirm-password])').forEach((campo) => {
-            campo.setCustomValidity(campo.value.length >= 8 && campo.value.length <= 128 ?
-                "" : "Usa entre 8 y 128 caracteres.");
+            campo.setCustomValidity(campo.value.length >= campo.minLength && campo.value.length <= campo.maxLength ?
+                "" : `Usa entre ${campo.minLength} y ${campo.maxLength} caracteres.`);
         });
         const pais = obtenerCampo(formulario, "company-country");
         const identificacion = obtenerCampo(formulario, "company-tax-id");

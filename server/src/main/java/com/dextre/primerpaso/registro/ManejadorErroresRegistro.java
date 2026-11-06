@@ -13,9 +13,15 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice(assignableTypes = ControladorRegistro.class)
 public class ManejadorErroresRegistro {
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorRegistro> manejarDisponibilidad() {
+        return responder(HttpStatus.FORBIDDEN, "El registro de este tipo de cuenta está cerrado.", Map.of());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorRegistro> manejarValidacion(MethodArgumentNotValidException excepcion) {
@@ -64,7 +70,7 @@ public class ManejadorErroresRegistro {
     private String mensajeCampo(String campo) {
         return switch (campo) {
             case "correo" -> "Ingresa un correo válido de hasta 254 caracteres.";
-            case "contrasena" -> "La contraseña debe tener entre 8 y 128 caracteres.";
+            case "contrasena" -> DatosRegistro.MENSAJE_CONTRASENA;
             case "aceptaTerminos" -> "Debes aceptar los términos para crear tu cuenta.";
             default -> "Completa este campo con un valor válido y respeta su longitud máxima.";
         };

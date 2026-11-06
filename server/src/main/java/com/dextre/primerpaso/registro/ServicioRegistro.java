@@ -154,8 +154,9 @@ public class ServicioRegistro {
 
     private void validarCuenta(String correo, String contrasena, Boolean aceptaTerminos) {
         textoObligatorio(correo, "correo electrónico");
-        if (contrasena == null || contrasena.isBlank()) {
-            throw new IllegalArgumentException("Ingresa una contraseña válida.");
+        if (contrasena == null || contrasena.isBlank() || contrasena.length() < DatosRegistro.MINIMO_CONTRASENA
+                || contrasena.length() > DatosRegistro.MAXIMO_CONTRASENA) {
+            throw new IllegalArgumentException(DatosRegistro.MENSAJE_CONTRASENA);
         }
         if (!Boolean.TRUE.equals(aceptaTerminos)) {
             throw new IllegalArgumentException("Debes aceptar los términos para registrarte.");

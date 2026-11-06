@@ -94,7 +94,7 @@ class ControladorVistasTests {
                 .contains("data-tipo-registro=\"" + tipo + "\"")
                 .contains("data-step-panel=\"1\"", "data-step-panel=\"2\"",
                         "data-step-panel=\"3\"")
-                .contains("minlength=\"8\"", "maxlength=\"128\"", "required")
+                .contains("minlength=\"15\"", "maxlength=\"128\"", "required")
                 .contains("data-confirm-password=\"#" + contrasena + "\"")
                 .contains("data-registro-acceso", "href=\"/iniciar-sesion\"")
                 .contains("src=\"/js/registro.js\"", "src=\"/js/auth.js\"");

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.servlet.HandlerMapping;
 
+import com.dextre.primerpaso.registro.DisponibilidadRegistro;
 import com.dextre.primerpaso.sesion.DatosSesion.UsuarioSesion;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,11 @@ public class ControladorVistas {
             "/html/registro-postulante.html", "/registro-postulante",
             "/html/registro-empresa.html", "/registro-empresa",
             "/html/cuenta.html", "/cuenta");
+    private final DisponibilidadRegistro disponibilidad;
+
+    public ControladorVistas(DisponibilidadRegistro disponibilidad) {
+        this.disponibilidad = disponibilidad;
+    }
 
     @GetMapping("/")
     public String inicio(Model modelo) {
@@ -45,18 +51,20 @@ public class ControladorVistas {
     }
 
     @GetMapping("/registro")
-    public String registro() {
+    public String registro(Model modelo) {
+        modelo.addAttribute("registroPostulantes", disponibilidad.permitePostulantes());
+        modelo.addAttribute("registroEmpresas", disponibilidad.permiteEmpresas());
         return "registro";
     }
 
     @GetMapping("/registro-postulante")
     public String registroPostulante() {
-        return "registro-postulante";
+        return disponibilidad.permitePostulantes() ? "registro-postulante" : "redirect:/registro";
     }
 
     @GetMapping("/registro-empresa")
     public String registroEmpresa() {
-        return "registro-empresa";
+        return disponibilidad.permiteEmpresas() ? "registro-empresa" : "redirect:/registro";
     }
 
     @GetMapping("/cuenta")

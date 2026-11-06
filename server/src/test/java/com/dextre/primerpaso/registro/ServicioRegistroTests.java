@@ -210,7 +210,7 @@ class ServicioRegistroTests {
 
     private SolicitudPostulante solicitudPostulante(String condicion, Integer ciclo, Integer anio,
             List<String> habilidades) {
-        return new SolicitudPostulante("Ana", "López", "ana@ejemplo.com", "Prueba123!", true,
+        return new SolicitudPostulante("Ana", "López", "ana@ejemplo.com", "Frase de prueba 123", true,
                 "Universidad", "Sistemas", condicion, ciclo, anio, habilidades, null, null);
     }
 
@@ -219,7 +219,7 @@ class ServicioRegistroTests {
     }
 
     private SolicitudEmpresa solicitudEmpresa(String sector, List<String> intereses, String sitioWeb) {
-        return new SolicitudEmpresa(" Luis ", " Pérez ", " EMPRESA@EJEMPLO.COM ", "Prueba123!", true,
+        return new SolicitudEmpresa(" Luis ", " Pérez ", " EMPRESA@EJEMPLO.COM ", "Frase de prueba 123", true,
                 " Empresa de prueba ", " pe ", " 20123456789 ", sector, " Lima ", sitioWeb,
                 " +51 999 123 456 ", intereses);
     }

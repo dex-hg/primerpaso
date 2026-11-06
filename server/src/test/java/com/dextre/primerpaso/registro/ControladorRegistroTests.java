@@ -38,7 +38,7 @@ class ControladorRegistroTests {
     private static final String RUTA_EMPRESAS = "/api/registro/empresas";
     private static final String POSTULANTE_VALIDO = """
             {"nombres":"Ana","apellidos":"Pérez","correo":"ana@example.test",
-            "contrasena":" Clave á 123 ","aceptaTerminos":true,
+            "contrasena":" Clave de prueba á 123 ","aceptaTerminos":true,
             "institucion":"Universidad de prueba","carrera":"Sistemas",
             "condicionAcademica":"estudiante","cicloActual":7,"anioEgreso":null,
             "habilidades":["java"],"intereses":["technology"],
@@ -46,7 +46,7 @@ class ControladorRegistroTests {
             """;
     private static final String EMPRESA_VALIDA = """
             {"nombres":"Luis","apellidos":"Pérez","correo":"luis@example.test",
-            "contrasena":" Clave á 123 ","aceptaTerminos":true,
+            "contrasena":" Clave de prueba á 123 ","aceptaTerminos":true,
             "nombreComercial":"Empresa de prueba","codigoPais":"PE",
             "identificacionFiscal":"20100070970","sector":"technology",
             "ciudad":"Lima","sitioWeb":"https://example.test",
@@ -61,7 +61,8 @@ class ControladorRegistroTests {
         servicio = mock(ServicioRegistro.class);
         LocalValidatorFactoryBean validador = new LocalValidatorFactoryBean();
         validador.afterPropertiesSet();
-        cliente = MockMvcBuilders.standaloneSetup(new ControladorRegistro(servicio))
+        cliente = MockMvcBuilders.standaloneSetup(new ControladorRegistro(servicio,
+                new DisponibilidadRegistro(true, true)))
                 .setControllerAdvice(new ManejadorErroresRegistro())
                 .setValidator(validador).build();
     }
@@ -113,9 +114,9 @@ class ControladorRegistroTests {
         return Stream.of(new String[] {RUTA_POSTULANTES, POSTULANTE_VALIDO},
                 new String[] {RUTA_EMPRESAS, EMPRESA_VALIDA}).flatMap(datos -> Stream.of(
                         Arguments.of(datos[0], datos[1].replace("@example.test", ""), "correo"),
-                        Arguments.of(datos[0], datos[1].replace(" Clave á 123 ", "corta"), "contrasena"),
-                        Arguments.of(datos[0], datos[1].replace(" Clave á 123 ", "x".repeat(129)), "contrasena"),
-                        Arguments.of(datos[0], datos[1].replace(" Clave á 123 ", "        "), "contrasena"),
+                        Arguments.of(datos[0], datos[1].replace(" Clave de prueba á 123 ", "x".repeat(14)), "contrasena"),
+                        Arguments.of(datos[0], datos[1].replace(" Clave de prueba á 123 ", "x".repeat(129)), "contrasena"),
+                        Arguments.of(datos[0], datos[1].replace(" Clave de prueba á 123 ", " ".repeat(15)), "contrasena"),
                         Arguments.of(datos[0], datos[1].replace("\"aceptaTerminos\":true",
                                 "\"aceptaTerminos\":false"), "aceptaTerminos"),
                         Arguments.of(datos[0], datos[1].replace("\"aceptaTerminos\":true",

@@ -22,18 +22,21 @@
             <div class="role-selection-heading">
                 <span class="role-selection-icon" aria-hidden="true"><i class="bi bi-person-workspace"></i></span>
                 <h1 id="register-title">PrimerPaso</h1>
-                <p>Elige el tipo de cuenta que deseas crear.</p>
+                <p th:if="${registroPostulantes or registroEmpresas}">Elige el tipo de cuenta que deseas crear.</p>
+                <p th:unless="${registroPostulantes or registroEmpresas}">
+                    El registro está cerrado. Si ya tienes una cuenta, <a th:href="@{/iniciar-sesion}">inicia sesión</a>.
+                </p>
             </div>
 
             <div class="row g-4 justify-content-center">
-                <div class="col-sm-6">
+                <div class="col-sm-6" th:if="${registroPostulantes}">
                     <a class="role-card" th:href="@{/registro-postulante}">
                         <span class="role-card-icon" aria-hidden="true"><i class="bi bi-person"></i></span>
                         <strong>Postulante</strong>
                         <small>Quiero encontrar prácticas y empleos</small>
                     </a>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6" th:if="${registroEmpresas}">
                     <a class="role-card" th:href="@{/registro-empresa}">
                         <span class="role-card-icon" aria-hidden="true"><i class="bi bi-buildings"></i></span>
                         <strong>Empresa</strong>

@@ -12,6 +12,10 @@ import jakarta.validation.constraints.Size;
 
 public final class DatosRegistro {
 
+    static final int MINIMO_CONTRASENA = 15;
+    static final int MAXIMO_CONTRASENA = 128;
+    static final String MENSAJE_CONTRASENA = "La contraseña debe tener entre 15 y 128 caracteres.";
+
     private DatosRegistro() {
     }
 
@@ -19,7 +23,7 @@ public final class DatosRegistro {
             @NotBlank @Size(max = 120) String nombres,
             @NotBlank @Size(max = 120) String apellidos,
             @NotBlank @Email @Size(max = 254) String correo,
-            @NotBlank @Size(min = 8, max = 128) String contrasena,
+            @NotBlank @Size(min = MINIMO_CONTRASENA, max = MAXIMO_CONTRASENA) String contrasena,
             @NotNull @AssertTrue(message = "Debes aceptar los términos para crear tu cuenta.") Boolean aceptaTerminos,
             @NotBlank @Size(max = 180) String institucion,
             @NotBlank @Size(max = 160) String carrera,
@@ -50,7 +54,7 @@ public final class DatosRegistro {
             @NotBlank @Size(max = 120) String nombres,
             @NotBlank @Size(max = 120) String apellidos,
             @NotBlank @Email @Size(max = 254) String correo,
-            @NotBlank @Size(min = 8, max = 128) String contrasena,
+            @NotBlank @Size(min = MINIMO_CONTRASENA, max = MAXIMO_CONTRASENA) String contrasena,
             @NotNull @AssertTrue(message = "Debes aceptar los términos para crear tu cuenta.") Boolean aceptaTerminos,
             @NotBlank @Size(max = 180) String nombreComercial,
             @NotBlank @Pattern(regexp = "[A-Za-z]{2}") String codigoPais,
